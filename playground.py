@@ -1,9 +1,6 @@
-import json
-
 from maze_dataset import MazeDataset, MazeDatasetConfig
 from maze_dataset.generation import LatticeMazeGenerators
 from maze_dataset.tokenization.modular.maze_tokenizer_modular import MazeTokenizerModular
-from utils import make_training_example
 
 cfg: MazeDatasetConfig = MazeDatasetConfig(
     name="test", # name is only for you to keep track of things
@@ -28,3 +25,5 @@ list_of_list = dataset[0].as_tokens(mazeTokenizer)
 #
 # print("✅ Saved", len(examples), "examples to maze_training.json")
 #
+
+
