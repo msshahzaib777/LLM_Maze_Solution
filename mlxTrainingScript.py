@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json, os, math, pathlib, random
+import types
 from typing import List, Dict, Any, Optional, Tuple
 
 import matplotlib.pyplot as plt
@@ -8,9 +9,12 @@ import mlx.optimizers as optim
 from mlx.utils import tree_flatten
 from mlx_lm import generate, load
 from mlx_lm.tuner import TrainingArgs, train  # we'll use our own dataset class
-from classes.MazeJSONLDataset import MazeJSONLDataset
+
+from Dataset_Gen.utils import build_prompt
 from mlx_lm.tuner import linear_to_lora_layers
+from mlx_lm.tuner.datasets import load_dataset
 from classes.metrics import SimpleMetrics
+
 # NOTE: we don't rely on mlx_lm.tuner.datasets to avoid format mismatch
 
 # --------------------------
@@ -23,8 +27,7 @@ adapter_dir = "finetuned_model/adapters"
 # --------------------------
 # Point these to your prepared JSONL files.
 # Tip: keep 10% val, stratify by maze size (3..7).
-train_jsonl = "data/maze_training_train.json"
-val_jsonl   = "data/maze_training_test.json"
+ds_dir = "data/custom_1"
 
 os.makedirs(adapter_dir, exist_ok=True)
 adapter_config_path = os.path.join(adapter_dir, "adapter_config.json")
@@ -57,38 +60,6 @@ preamble = tokenizer.apply_chat_template(messages, tokenize=False, add_generatio
 _ = generate(model, tokenizer, prompt=preamble, max_tokens=32, verbose=False)
 
 # --------------------------
-# Dataset: JSONL → supervised pairs
-# --------------------------
-def build_prompt(maze_ascii: str, user_prompt: str) -> str:
-    # Keep formatting consistent so tokenization is stable.
-    user = (
-        "You are a maze assistant. Read the ASCII maze and answer in STRICT JSON.\n"
-        "Return only these keys: `start` (0-based [row,col]) and `available_directions` "
-        "(array using 'up','down','left','right').\n\n"
-        "<maze>\n" + maze_ascii + "\n</maze>\n\n"
-        + user_prompt.strip()
-    )
-    messages = [
-        {"role": "system", "content": "Follow the schema exactly. No extra text."},
-        {"role": "user", "content": user},
-    ]
-    return tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
-
-def build_target(answer_start: List[int], answer_dirs: List[str]) -> str:
-    # The trainer will learn only from these target tokens (prompt is masked out).
-    return json.dumps({
-        "start": [int(answer_start[0]), int(answer_start[1])],
-        "available_directions": list(answer_dirs)
-    }, ensure_ascii=False)
-
-def clamp_and_pad(ids: List[int], max_len: int, pad_id: int) -> List[int]:
-    if len(ids) > max_len:
-        # For chat SFT, truncating the left (prompt side) is usually safer than chopping off the label.
-        # But since we create the full sequence ourselves, keep it simple: right-truncate.
-        ids = ids[:max_len]
-    return ids + [pad_id] * (max_len - len(ids))
-
-# --------------------------
 # Write LoRA adapter config
 # --------------------------
 with open(adapter_config_path, "w", encoding="utf-8") as f:
@@ -112,10 +83,17 @@ model.train()
 # Datasets
 # --------------------------
 # If you also have “start-only” rows, you can instantiate a second dataset and concatenate.
-train_set = MazeJSONLDataset(train_jsonl, tokenizer, max_seq_len=MAX_SEQ_LEN, target_mode="start_and_dirs")
-val_set   = MazeJSONLDataset(val_jsonl,   tokenizer, max_seq_len=MAX_SEQ_LEN, target_mode="start_and_dirs")
+ds_args = types.SimpleNamespace(
+    data=ds_dir,
+    train=True,
+    test=True,
+    data_format= "completion",
+    max_seq_len = MAX_SEQ_LEN,
+    mask_prompt=True
+)
+train_set, val_set, test_set = load_dataset(ds_args, tokenizer)
 
-print(f"Loaded train: {len(train_set)}, val: {len(val_set)}")
+print(f"Loaded train: {len(train_set)}, val: {len(val_set)}, test: {len(test_set)}")
 
 # --------------------------
 # Training args & run
@@ -133,13 +111,10 @@ training_args = TrainingArgs(
 optimizer = optim.Adam(learning_rate=LR)
 
 # Optional: simple callback to collect losses (compatible with your Metrics helper)
-
-
 metrics = SimpleMetrics()
 
 train(
     model=model,
-    tokenizer=tokenizer,
     args=training_args,
     optimizer=optimizer,
     train_dataset=train_set,

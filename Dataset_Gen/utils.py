@@ -1,5 +1,6 @@
 import json
 from mlx_lm import load, generate
+from typing import List, Dict, Any, Optional, Tuple
 
 _, tokenizer = load("nightmedia/Qwen3-4B-Thinking-2507-bf16-mlx")
 
@@ -89,3 +90,36 @@ def dict_to_prompt_completion(dict, start=True, available_directions=True, think
                 "prompt": text,
                 "completion": completion_text
             }) + "\n"
+
+
+# --------------------------
+# Dataset: JSONL → supervised pairs
+# --------------------------
+def build_prompt(maze_ascii: str, user_prompt: str) -> str:
+    # Keep formatting consistent so tokenization is stable.
+    user = (
+        "You are a maze assistant. Read the ASCII maze and answer in STRICT JSON.\n"
+        "Return only these keys: `start` (0-based [row,col]) and `available_directions` "
+        "(array using 'up','down','left','right').\n\n"
+        "<maze>\n" + maze_ascii + "\n</maze>\n\n"
+        + user_prompt.strip()
+    )
+    messages = [
+        {"role": "system", "content": "Follow the schema exactly. No extra text."},
+        {"role": "user", "content": user},
+    ]
+    return tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+
+def build_target(answer_start: List[int], answer_dirs: List[str]) -> str:
+    # The trainer will learn only from these target tokens (prompt is masked out).
+    return json.dumps({
+        "start": [int(answer_start[0]), int(answer_start[1])],
+        "available_directions": list(answer_dirs)
+    }, ensure_ascii=False)
+
+def clamp_and_pad(ids: List[int], max_len: int, pad_id: int) -> List[int]:
+    if len(ids) > max_len:
+        # For chat SFT, truncating the left (prompt side) is usually safer than chopping off the label.
+        # But since we create the full sequence ourselves, keep it simple: right-truncate.
+        ids = ids[:max_len]
+    return ids + [pad_id] * (max_len - len(ids))

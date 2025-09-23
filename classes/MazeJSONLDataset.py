@@ -1,4 +1,8 @@
 import json
+from typing import List, Dict, Any, Optional, Tuple
+
+from Dataset_Gen.utils import build_prompt, build_target, clamp_and_pad
+
 
 class MazeJSONLDataset:
     """
@@ -42,25 +46,26 @@ class MazeJSONLDataset:
                 else:
                     target_text = build_target(start, dirs)
 
-                # Tokenize full sequence = [prompt][assistant target]
-                prompt_ids = self.tok.encode(prompt_text)
-                target_ids = self.tok.encode(target_text)
-
-                input_ids = prompt_ids + target_ids
-                input_ids = clamp_and_pad(input_ids, self.max_len, self.pad_id)
-
-                # Labels: mask prompt part (set to -100), keep target tokens
-                labels = [-100] * min(len(prompt_ids), self.max_len)
-                tail = self.max_len - len(labels)
-                if tail > 0:
-                    # the tail corresponds to (part of) target_ids (padded to max_len)
-                    tgt_tail = clamp_and_pad(target_ids, tail, self.pad_id)
-                    # masked positions for padding should also be -100 (so they don’t contribute to loss)
-                    labels += [tid if tid != self.pad_id else -100 for tid in tgt_tail]
-                else:
-                    labels = labels[:self.max_len]
-
-                self.items.append({"input_ids": input_ids, "labels": labels})
+                # # Tokenize full sequence = [prompt][assistant target]
+                # prompt_ids = self.tok.encode(prompt_text)
+                # target_ids = self.tok.encode(target_text)
+                #
+                # input_ids = prompt_ids + target_ids
+                # input_ids = clamp_and_pad(input_ids, self.max_len, self.pad_id)
+                #
+                # # Labels: mask prompt part (set to -100), keep target tokens
+                # labels = [-100] * min(len(prompt_ids), self.max_len)
+                # tail = self.max_len - len(labels)
+                # if tail > 0:
+                #     # the tail corresponds to (part of) target_ids (padded to max_len)
+                #     tgt_tail = clamp_and_pad(target_ids, tail, self.pad_id)
+                #     # masked positions for padding should also be -100 (so they don’t contribute to loss)
+                #     labels += [tid if tid != self.pad_id else -100 for tid in tgt_tail]
+                # else:
+                #     labels = labels[:self.max_len]
+                #
+                # self.items.append({"input_ids": input_ids, "labels": labels})
+                self.items.append({"prompt": prompt_text, "completion": target_text})
 
     def __len__(self):
         return len(self.items)
