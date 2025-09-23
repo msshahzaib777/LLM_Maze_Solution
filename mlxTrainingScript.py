@@ -95,6 +95,8 @@ train_set, val_set, test_set = load_dataset(ds_args, tokenizer)
 
 print(f"Loaded train: {len(train_set)}, val: {len(val_set)}, test: {len(test_set)}")
 
+train_set, val_set, test_set = [ [(it["input_ids"], it["labels"]) for it in split] for split in (train_set, val_set, test_set) ]
+
 # --------------------------
 # Training args & run
 # --------------------------
