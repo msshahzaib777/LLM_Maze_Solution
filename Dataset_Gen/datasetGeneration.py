@@ -7,14 +7,14 @@ from mazelib.generate.Prims import Prims
 from mazelib.solve.BacktrackingSolver import BacktrackingSolver
 import json, random, os
 
-split_name = "2_only_Start"
-filename = f'maze_training_{split_name}.json'
+split_name = "train"
+filename = f'data/maze_training_{split_name}.json'
 
 # --- Define sizes and counts ---
 size_counts = {
-    3: 100,   # 1000 mazes of size 5x5
-    4: 200,       # 500 mazes of size 7x7
-    5: 300,       # 250 mazes of size 9x9
+    3: 1000,   # 1000 mazes of size 5x5
+    4: 1500,       # 500 mazes of size 7x7
+    5: 2500,       # 250 mazes of size 9x9
     #6: 3000,
     #7: 4000,      # 100 mazes of size 11x11
 }

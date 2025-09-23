@@ -48,6 +48,7 @@ def make_training_example(m):
             "available_directions": [d for d,v in surroundings.items() if v]
         },
         "solved_maze": solved_maze,
+        "maze_size": (m.grid.shape[0] - 1)/2
     }
 
 def dict_to_prompt_completion(dict, start=True, available_directions=True, thinking=False):

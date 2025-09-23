@@ -8,17 +8,24 @@ import mlx.optimizers as optim
 from mlx.utils import tree_flatten
 from mlx_lm import generate, load
 from mlx_lm.tuner import TrainingArgs, train  # we'll use our own dataset class
+from classes.MazeJSONLDataset import MazeJSONLDataset
+from mlx_lm.tuner import linear_to_lora_layers
+from classes.metrics import SimpleMetrics
 # NOTE: we don't rely on mlx_lm.tuner.datasets to avoid format mismatch
 
 # --------------------------
 # Config
 # --------------------------
-# Use your actual model id/path; you said "Qwen3 4B Thinking 2507 bf16 mlx (~8GB)"
-# Example placeholders you can swap:
-# model_path = "mlx-community/Qwen2.5-4B-Instruct-MLX"
-# or your local fused weights directory:
 model_path = "nightmedia/Qwen3-4B-Thinking-2507-bf16-mlx"
 adapter_dir = "finetuned_model/adapters"
+# --------------------------
+# Datasets
+# --------------------------
+# Point these to your prepared JSONL files.
+# Tip: keep 10% val, stratify by maze size (3..7).
+train_jsonl = "data/maze_training_train.json"
+val_jsonl   = "data/maze_training_test.json"
+
 os.makedirs(adapter_dir, exist_ok=True)
 adapter_config_path = os.path.join(adapter_dir, "adapter_config.json")
 adapter_file_path   = os.path.join(adapter_dir, "adapters.safetensors")
@@ -81,74 +88,6 @@ def clamp_and_pad(ids: List[int], max_len: int, pad_id: int) -> List[int]:
         ids = ids[:max_len]
     return ids + [pad_id] * (max_len - len(ids))
 
-class MazeJSONLDataset:
-    """
-    Expects a JSONL file with rows like:
-    {
-      "maze": "#########\\n#   S  E\\n#########",
-      "prompt": "Identify the start location and its available directions in this maze.",
-      "answer": {"start":[r,c], "available_directions":["left","up"] }
-      // optional: "chain_of_thought", "solved_maze"
-    }
-    Emits dicts with 'input_ids' and 'labels' (prompt masked with -100).
-    """
-    def __init__(self,
-                 jsonl_path: str,
-                 tokenizer,
-                 max_seq_len: int = 256,
-                 target_mode: str = "start_and_dirs"  # or "start_only"
-                 ):
-        self.items: List[Dict[str, Any]] = []
-        self.tok = tokenizer
-        self.max_len = max_seq_len
-        self.pad_id = tokenizer.pad_id if hasattr(tokenizer, "pad_id") and tokenizer.pad_id is not None else 0
-        self.target_mode = target_mode
-
-        with open(jsonl_path, "r", encoding="utf-8") as f:
-            for line in f:
-                ex = json.loads(line)
-                maze = ex["maze"]
-                user_prompt = ex.get("prompt", "Identify the start location and its available directions in this maze.")
-                # Ground truth:
-                ans = ex.get("answer", {})
-                start = ans.get("start", None)
-                dirs  = ans.get("available_directions", None)
-
-                # Build strings
-                prompt_text = build_prompt(maze, user_prompt)
-
-                if self.target_mode == "start_only":
-                    target_obj = {"start": start}
-                    target_text = json.dumps(target_obj, ensure_ascii=False)
-                else:
-                    target_text = build_target(start, dirs)
-
-                # Tokenize full sequence = [prompt][assistant target]
-                prompt_ids = self.tok.encode(prompt_text)
-                target_ids = self.tok.encode(target_text)
-
-                input_ids = prompt_ids + target_ids
-                input_ids = clamp_and_pad(input_ids, self.max_len, self.pad_id)
-
-                # Labels: mask prompt part (set to -100), keep target tokens
-                labels = [-100] * min(len(prompt_ids), self.max_len)
-                tail = self.max_len - len(labels)
-                if tail > 0:
-                    # the tail corresponds to (part of) target_ids (padded to max_len)
-                    tgt_tail = clamp_and_pad(target_ids, tail, self.pad_id)
-                    # masked positions for padding should also be -100 (so they don’t contribute to loss)
-                    labels += [tid if tid != self.pad_id else -100 for tid in tgt_tail]
-                else:
-                    labels = labels[:self.max_len]
-
-                self.items.append({"input_ids": input_ids, "labels": labels})
-
-    def __len__(self):
-        return len(self.items)
-
-    def __getitem__(self, idx):
-        return self.items[idx]
-
 # --------------------------
 # Write LoRA adapter config
 # --------------------------
@@ -159,8 +98,9 @@ with open(adapter_config_path, "w", encoding="utf-8") as f:
 # Prepare LoRA
 # --------------------------
 model.freeze()
+
 # Convert the last N linear layers in each block to LoRA (uses mlx_lm.tuner.linear_to_lora_layers internally)
-from mlx_lm.tuner import linear_to_lora_layers
+
 linear_to_lora_layers(model, lora_config["num_layers"], lora_config["lora_parameters"])
 
 num_train_params = sum(v.size for _, v in tree_flatten(model.trainable_parameters()))
@@ -171,11 +111,6 @@ model.train()
 # --------------------------
 # Datasets
 # --------------------------
-# Point these to your prepared JSONL files.
-# Tip: keep 10% val, stratify by maze size (3..7).
-train_jsonl = "data/mazes_stageA_train.jsonl"
-val_jsonl   = "data/mazes_stageA_val.jsonl"
-
 # If you also have “start-only” rows, you can instantiate a second dataset and concatenate.
 train_set = MazeJSONLDataset(train_jsonl, tokenizer, max_seq_len=MAX_SEQ_LEN, target_mode="start_and_dirs")
 val_set   = MazeJSONLDataset(val_jsonl,   tokenizer, max_seq_len=MAX_SEQ_LEN, target_mode="start_and_dirs")
@@ -198,14 +133,7 @@ training_args = TrainingArgs(
 optimizer = optim.Adam(learning_rate=LR)
 
 # Optional: simple callback to collect losses (compatible with your Metrics helper)
-class SimpleMetrics:
-    def __init__(self):
-        self.train_losses: List[Tuple[int, float]] = []
-        self.val_losses:   List[Tuple[int, float]] = []
-    def on_train_step_end(self, it: int, loss: float):
-        self.train_losses.append((it, float(loss)))
-    def on_eval_end(self, it: int, loss: float):
-        self.val_losses.append((it, float(loss)))
+
 
 metrics = SimpleMetrics()
 
