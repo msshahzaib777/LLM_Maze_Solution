@@ -95,7 +95,7 @@ train_set, val_set, test_set = load_dataset(ds_args, tokenizer)
 
 print(f"Loaded train: {len(train_set)}, val: {len(val_set)}, test: {len(test_set)}")
 
-train_set, val_set, test_set = [ [(it["input_ids"], it["labels"]) for it in split] for split in (train_set, val_set, test_set) ]
+train_set, val_set, test_set = [[((x:=it.get("input_ids", it.get("tokens"))), (it["labels"] if "labels" in it else [tid if m else -100 for tid, m in zip(x, it.get("mask", it.get("loss_mask")))])) for it in split] for split in (train_set, val_set, test_set)]
 
 # --------------------------
 # Training args & run
