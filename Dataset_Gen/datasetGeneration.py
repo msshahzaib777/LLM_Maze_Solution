@@ -1,6 +1,6 @@
 import json
 
-from Dataset_Gen.utils import dict_to_prompt_completion
+from utils import dict_to_prompt_completion
 from utils import make_training_example
 from mazelib import Maze
 from mazelib.generate.Prims import Prims
