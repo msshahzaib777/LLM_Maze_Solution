@@ -33,11 +33,23 @@ with open(filename, "w") as f:
     json.dump(all_examples, f, indent=2)
 
 data = all_examples
-random.shuffle(data)
-# 90% train, 10% valid
-split = int(0.9 * len(data))
-train_data = data[:split]
-valid_data = data[split:]
+
+# Extract labels for stratification
+labels = [d["maze_size"] for d in data]
+
+# Split indices instead of the dicts directly
+indices = list(range(len(data)))
+
+train_idx, test_idx = train_test_split(
+    indices,
+    test_size=0.33,
+    stratify=labels,
+    random_state=42
+)
+
+# Map back to dicts
+train_data = [data[i] for i in train_idx]
+valid_data = [data[i] for i in test_idx]
 
 os.makedirs("../data", exist_ok=True)
 
