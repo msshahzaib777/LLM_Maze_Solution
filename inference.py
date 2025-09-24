@@ -1,95 +1,120 @@
-import os
-from Dataset_Gen.utils import build_prompt
-from mlx_lm import generate, load
-import re, json
-
-
-
 # --------------------------
-# Load with adapter & test
+# Eval on test.jsonl + save per-example outputs
 # --------------------------
-model_path = "nightmedia/Qwen3-4B-Thinking-2507-bf16-mlx"
-adapter_dir = "finetuned_model/adapters_available"
-ds_dir = "data/custom_2"
+import os, re, json
+
+ALLOWED_DIRS = {"up", "down", "left", "right"}
 test_path = os.path.join(ds_dir, "test.jsonl")
 
-model_lora, tokenizer = load(model_path, adapter_path=adapter_dir)
-
-# # Tiny sanity check on a single sample prompt
-# demo_maze = (
-#     "###########\n"
-#     "# # # # # #\n"
-#     "###########\n"
-#     "# # # # # #\n"
-#     "###########\n"
-#     "#     #  E#\n"
-#     "# ### ### #\n"
-#     "# # #   # #\n"
-#     "# ####### #\n"
-#     "#        S#\n"
-#     "###########"
-# )
-# demo_prompt = "Identify the start location and its available directions in this maze."
-# demo_infer = build_prompt(demo_maze, demo_prompt)
-# resp = generate(model_lora, tokenizer, prompt=demo_infer, max_tokens=64, verbose=True)
-# print("\nMODEL OUTPUT:\n", resp)
-
-
-# --------------------------
-# Eval on test.jsonl: Start-index accuracy
-# --------------------------
-
+eval_dir = os.path.join(adapter_dir, "eval")
+os.makedirs(eval_dir, exist_ok=True)
+preds_jsonl = os.path.join(eval_dir, "test_predictions.jsonl")
+summary_json = os.path.join(eval_dir, "summary.json")
 
 def _extract_first_json(s: str):
-    # try direct parse first
     try:
         return json.loads(s)
     except Exception:
-        pass
-    # fallback: grab first {...} block
-    m = re.search(r"\{.*?\}", s, flags=re.S)
-    if not m:
-        return None
-    chunk = m.group(0).strip()
-    try:
-        return json.loads(chunk)
-    except Exception:
-        return None
+        m = re.search(r"\{.*?\}", s, flags=re.S)
+        if not m:
+            return None
+        try:
+            return json.loads(m.group(0))
+        except Exception:
+            return None
 
-total = 0
-correct = 0
-bad_json = 0
+def _norm_dirs(dirs):
+    if not isinstance(dirs, (list, tuple)): return set()
+    return {str(x).strip().lower() for x in dirs if str(x).strip().lower() in ALLOWED_DIRS}
 
-with open(test_path, "r", encoding="utf-8") as f:
-    for line in f:
+total = correct_start = correct_dirs = exact_both = bad_json = 0
+tp = fp = fn = 0  # micro P/R/F1 for directions
+
+with open(test_path, "r", encoding="utf-8") as fin, open(preds_jsonl, "w", encoding="utf-8") as fout:
+    for i, line in enumerate(fin):
         ex = json.loads(line)
         user_prompt = ex["prompt"]
-        gt = json.loads(ex["completion"])  # expected: {"start":[r,c], "available_directions":[...]}
-        gt_start = list(map(int, gt.get("start", [])))
+        gt = json.loads(ex["completion"])  # {"start":[r,c], "available_directions":[...]}
+        gt_start = [int(gt["start"][0]), int(gt["start"][1])]
+        gt_dirs  = _norm_dirs(gt.get("available_directions", []))
 
-        # compose chat prompt from plain prompt text
-        demo_prompt = "Identify the start location and its available directions in this maze."
+        # Compose chat prompt and decode deterministically
         messages = [{"role": "user", "content": user_prompt}]
         chat_prompt = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
-
-        # deterministic decode for accuracy
-        out = generate(
-            model_lora, tokenizer,
-            prompt=chat_prompt,
-            max_tokens=64,
-            verbose=False
-        )
+        out = generate(model_lora, tokenizer, prompt=chat_prompt, max_tokens=64, temperature=0.0, verbose=False)
 
         pred = _extract_first_json(out)
+        record = {
+            "id": i,
+            "prompt": user_prompt,
+            "ground_truth": {"start": gt_start, "available_directions": sorted(gt_dirs)},
+            "raw_output": out,
+            "parsed": pred,
+        }
+
         if not pred or "start" not in pred:
             bad_json += 1
+            record["prediction"] = None
+            record["match"] = {"start": False, "available_directions": False, "both": False}
+            fout.write(json.dumps(record, ensure_ascii=False) + "\n")
             total += 1
             continue
 
-        pred_start = list(map(int, pred["start"]))
-        if pred_start == gt_start:
-            correct += 1
-        total += 1
+        # Parse prediction
+        try:
+            pred_start = [int(pred["start"][0]), int(pred["start"][1])]
+        except Exception:
+            bad_json += 1
+            record["prediction"] = None
+            record["match"] = {"start": False, "available_directions": False, "both": False}
+            fout.write(json.dumps(record, ensure_ascii=False) + "\n")
+            total += 1
+            continue
 
-acc = 0.0 if total == 0 else correct / total
-print(f"\nStart index accuracy: {acc:.2%}  (correct={correct}/{total}, invalid_json={bad_json})")
+        pred_dirs = _norm_dirs(pred.get("available_directions", []))
+        start_ok = (pred_start == gt_start)
+        dirs_ok  = (pred_dirs == gt_dirs)
+
+        # Update set metrics
+        tp += len(pred_dirs & gt_dirs)
+        fp += len(pred_dirs - gt_dirs)
+        fn += len(gt_dirs - pred_dirs)
+
+        record["prediction"] = {"start": pred_start, "available_directions": sorted(pred_dirs)}
+        record["match"] = {"start": start_ok, "available_directions": dirs_ok, "both": start_ok and dirs_ok}
+        fout.write(json.dumps(record, ensure_ascii=False) + "\n")
+
+        total += 1
+        if start_ok: correct_start += 1
+        if dirs_ok:  correct_dirs  += 1
+        if start_ok and dirs_ok: exact_both += 1
+
+# Aggregate metrics
+acc_start = 0.0 if total == 0 else correct_start / total
+acc_dirs  = 0.0 if total == 0 else correct_dirs  / total
+acc_both  = 0.0 if total == 0 else exact_both    / total
+valid_json_rate = 0.0 if total == 0 else 1.0 - (bad_json / total)
+precision = 0.0 if (tp + fp) == 0 else tp / (tp + fp)
+recall    = 0.0 if (tp + fn) == 0 else tp / (tp + fn)
+f1        = 0.0 if (precision + recall) == 0 else 2 * precision * recall / (precision + recall)
+
+summary = {
+    "total": total,
+    "start_accuracy": acc_start,
+    "dirs_accuracy": acc_dirs,
+    "exact_both_accuracy": acc_both,
+    "dirs_micro_precision": precision,
+    "dirs_micro_recall": recall,
+    "dirs_micro_f1": f1,
+    "valid_json_rate": valid_json_rate,
+    "invalid_json": bad_json,
+    "preds_file": preds_jsonl,
+}
+with open(summary_json, "w", encoding="utf-8") as f:
+    json.dump(summary, f, indent=2)
+print("\nSaved predictions to:", preds_jsonl)
+print("Saved summary to    :", summary_json)
+print(
+    f"\nStart acc={acc_start:.2%} | Dirs acc={acc_dirs:.2%} | Both={acc_both:.2%} | "
+    f"P={precision:.2%} R={recall:.2%} F1={f1:.2%} | Valid JSON={valid_json_rate:.2%}"
+)
