@@ -21,8 +21,8 @@ size_counts = {
     3: 1500,   # 1000 mazes of size 5x5
     4: 2500,       # 500 mazes of size 7x7
     5: 3500,       # 250 mazes of size 9x9
-    #6: 3000,
-    #7: 4000,      # 100 mazes of size 11x11
+    6: 5000,
+    7: 7000,      # 100 mazes of size 11x11
 }
 
 all_examples = []

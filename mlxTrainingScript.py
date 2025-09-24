@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
-import json, os, math, pathlib, random
+import json, os
 import types
-from typing import List, Dict, Any, Optional, Tuple
 
 import matplotlib.pyplot as plt
 
@@ -12,7 +11,7 @@ from mlx_lm.tuner import TrainingArgs, train  # we'll use our own dataset class
 
 from Dataset_Gen.utils import build_prompt
 from mlx_lm.tuner import linear_to_lora_layers
-from mlx_lm.tuner.datasets import load_dataset
+from mlx_lm.tuner.datasets import load_dataset, CacheDataset
 from classes.metrics import SimpleMetrics
 
 # NOTE: we don't rely on mlx_lm.tuner.datasets to avoid format mismatch
@@ -46,13 +45,13 @@ lora_config = {
 # Training settings
 MAX_SEQ_LEN = 256  # enough for 7x7 grid + prompt + short JSON answer
 LR = 1.0e-4        # LoRA LR (cosine schedule handled inside trainer if available)
-ITERS = 3000       # ~few epochs over 25–50k rows; adjust to your dataset size
+ITERS = 400       # ~few epochs over 25–50k rows; adjust to your dataset size
 EVAL_EVERY = 200
 
 # --------------------------
 # Load model + tokenizer
 # --------------------------
-model, tokenizer = load(model_path)  # tokenizer has .apply_chat_template and .encode/.decode
+model, tokenizer = load(model_path, tokenizer_config={"trust_remote_code": True})  # tokenizer has .apply_chat_template and .encode/.decode
 
 # Quick sanity generation
 messages = [{"role": "user", "content": "You will be fine-tuned to read ASCII mazes."}]
@@ -87,16 +86,13 @@ ds_args = types.SimpleNamespace(
     data=ds_dir,
     train=True,
     test=True,
-    data_format= "completion",
+    # data_format= "completion",
     max_seq_len = MAX_SEQ_LEN,
     mask_prompt=True
 )
 train_set, val_set, test_set = load_dataset(ds_args, tokenizer)
 
 print(f"Loaded train: {len(train_set)}, val: {len(val_set)}, test: {len(test_set)}")
-
-train_set, val_set, test_set = [[((x:=it.get("input_ids", it.get("tokens"))), (it["labels"] if "labels" in it else [tid if m else -100 for tid, m in zip(x, it.get("mask", it.get("loss_mask")))])) for it in split] for split in (train_set, val_set, test_set)]
-
 # --------------------------
 # Training args & run
 # --------------------------
@@ -119,8 +115,8 @@ train(
     model=model,
     args=training_args,
     optimizer=optimizer,
-    train_dataset=train_set,
-    val_dataset=val_set,
+    train_dataset=CacheDataset(train_set),
+    val_dataset=CacheDataset(val_set),
     training_callback=metrics,
 )
 
