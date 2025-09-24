@@ -20,13 +20,13 @@ from classes.metrics import SimpleMetrics
 # Config
 # --------------------------
 model_path = "nightmedia/Qwen3-4B-Thinking-2507-bf16-mlx"
-adapter_dir = "finetuned_model/adapters"
+adapter_dir = "finetuned_model/adapters_available"
 # --------------------------
 # Datasets
 # --------------------------
 # Point these to your prepared JSONL files.
 # Tip: keep 10% val, stratify by maze size (3..7).
-ds_dir = "data/custom_1"
+ds_dir = "data/custom_2"
 
 os.makedirs(adapter_dir, exist_ok=True)
 adapter_config_path = os.path.join(adapter_dir, "adapter_config.json")
@@ -45,8 +45,8 @@ lora_config = {
 # Training settings
 MAX_SEQ_LEN = 256  # enough for 7x7 grid + prompt + short JSON answer
 LR = 1.0e-4        # LoRA LR (cosine schedule handled inside trainer if available)
-ITERS = 400       # ~few epochs over 25–50k rows; adjust to your dataset size
-EVAL_EVERY = 200
+ITERS = 240       # ~few epochs over 25–50k rows; adjust to your dataset size
+EVAL_EVERY = 30
 
 # --------------------------
 # Load model + tokenizer

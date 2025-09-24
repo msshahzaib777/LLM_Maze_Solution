@@ -1,12 +1,17 @@
+import os
 from Dataset_Gen.utils import build_prompt
 from mlx_lm import generate, load
+import re, json
+
+
 
 # --------------------------
 # Load with adapter & test
 # --------------------------
 model_path = "nightmedia/Qwen3-4B-Thinking-2507-bf16-mlx"
-adapter_dir = "finetuned_model/adapters"
-ds_dir = "data/custom_1"
+adapter_dir = "finetuned_model/adapters_available"
+ds_dir = "data/custom_2"
+test_path = os.path.join(ds_dir, "test.jsonl")
 
 model_lora, tokenizer = load(model_path, adapter_path=adapter_dir)
 
@@ -33,9 +38,7 @@ model_lora, tokenizer = load(model_path, adapter_path=adapter_dir)
 # --------------------------
 # Eval on test.jsonl: Start-index accuracy
 # --------------------------
-import re, json
 
-test_path = os.path.join(ds_dir, "test.jsonl")
 
 def _extract_first_json(s: str):
     # try direct parse first
@@ -65,6 +68,7 @@ with open(test_path, "r", encoding="utf-8") as f:
         gt_start = list(map(int, gt.get("start", [])))
 
         # compose chat prompt from plain prompt text
+        demo_prompt = "Identify the start location and its available directions in this maze."
         messages = [{"role": "user", "content": user_prompt}]
         chat_prompt = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
 
@@ -73,7 +77,6 @@ with open(test_path, "r", encoding="utf-8") as f:
             model_lora, tokenizer,
             prompt=chat_prompt,
             max_tokens=64,
-            temperature=0.0,
             verbose=False
         )
 

@@ -7,7 +7,7 @@ from mazelib.generate.Prims import Prims
 from mazelib.solve.BacktrackingSolver import BacktrackingSolver
 import json, os
 
-split_name = "1"
+split_name = "2"
 
 filename = f'../data/maze_training_{split_name}.json'
 dataset_dir = f'../data/custom_{split_name}'
@@ -15,7 +15,7 @@ dataset_dir = f'../data/custom_{split_name}'
 os.makedirs("../data", exist_ok=True)
 os.makedirs(dataset_dir, exist_ok=True)
 
-target_mode = "start_only"
+target_mode = "start_available_direction"
 # --- Define sizes and counts ---
 size_counts = {
     3: 1500,   # 1000 mazes of size 5x5
