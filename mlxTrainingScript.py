@@ -20,7 +20,7 @@ from classes.metrics import SimpleMetrics
 # Config
 # --------------------------
 model_path = "nightmedia/Qwen3-4B-Thinking-2507-bf16-mlx"
-adapter_dir = "finetuned_model/adapters_available"
+adapter_dir = "finetuned_model/adapters_available2"
 # --------------------------
 # Datasets
 # --------------------------
@@ -45,19 +45,17 @@ lora_config = {
 # Training settings
 MAX_SEQ_LEN = 256  # enough for 7x7 grid + prompt + short JSON answer
 LR = 1.0e-4        # LoRA LR (cosine schedule handled inside trainer if available)
-ITERS = 240       # ~few epochs over 25–50k rows; adjust to your dataset size
-EVAL_EVERY = 30
-
+ITERS = 2000       # ~few epochs over 25–50k rows; adjust to your dataset size
+EVAL_EVERY = 500
+TRAINING_CONTINUE = False
 # --------------------------
 # Load model + tokenizer
 # --------------------------
-model, tokenizer = load(model_path, tokenizer_config={"trust_remote_code": True})  # tokenizer has .apply_chat_template and .encode/.decode
 
-# Quick sanity generation
-messages = [{"role": "user", "content": "You will be fine-tuned to read ASCII mazes."}]
-preamble = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
-_ = generate(model, tokenizer, prompt=preamble, max_tokens=32, verbose=False)
-
+if TRAINING_CONTINUE :
+    model, tokenizer = load(model_path, adapter_path= adapter_dir,tokenizer_config={"trust_remote_code": True})
+else:
+    model, tokenizer = load(model_path, tokenizer_config={"trust_remote_code": True})  # tokenizer has .apply_chat_template and .encode/.decode
 # --------------------------
 # Write LoRA adapter config
 # --------------------------
@@ -69,9 +67,10 @@ with open(adapter_config_path, "w", encoding="utf-8") as f:
 # --------------------------
 model.freeze()
 
-# Convert the last N linear layers in each block to LoRA (uses mlx_lm.tuner.linear_to_lora_layers internally)
 
-linear_to_lora_layers(model, lora_config["num_layers"], lora_config["lora_parameters"])
+# Convert the last N linear layers in each block to LoRA (uses mlx_lm.tuner.linear_to_lora_layers internally)
+if not TRAINING_CONTINUE :
+    linear_to_lora_layers(model, lora_config["num_layers"], lora_config["lora_parameters"])
 
 num_train_params = sum(v.size for _, v in tree_flatten(model.trainable_parameters()))
 print(f"Trainable params (LoRA): {num_train_params:,}")
@@ -134,27 +133,3 @@ plt.ylabel("Loss")
 plt.legend()
 plt.tight_layout()
 plt.show()
-
-# --------------------------
-# Load with adapter & test
-# --------------------------
-model_lora, _ = load(model_path, adapter_path=adapter_dir)
-
-# Tiny sanity check on a single sample prompt
-demo_maze = (
-    "###########\n"
-    "# # # # # #\n"
-    "###########\n"
-    "# # # # # #\n"
-    "###########\n"
-    "#     #  E#\n"
-    "# ### ### #\n"
-    "# # #   # #\n"
-    "# ####### #\n"
-    "#        S#\n"
-    "###########"
-)
-demo_prompt = "Identify the start location and its available directions in this maze."
-demo_infer = build_prompt(demo_maze, demo_prompt)
-resp = generate(model_lora, tokenizer, prompt=demo_infer, max_tokens=64, verbose=True)
-print("\nMODEL OUTPUT:\n", resp)

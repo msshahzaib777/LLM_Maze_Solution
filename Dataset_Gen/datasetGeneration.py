@@ -15,15 +15,18 @@ dataset_dir = f'../data/custom_{split_name}'
 os.makedirs("../data", exist_ok=True)
 os.makedirs(dataset_dir, exist_ok=True)
 
-target_mode = "start_available_direction"
+target_mode = "start_available_direction" # start_only, optimal_next_step.
+
 # --- Define sizes and counts ---
 size_counts = {
-    3: 1500,   # 1000 mazes of size 5x5
-    4: 2500,       # 500 mazes of size 7x7
-    5: 3500,       # 250 mazes of size 9x9
-    6: 5000,
-    7: 7000,      # 100 mazes of size 11x11
+    3: 2500,   # 1000 mazes of size 5x5
+    4: 3500,       # 500 mazes of size 7x7
+    5: 4500,       # 250 mazes of size 9x9
+    6: 6000,
+    7: 8000,      # 100 mazes of size 11x11
 }
+
+Maze.set_seed(123)
 
 all_examples = []
 for g, n in size_counts.items():
@@ -31,7 +34,12 @@ for g, n in size_counts.items():
         m = Maze()
         m.generator = Prims(g, g)
         m.solver = BacktrackingSolver()
-        m.generate_monte_carlo(5, 10, 0.5)
+        if count < n//4:
+            m.generate_monte_carlo(5, 10, 0.5)
+        else:
+            m.generate()
+            m.generate_entrances(start_outer=False, end_outer=False)
+
         all_examples.append(make_training_example(m))
 
 # --- Save to JSON ---
@@ -74,28 +82,9 @@ test_data = [data[i] for i in test_idx]
 def save_jsonl(examples, path):
     with open(path, "w") as fout:
         for ex in examples:
-            # fout.write(dict_to_prompt_completion(ex, True, False, False))
-            # fout.write(json.dumps(ex) + "\n")
+            fout.write(dict_to_prompt_completion(ex, target_mode))
 
-            maze = ex["maze"]
-            user_prompt = ex.get("prompt", "Identify the start location and its available directions in this maze.")
-            # Ground truth:
-            ans = ex.get("answer", {})
-            start = ans.get("start", None)
-            dirs = ans.get("available_directions", None)
 
-            # Build strings
-            prompt_text = build_prompt(maze, user_prompt)
-
-            if target_mode == "start_only":
-                target_obj = {"start": start}
-                target_text = json.dumps(target_obj, ensure_ascii=False)
-            else:
-                target_text = build_target(start, dirs)
-            fout.write(json.dumps({
-                "prompt": prompt_text,
-                "completion": target_text
-            }) + "\n")
 save_jsonl(train_data, f'{dataset_dir}/train.jsonl')
 save_jsonl(valid_data, f'{dataset_dir}/valid.jsonl')
 save_jsonl(test_data, f'{dataset_dir}/test.jsonl')

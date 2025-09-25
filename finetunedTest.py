@@ -2,14 +2,22 @@
 # Eval on test.jsonl + save per-example outputs
 # --------------------------
 import os, re, json
+from mlx_lm import generate, load
+
+ds_dir = "data/custom_2"
+adapter_dir = "finetuned_model/adapters_available2"
+model_path = "nightmedia/Qwen3-4B-Thinking-2507-bf16-mlx"
 
 ALLOWED_DIRS = {"up", "down", "left", "right"}
 test_path = os.path.join(ds_dir, "test.jsonl")
 
-eval_dir = os.path.join(adapter_dir, "eval")
+eval_dir = os.path.join(adapter_dir, "eval_2")
 os.makedirs(eval_dir, exist_ok=True)
 preds_jsonl = os.path.join(eval_dir, "test_predictions.jsonl")
 summary_json = os.path.join(eval_dir, "summary.json")
+
+model_lora, tokenizer = load(model_path, tokenizer_config={"trust_remote_code": True}, adapter_path=adapter_dir)  # tokenizer has .apply_chat_template and .encode/.decode
+
 
 def _extract_first_json(s: str):
     try:
@@ -41,7 +49,7 @@ with open(test_path, "r", encoding="utf-8") as fin, open(preds_jsonl, "w", encod
         # Compose chat prompt and decode deterministically
         messages = [{"role": "user", "content": user_prompt}]
         chat_prompt = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
-        out = generate(model_lora, tokenizer, prompt=chat_prompt, max_tokens=64, temperature=0.0, verbose=False)
+        out = generate(model_lora, tokenizer, prompt=chat_prompt, max_tokens=64, verbose=False)
 
         pred = _extract_first_json(out)
         record = {

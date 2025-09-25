@@ -74,7 +74,7 @@ def main():
     parser.add_argument("--val-batches", type=int, default=25)
     parser.add_argument("--learning-rate", type=float, default=2e-5)
     parser.add_argument("--steps-per-report", type=int, default=10)
-    parser.add_argument("--steps-per-eval", type=int, default=200)
+    parser.add_argument("--steps-per-eval_1", type=int, default=200)
     parser.add_argument("--resume-adapter-file", type=str, default=None)
     parser.add_argument("--adapter-path", type=str, default="adapters")
     parser.add_argument("--save-every", type=int, default=100)

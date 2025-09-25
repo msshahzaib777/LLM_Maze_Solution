@@ -52,44 +52,29 @@ def make_training_example(m):
         "maze_size": (m.grid.shape[0] - 1)/2
     }
 
-def dict_to_prompt_completion(dict, start=True, available_directions=True, thinking=False):
-    maze = dict["maze"]
-    prompt = dict["prompt"]
-    cot = dict["chain_of_thought"]
-    answer = ""
-    if start:
-        if available_directions:
-            answer = json.dumps(dict["answer"])
-            cot = dict["chain_of_thought"]["start"] + dict["chain_of_thought"]["available_directions"]
-        else:
-            answer = dict["answer"]["start"]
-            cot = dict["chain_of_thought"]["start"]
-    system = '''You are an expert Maze Solver. 
-                Your task is to analyze the given maze (ASCII grid) and answer questions about it. 
-                The maze always contains:
-                - a start position, marked with 'S'
-                - an exit position, marked with 'E'
-                - walls '#'
-                - open paths ' '
-                
-                When answering:
-                - Always return the result in the requested format (e.g., coordinates as [row, col]).
-                - Use 0-based indexing for rows and columns unless instructed otherwise.
-                - Do not include extra text beyond the answer unless explicitly asked.
-                - If something is missing or invalid in the maze, state it clearly.'''
-    input_text = (f"Maze:\n{maze}\n\nTask: {prompt}\n")
-    completion_text = ""
-    if thinking:
-        completion_text = f"<think>\n{cot}\n"
-    completion_text = completion_text +  f"</think>{answer}\n<|im_end|>"
-    messages = [{"role": "system", "content": system},
-                {"role": "user", "content": input_text}]
-    # --- Load fused model + tokenizer ---
-    text = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
-    return json.dumps({
-                "prompt": text,
-                "completion": completion_text
-            }) + "\n"
+def dict_to_prompt_completion(ex, target_mode):
+    maze = ex["maze"]
+    user_prompt = ex.get("prompt", "Identify the start location and its available directions in this maze.")
+    # Ground truth:
+    ans = ex.get("answer", {})
+    start = ans.get("start", None)
+    dirs = ans.get("available_directions", None)
+
+    # Build strings
+    prompt_text = build_prompt(maze, user_prompt)
+    target_text = ""
+    if target_mode == "start_only":
+        target_obj = {"start": start}
+        target_text = json.dumps(target_obj, ensure_ascii=False)
+    elif target_mode == "start_available_direction":
+        target_text = build_target(start, dirs)
+    elif target_mode == "optimal_next_step":
+        pass
+
+    return(json.dumps({
+        "prompt": prompt_text,
+        "completion": target_text
+    }) + "\n")
 
 
 # --------------------------
@@ -116,6 +101,7 @@ def build_target(answer_start: List[int], answer_dirs: List[str]) -> str:
         "start": [int(answer_start[0]), int(answer_start[1])],
         "available_directions": list(answer_dirs)
     }, ensure_ascii=False)
+
 
 def clamp_and_pad(ids: List[int], max_len: int, pad_id: int) -> List[int]:
     if len(ids) > max_len:
