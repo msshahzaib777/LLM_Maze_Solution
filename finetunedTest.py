@@ -10,18 +10,18 @@ from mlx_lm import generate, load
 # --------------------------
 ds_dir = "data/custom_2"
 adapter_dir = "finetuned_model/adapters_available2"
-model_path = "nightmedia/Qwen3-4B-Thinking-2507-bf16-mlx"
+model_path = "Qwen/Qwen3-4B-MLX-bf16"
 
 ALLOWED_DIRS = {"up", "down", "left", "right"}
 test_path = os.path.join(ds_dir, "test.jsonl")
 
-eval_dir = os.path.join(adapter_dir, "eval_2")
+eval_dir = os.path.join(adapter_dir, "eval_3")
 os.makedirs(eval_dir, exist_ok=True)
 preds_jsonl = os.path.join(eval_dir, "test_predictions.jsonl")
 summary_json = os.path.join(eval_dir, "summary.json")
 
 # Tune batch throughput vs. memory
-BATCH_SIZE = 16          # try 8–64 depending on VRAM
+BATCH_SIZE = 64          # try 8–64 depending on VRAM
 MAX_TOKENS = 64          # decoding budget per sample
 TEMPERATURE = 0.0        # deterministic
 TOP_P = 1.0
@@ -78,9 +78,6 @@ def _batched_generate(prompts: List[str]) -> List[str]:
             tokenizer,
             prompts=prompts,
             max_tokens=MAX_TOKENS,
-            temperature=TEMPERATURE,
-            top_p=TOP_P,
-            seed=SEED,
             verbose=VERBOSE,
         )
     except TypeError:
@@ -91,9 +88,6 @@ def _batched_generate(prompts: List[str]) -> List[str]:
                     model_lora, tokenizer,
                     prompt=p,
                     max_tokens=MAX_TOKENS,
-                    temperature=TEMPERATURE,
-                    top_p=TOP_P,
-                    seed=SEED,
                     verbose=VERBOSE,
                 )
                 for p in prompts

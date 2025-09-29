@@ -19,14 +19,14 @@ from classes.metrics import SimpleMetrics
 # --------------------------
 # Config
 # --------------------------
-model_path = "nightmedia/Qwen3-4B-Thinking-2507-bf16-mlx"
-adapter_dir = "finetuned_model/adapters_available2"
+model_path = "Qwen/Qwen3-4B-MLX-bf16"
+adapter_dir = "finetuned_model/adapters_dir_start_1"
 # --------------------------
 # Datasets
 # --------------------------
 # Point these to your prepared JSONL files.
 # Tip: keep 10% val, stratify by maze size (3..7).
-ds_dir = "data/custom_2"
+ds_dir = "data/custom_3"
 
 os.makedirs(adapter_dir, exist_ok=True)
 adapter_config_path = os.path.join(adapter_dir, "adapter_config.json")
@@ -34,18 +34,18 @@ adapter_file_path   = os.path.join(adapter_dir, "adapters.safetensors")
 
 # LoRA settings matched to your 4B & M2 Max 64GB
 lora_config = {
-    "num_layers": 12,  # LoRA on last 12 blocks is a solid start for 4B
+    "num_layers": 32,  # LoRA on last 12 blocks is a solid start for 4B
     "lora_parameters": {
-        "rank": 16,    # r=16 is a good default; try 8 if memory-constrained, 32 if underfitting
-        "scale": 16.0, # α typically = r (or 2r). Start with r.
-        "dropout": 0.05,
+        "rank": 32,    # r=16 is a good default; try 8 if memory-constrained, 32 if underfitting
+        "scale": 64.0, # α typically = r (or 2r). Start with r.
+        "dropout": 0.1,
     },
 }
 
 # Training settings
 MAX_SEQ_LEN = 256  # enough for 7x7 grid + prompt + short JSON answer
 LR = 1.0e-4        # LoRA LR (cosine schedule handled inside trainer if available)
-ITERS = 2000       # ~few epochs over 25–50k rows; adjust to your dataset size
+ITERS = 2500       # ~few epochs over 25–50k rows; adjust to your dataset size
 EVAL_EVERY = 500
 TRAINING_CONTINUE = False
 # --------------------------
