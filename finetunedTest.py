@@ -9,7 +9,7 @@ from mlx_lm import generate, load
 # Paths & constants
 # --------------------------
 ds_dir = "data/custom_3"
-adapter_dir = "finetuned_model/adapters_dir_start_3"
+adapter_dir = "finetuned_model/adapters_dir_start_4"
 model_path = "Qwen/Qwen3-4B-MLX-bf16"
 
 ALLOWED_DIRS = {"up", "down", "left", "right"}
