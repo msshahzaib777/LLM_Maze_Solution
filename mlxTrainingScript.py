@@ -20,7 +20,7 @@ from classes.metrics import SimpleMetrics
 # Config
 # --------------------------
 model_path = "Qwen/Qwen3-4B-MLX-bf16"
-adapter_dir = "finetuned_model/adapters_dir_start_1"
+adapter_dir = "finetuned_model/adapters_dir_start_3"
 # --------------------------
 # Datasets
 # --------------------------
@@ -34,18 +34,18 @@ adapter_file_path   = os.path.join(adapter_dir, "adapters.safetensors")
 
 # LoRA settings matched to your 4B & M2 Max 64GB
 lora_config = {
-    "num_layers": 32,  # LoRA on last 12 blocks is a solid start for 4B
+    "num_layers": 24,  # LoRA on last 12 blocks is a solid start for 4B
     "lora_parameters": {
         "rank": 32,    # r=16 is a good default; try 8 if memory-constrained, 32 if underfitting
-        "scale": 64.0, # α typically = r (or 2r). Start with r.
-        "dropout": 0.1,
+        "scale": 32.0, # α typically = r (or 2r). Start with r.
+        "dropout": 0.09,
     },
 }
 
 # Training settings
 MAX_SEQ_LEN = 256  # enough for 7x7 grid + prompt + short JSON answer
-LR = 1.0e-4        # LoRA LR (cosine schedule handled inside trainer if available)
-ITERS = 2500       # ~few epochs over 25–50k rows; adjust to your dataset size
+LR = 1.0e-5        # LoRA LR (cosine schedule handled inside trainer if available)
+ITERS = 3000       # ~few epochs over 25–50k rows; adjust to your dataset size
 EVAL_EVERY = 500
 TRAINING_CONTINUE = False
 # --------------------------
