@@ -12,7 +12,7 @@ from mlx_lm.tuner import TrainingArgs, train  # we'll use our own dataset class
 from Dataset_Gen.utils import build_prompt
 from mlx_lm.tuner import linear_to_lora_layers
 from mlx_lm.tuner.datasets import load_dataset, CacheDataset
-from classes.metrics import SimpleMetrics
+from classes.metrics import LRSchedulerCallback
 
 # NOTE: we don't rely on mlx_lm.tuner.datasets to avoid format mismatch
 
@@ -38,15 +38,16 @@ lora_config = {
     "lora_parameters": {
         "rank": 32,    # r=16 is a good default; try 8 if memory-constrained, 32 if underfitting
         "scale": 32.0, # α typically = r (or 2r). Start with r.
-        "dropout": 0.09,
+        "dropout": 0.05,
     },
 }
 
 # Training settings
 MAX_SEQ_LEN = 256  # enough for 7x7 grid + prompt + short JSON answer
-LR = 1.0e-5        # LoRA LR (cosine schedule handled inside trainer if available)
+LR = 3.0e-5        # LoRA LR (cosine schedule handled inside trainer if available)
 ITERS = 3000       # ~few epochs over 25–50k rows; adjust to your dataset size
-EVAL_EVERY = 500
+WARMUP = max(50, int(0.03*ITERS))  # 3% warmup, at least 50 iters
+EVAL_EVERY = 100
 TRAINING_CONTINUE = False
 # --------------------------
 # Load model + tokenizer
@@ -108,7 +109,14 @@ training_args = TrainingArgs(
 optimizer = optim.Adam(learning_rate=LR)
 
 # Optional: simple callback to collect losses (compatible with your Metrics helper)
-metrics = SimpleMetrics()
+metrics =  LRSchedulerCallback(
+    optimizer=optimizer,
+    base_lr=LR,
+    total_steps=ITERS,
+    warmup_steps=WARMUP,
+    min_lr_ratio=0.10,
+    log_every=50,
+)
 
 train(
     model=model,
