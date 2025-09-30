@@ -9,13 +9,13 @@ from mlx_lm import generate, load
 # Paths & constants
 # --------------------------
 ds_dir = "data/custom_3"
-adapter_dir = "finetuned_model/adapters_dir_start_2"
+adapter_dir = "finetuned_model/adapters_dir_start_3"
 model_path = "Qwen/Qwen3-4B-MLX-bf16"
 
 ALLOWED_DIRS = {"up", "down", "left", "right"}
 test_path = os.path.join(ds_dir, "test.jsonl")
 
-eval_dir = os.path.join(adapter_dir, "eval_2")
+eval_dir = os.path.join(adapter_dir, "eval_1")
 os.makedirs(eval_dir, exist_ok=True)
 preds_jsonl = os.path.join(eval_dir, "test_predictions.jsonl")
 summary_json = os.path.join(eval_dir, "summary.json")

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import json, os
 import types
-
+import numpy as np
 import matplotlib.pyplot as plt
 
 import mlx.optimizers as optim
@@ -12,7 +12,7 @@ from mlx_lm.tuner import TrainingArgs, train  # we'll use our own dataset class
 from Dataset_Gen.utils import build_prompt
 from mlx_lm.tuner import linear_to_lora_layers
 from mlx_lm.tuner.datasets import load_dataset, CacheDataset
-from classes.metrics import LRSchedulerCallback
+from classes.metrics import LRSchedulerCallback, SimpleMetrics
 
 # NOTE: we don't rely on mlx_lm.tuner.datasets to avoid format mismatch
 
@@ -20,7 +20,7 @@ from classes.metrics import LRSchedulerCallback
 # Config
 # --------------------------
 model_path = "Qwen/Qwen3-4B-MLX-bf16"
-adapter_dir = "finetuned_model/adapters_dir_start_3"
+adapter_dir = "finetuned_model/adapters_dir_start_4"
 # --------------------------
 # Datasets
 # --------------------------
@@ -34,7 +34,7 @@ adapter_file_path   = os.path.join(adapter_dir, "adapters.safetensors")
 
 # LoRA settings matched to your 4B & M2 Max 64GB
 lora_config = {
-    "num_layers": 24,  # LoRA on last 12 blocks is a solid start for 4B
+    "num_layers": 16,  # LoRA on last 12 blocks is a solid start for 4B
     "lora_parameters": {
         "rank": 32,    # r=16 is a good default; try 8 if memory-constrained, 32 if underfitting
         "scale": 32.0, # α typically = r (or 2r). Start with r.
@@ -44,9 +44,11 @@ lora_config = {
 
 # Training settings
 MAX_SEQ_LEN = 256  # enough for 7x7 grid + prompt + short JSON answer
-LR = 3.0e-5        # LoRA LR (cosine schedule handled inside trainer if available)
+BASE_LR = 3.0e-5        # LoRA LR (cosine schedule handled inside trainer if available)
 ITERS = 3000       # ~few epochs over 25–50k rows; adjust to your dataset size
-WARMUP = max(50, int(0.03*ITERS))  # 3% warmup, at least 50 iters
+WARMUP = int(0.03 * ITERS)
+DECAY_STEPS = ITERS - WARMUP
+LR_FLOOR = 0.1 * BASE_LR
 EVAL_EVERY = 100
 TRAINING_CONTINUE = False
 # --------------------------
@@ -106,17 +108,12 @@ training_args = TrainingArgs(
 )
 
 # Adam is fine for LoRA; keep LR ~1e-4; weight decay optional for LoRA adapters.
-optimizer = optim.Adam(learning_rate=LR)
+cos = optim.cosine_decay(BASE_LR, ITERS, LR_FLOOR)
+
+optimizer = optim.Adam(learning_rate=cos)
 
 # Optional: simple callback to collect losses (compatible with your Metrics helper)
-metrics =  LRSchedulerCallback(
-    optimizer=optimizer,
-    base_lr=LR,
-    total_steps=ITERS,
-    warmup_steps=WARMUP,
-    min_lr_ratio=0.10,
-    log_every=50,
-)
+metrics =  SimpleMetrics()
 
 train(
     model=model,
