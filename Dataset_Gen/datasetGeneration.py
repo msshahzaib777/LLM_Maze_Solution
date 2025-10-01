@@ -19,12 +19,11 @@ target_mode = "start_and_end" #"start_available_direction" # "right_dir" # "star
 
 # --- Define sizes and counts ---
 size_counts = {
-    3: 2000,   # 1000 mazes of size 5x5
-    4: 3000,       # 500 mazes of size 7x7
-    5: 5000,       # 250 mazes of size 9x9
-    6: 7000,
-    7: 10000,      # 100 mazes of size 11x11
-    8: 20000
+    3: 2500,   # 1000 mazes of size 5x5
+    4: 5000,       # 500 mazes of size 7x7
+    5: 8000,       # 250 mazes of size 9x9
+    6: 1000,
+    7: 20000,      # 100 mazes of size 11x11
 }
 
 Maze.set_seed(123)
