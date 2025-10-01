@@ -15,7 +15,7 @@ dataset_dir = f'../data/custom_{split_name}'
 os.makedirs("../data", exist_ok=True)
 os.makedirs(dataset_dir, exist_ok=True)
 
-target_mode = "right_dir" # "start_available_direction" # start_only, optimal_next_step.
+target_mode = "start_available_direction" # "right_dir" # "start_available_direction" # start_only, optimal_next_step.
 
 # --- Define sizes and counts ---
 size_counts = {
