@@ -20,13 +20,13 @@ from classes.metrics import LRSchedulerCallback, SimpleMetrics
 # Config
 # --------------------------
 model_path = "Qwen/Qwen3-4B-MLX-bf16"
-adapter_dir = "finetuned_model/adapters_dir_start_7"
+adapter_dir = "finetuned_model/adapters_dir_start_end"
 # --------------------------
 # Datasets
 # --------------------------
 # Point these to your prepared JSONL files.
 # Tip: keep 10% val, stratify by maze size (3..7).
-ds_dir = "data/custom_4"
+ds_dir = "data/custom__start_and_end_1"
 
 os.makedirs(adapter_dir, exist_ok=True)
 adapter_config_path = os.path.join(adapter_dir, "adapter_config.json")
