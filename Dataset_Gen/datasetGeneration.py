@@ -7,7 +7,7 @@ from mazelib.generate.Prims import Prims
 from mazelib.solve.BacktrackingSolver import BacktrackingSolver
 import json, os
 
-split_name = "4"
+split_name = "_start_and_end_1"
 
 filename = f'../data/maze_training_{split_name}.json'
 dataset_dir = f'../data/custom_{split_name}'
@@ -15,7 +15,7 @@ dataset_dir = f'../data/custom_{split_name}'
 os.makedirs("../data", exist_ok=True)
 os.makedirs(dataset_dir, exist_ok=True)
 
-target_mode = "start_available_direction" # "right_dir" # "start_available_direction" # start_only, optimal_next_step.
+target_mode = "start_and_end" #"start_available_direction" # "right_dir" # "start_available_direction" # start_only, optimal_next_step.
 
 # --- Define sizes and counts ---
 size_counts = {
