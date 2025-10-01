@@ -25,21 +25,25 @@ def maze_value_at(maze, position):
     return new_line[position[1]]
 
 def get_solution(sample):
-    start = find_start(sample)
+    maze = sample["solved_maze"]
+    start = find_start(maze)
     not_end = True
     current = start
     directions = []
+    stages = [maze]
     while not_end:
-        if maze_value_at(sample, current) == "E":
-            sample = update_maze(sample, current, "-")
+        if maze_value_at(maze, current) == "E":
+            maze = update_maze(maze, current, "-")
             break
-        surroundings = get_correct_direction_at(sample, current, int(ds_dict[0]["maze_size"] * 2))
-        sample = update_maze(sample, current, "-")
+        surroundings = get_correct_direction_at(maze, current, int(ds_dict[0]["maze_size"] * 2))
+        maze = update_maze(maze, current, "-")
+        stages.append(maze)
         directions.append(surroundings[0])
         current = current[0] + surroundings[1][0], current[1] + surroundings[1][1]
-
+    return directions, stages
 dataset_json = "data/maze_training_4.json"
 ds_dict = json.load(open(dataset_json))
 
-sample = ds_dict[0]["solved_maze"]
+sample = ds_dict[0]
+print(get_solution(sample))
 
