@@ -7,7 +7,7 @@ from mazelib.generate.Prims import Prims
 from mazelib.solve.BacktrackingSolver import BacktrackingSolver
 import json, os
 
-split_name = "3"
+split_name = "4"
 
 filename = f'../data/maze_training_{split_name}.json'
 dataset_dir = f'../data/custom_{split_name}'
@@ -15,15 +15,16 @@ dataset_dir = f'../data/custom_{split_name}'
 os.makedirs("../data", exist_ok=True)
 os.makedirs(dataset_dir, exist_ok=True)
 
-target_mode = "start_available_direction" # start_only, optimal_next_step.
+target_mode = "right_dir" # "start_available_direction" # start_only, optimal_next_step.
 
 # --- Define sizes and counts ---
 size_counts = {
     3: 2000,   # 1000 mazes of size 5x5
     4: 3000,       # 500 mazes of size 7x7
     5: 5000,       # 250 mazes of size 9x9
-    6: 6000,
+    6: 7000,
     7: 10000,      # 100 mazes of size 11x11
+    8: 20000
 }
 
 Maze.set_seed(123)
@@ -39,7 +40,7 @@ for g, n in size_counts.items():
         else:
             m.generate()
             m.generate_entrances(start_outer=False, end_outer=False)
-
+        m.solve()
         all_examples.append(make_training_example(m))
 
 # --- Save to JSON ---
@@ -89,4 +90,4 @@ save_jsonl(train_data, f'{dataset_dir}/train.jsonl')
 save_jsonl(valid_data, f'{dataset_dir}/valid.jsonl')
 save_jsonl(test_data, f'{dataset_dir}/test.jsonl')
 
-print(f"✅ Wrote {len(train_data)} train and {len(valid_data)} valid and {len(test_data)} test examples")
+print(f"Wrote {len(train_data)} train and {len(valid_data)} valid and {len(test_data)} test examples")
