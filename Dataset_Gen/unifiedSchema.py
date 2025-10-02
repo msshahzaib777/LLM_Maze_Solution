@@ -31,7 +31,7 @@ EMIT_TASKS = {
     "DETECT_START_END": True,
     "AVAILABLE_DIRECTIONS": True,
     "VALID_MOVE": True,
-    "ALL_IN_ONE": True,
+    "ALL_IN_ONE": False,
 }
 
 # how many negative VALID_MOVE examples to try per record

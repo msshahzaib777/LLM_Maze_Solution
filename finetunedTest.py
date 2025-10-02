@@ -119,6 +119,7 @@ with open(test_path, "r", encoding="utf-8") as fin:
         user_prompt = ex["prompt"]
         gt = json.loads(ex["completion"])  # {"start":[r,c], "available_directions":[...]}
         gt_start = [int(gt["start"][0]), int(gt["start"][1])]
+        gt_end = [int(gt["end"][0]), int(gt["end"][1])]
         gt_dirs  = _norm_dirs(gt.get("available_directions", []))
         chat_prompt = _build_chat_prompt(user_prompt)
         records.append({
@@ -126,12 +127,13 @@ with open(test_path, "r", encoding="utf-8") as fin:
             "chat_prompt": chat_prompt,
             "gt_start": gt_start,
             "gt_dirs": gt_dirs,
+            "gt_end": gt_end,
         })
 
 # --------------------------
 # Batched inference + scoring
 # --------------------------
-total = correct_start = correct_dirs = exact_both = bad_json = 0
+total = correct_start = correct_dirs = exact_all = bad_json = correct_end = 0
 tp = fp = fn = 0  # micro P/R/F1 for directions
 
 with open(preds_jsonl, "w", encoding="utf-8") as fout:
@@ -154,7 +156,8 @@ with open(preds_jsonl, "w", encoding="utf-8") as fout:
                 "prompt": rec["prompt_raw"],
                 "ground_truth": {
                     "start": rec["gt_start"],
-                    "available_directions": sorted(rec["gt_dirs"])
+                    "available_directions": sorted(rec["gt_dirs"]),
+                    "end": rec["gt_end"],
                 },
                 "raw_output": out,
                 "parsed": pred,
@@ -168,19 +171,31 @@ with open(preds_jsonl, "w", encoding="utf-8") as fout:
                 total += 1
                 continue
 
+            record["match"] = {"start": True, "available_directions": True, "both": True, "end": True}
             # Parse prediction
             try:
                 pred_start = [int(pred["start"][0]), int(pred["start"][1])]
             except Exception:
                 bad_json += 1
                 record["prediction"] = None
-                record["match"] = {"start": False, "available_directions": False, "both": False}
+                record["match"]["start"] = False
+                fout.write(json.dumps(record, ensure_ascii=False) + "\n")
+                total += 1
+                continue
+                # Parse prediction
+            try:
+                pred_end = [int(pred["end"][0]), int(pred["end"][1])]
+            except Exception:
+                bad_json += 1
+                record["prediction"] = None
+                record["match"]["end"] =  False
                 fout.write(json.dumps(record, ensure_ascii=False) + "\n")
                 total += 1
                 continue
 
             pred_dirs = _norm_dirs(pred.get("available_directions", []))
             start_ok = (pred_start == rec["gt_start"])
+            end_ok = (pred_end == rec["gt_end"])
             dirs_ok  = (pred_dirs == rec["gt_dirs"])
 
             # Update set metrics
@@ -190,12 +205,14 @@ with open(preds_jsonl, "w", encoding="utf-8") as fout:
 
             record["prediction"] = {
                 "start": pred_start,
-                "available_directions": sorted(pred_dirs)
+                "available_directions": sorted(pred_dirs),
+                "end": pred_end,
             }
             record["match"] = {
                 "start": start_ok,
                 "available_directions": dirs_ok,
-                "both": start_ok and dirs_ok
+                "end": end_ok,
+                "all": start_ok and dirs_ok and end_ok,
             }
 
             fout.write(json.dumps(record, ensure_ascii=False) + "\n")
@@ -203,14 +220,16 @@ with open(preds_jsonl, "w", encoding="utf-8") as fout:
             total += 1
             if start_ok: correct_start += 1
             if dirs_ok:  correct_dirs  += 1
-            if start_ok and dirs_ok: exact_both += 1
+            if end_ok: correct_end += 1
+            if start_ok and dirs_ok and end_ok : exact_all += 1
 
 # --------------------------
 # Aggregate metrics
 # --------------------------
 acc_start = 0.0 if total == 0 else correct_start / total
 acc_dirs  = 0.0 if total == 0 else correct_dirs  / total
-acc_both  = 0.0 if total == 0 else exact_both    / total
+acc_end = 0.0 if total == 0 else correct_end / total
+acc_all  = 0.0 if total == 0 else exact_all    / total
 valid_json_rate = 0.0 if total == 0 else 1.0 - (bad_json / total)
 precision = 0.0 if (tp + fp) == 0 else tp / (tp + fp)
 recall    = 0.0 if (tp + fn) == 0 else tp / (tp + fn)
@@ -219,8 +238,9 @@ f1        = 0.0 if (precision + recall) == 0 else 2 * precision * recall / (prec
 summary = {
     "total": total,
     "start_accuracy": acc_start,
+    "end_accuracy": acc_end,
     "dirs_accuracy": acc_dirs,
-    "exact_both_accuracy": acc_both,
+    "exact_both_accuracy": acc_all,
     "dirs_micro_precision": precision,
     "dirs_micro_recall": recall,
     "dirs_micro_f1": f1,
@@ -238,6 +258,6 @@ with open(summary_json, "w", encoding="utf-8") as f:
 print("\nSaved predictions to:", preds_jsonl)
 print("Saved summary to    :", summary_json)
 print(
-    f"\nStart acc={acc_start:.2%} | Dirs acc={acc_dirs:.2%} | Both={acc_both:.2%} | "
+    f"\nStart acc={acc_start:.2%} | Dirs acc={acc_dirs:.2%} | Both={acc_all:.2%} | "
     f"P={precision:.2%} R={recall:.2%} F1={f1:.2%} | Valid JSON={valid_json_rate:.2%}"
 )
