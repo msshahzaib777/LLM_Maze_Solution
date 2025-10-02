@@ -42,6 +42,18 @@ model_lora, tokenizer = load(
     adapter_path=adapter_dir
 )
 
+preds_jsonl_data = []
+if os.path.isfile(preds_jsonl) and os.path.getsize(preds_jsonl) > 0:
+    with open(preds_jsonl, "r", encoding="utf-8") as f:
+        for i, line in enumerate(f, 1):
+            line = line.strip()
+            if not line:
+                continue
+        try:
+            preds_jsonl_data.append(json.loads(line))
+        except json.JSONDecodeError as e:
+            print(f"Skipping line {i}: {e}")
+
 # --------------------------
 # Utils
 # --------------------------
@@ -140,8 +152,10 @@ with open(preds_jsonl, "w", encoding="utf-8") as fout:
     for b in range(0, len(records), BATCH_SIZE):
         batch = records[b:b+BATCH_SIZE]
         chat_prompts = [r["chat_prompt"] for r in batch]
-
-        outs = _batched_generate(chat_prompts)
+        if len(preds_jsonl_data) >= len(records):
+            outs = [r["raw_output"] for r in preds_jsonl_data[b:b+BATCH_SIZE]]
+        else:
+            outs = _batched_generate(chat_prompts)
         # Normalize to list
         if isinstance(outs, str):
             outs = [outs]
