@@ -22,7 +22,7 @@ size_counts = {
     3: 2500,   # 1000 mazes of size 5x5
     4: 5000,       # 500 mazes of size 7x7
     5: 8000,       # 250 mazes of size 9x9
-    6: 1000,
+    6: 10000,
     7: 20000,      # 100 mazes of size 11x11
 }
 

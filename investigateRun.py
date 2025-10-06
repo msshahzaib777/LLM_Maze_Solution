@@ -9,8 +9,8 @@ def _norm_dirs(dirs):
     return {str(x).strip().lower() for x in dirs if str(x).strip().lower() in ALLOWED_DIRS}
 
 ds_dir = "data/custom_2"
-adapter_dir = "finetuned_model/adapters_available"
-model_path = "nightmedia/Qwen3-4B-Thinking-2507-bf16-mlx"
+adapter_dir = "finetuned_model/adapters_dir_start_7"
+model_path = "Qwen/Qwen3-4B-MLX-bf16"
 
 ALLOWED_DIRS = {"up", "down", "left", "right"}
 test_path = os.path.join(ds_dir, "test.jsonl")
@@ -24,16 +24,16 @@ from Dataset_Gen.utils import make_training_example
 from mazelib import Maze
 from mazelib.generate.Prims import Prims
 from mazelib.solve.BacktrackingSolver import BacktrackingSolver
-import json, os
+# import json, os
 
-split_name = "2"
-
-filename = f'../data/maze_training_{split_name}.json'
-dataset_dir = f'../data/custom_{split_name}'
-
-os.makedirs("../data", exist_ok=True)
-os.makedirs(dataset_dir, exist_ok=True)
-
+# split_name = "2"
+#
+# filename = f'../data/maze_training_{split_name}.json'
+# dataset_dir = f'../data/custom_{split_name}'
+#
+# os.makedirs("../data", exist_ok=True)
+# os.makedirs(dataset_dir, exist_ok=True)
+#
 target_mode = "start_available_direction" # start_only, optimal_next_step.
 
 # --- Define sizes and counts ---
@@ -45,12 +45,13 @@ size_counts = {
     7: 7000,      # 100 mazes of size 11x11
 }
 
-g = 5
+g = 6
 m = Maze()
 m.generator = Prims(g, g)
 m.solver = BacktrackingSolver()
 m.generate()
 m.generate_entrances(start_outer=False, end_outer=False)
+m.solve()
 training_example = make_training_example(m)
 ex_jsonl = dict_to_prompt_completion(training_example, target_mode)
 ex = json.loads(ex_jsonl)
