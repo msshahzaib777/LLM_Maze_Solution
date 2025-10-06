@@ -4,8 +4,25 @@ from typing import List, Dict, Any, Optional, Tuple
 
 _, tokenizer = load("nightmedia/Qwen3-4B-Thinking-2507-bf16-mlx")
 
+DIRECTION_VECTORS = {
+    "up": (-1, 0),
+    "down": (1, 0),
+    "left": (0, -1),
+    "right": (0, 1),
+}
+
+DIR_TEXT_TO_ENUM = {
+    "up": "U",
+    "down": "D",
+    "left": "L",
+    "right": "R",
+}
+
+DIR_ENUM_TO_TEXT = {v: k for k, v in DIR_TEXT_TO_ENUM.items()}
+
+
 def clean_maze_ascii(maze_ascii: str) -> str:
-        return maze_ascii.replace("+", " ")
+    return maze_ascii.replace("+", " ")
 
 def find_start(maze_ascii: str):
     lines = maze_ascii.splitlines()
@@ -15,16 +32,76 @@ def find_start(maze_ascii: str):
                 return (i, j)
     return None
 
-def get_surroundings(maze_ascii: str, start):
+def find_end(maze_ascii: str):
     lines = maze_ascii.splitlines()
-    i, j = start
-    directions = {}
-    moves = {"up": (-1, 0), "down": (1, 0), "left": (0, -1), "right": (0, 1)}
+    for i, row in enumerate(lines):
+        for j, c in enumerate(row):
+            if c == "E":
+                return (i, j)
+    return None
 
-    for d, (di, dj) in moves.items():
+
+def maze_value_at(maze, position, default: str = "#"):
+    lines = maze.splitlines()
+    i, j = position
+    if not (0 <= i < len(lines)):
+        return default
+    row = lines[i]
+    if not (0 <= j < len(row)):
+        return default
+    return row[j]
+
+
+def is_walkable(maze_ascii: str, position: Tuple[int, int]) -> bool:
+    return maze_value_at(maze_ascii, position) != "#"
+
+
+def walkable_directions(maze_ascii: str, position: Tuple[int, int]) -> Dict[str, bool]:
+    i, j = position
+    lines = maze_ascii.splitlines()
+    height = len(lines)
+    result: Dict[str, bool] = {}
+    for name, (di, dj) in DIRECTION_VECTORS.items():
         ni, nj = i + di, j + dj
-        if 0 <= ni < len(lines) and 0 <= nj < len(lines[0]):
-            directions[d] = (lines[ni][nj] != "#")  # True if open, False if wall
+        in_bounds = 0 <= ni < height
+        if in_bounds:
+            row = lines[ni]
+            in_bounds = 0 <= nj < len(row)
+        result[name] = in_bounds and maze_value_at(maze_ascii, (ni, nj)) != "#"
+    return result
+
+
+def available_direction_enums(maze_ascii: str, position: Tuple[int, int]) -> List[str]:
+    return [
+        DIR_TEXT_TO_ENUM[name]
+        for name, open_path in walkable_directions(maze_ascii, position).items()
+        if open_path
+    ]
+
+
+def apply_direction(position: Tuple[int, int], direction: str) -> Tuple[int, int]:
+    key = direction.lower()
+    if key in DIRECTION_VECTORS:
+        di, dj = DIRECTION_VECTORS[key]
+    else:
+        enum_key = direction.upper()
+        if enum_key not in DIR_ENUM_TO_TEXT:
+            raise ValueError(f"Unknown direction: {direction}")
+        di, dj = DIRECTION_VECTORS[DIR_ENUM_TO_TEXT[enum_key]]
+    return position[0] + di, position[1] + dj
+
+
+def map_text_dirs_to_enum(text_dirs: List[str]) -> List[str]:
+    out: List[str] = []
+    for d in text_dirs:
+        key = d.strip().lower()
+        if key in DIR_TEXT_TO_ENUM:
+            out.append(DIR_TEXT_TO_ENUM[key])
+    return out
+
+
+def get_surroundings(maze_ascii: str, start):
+    directions = walkable_directions(maze_ascii, start)
     return directions
 
 
@@ -46,7 +123,7 @@ def make_training_example(m):
         "chain_of_thought": reasoning,
         "answer": {
             "start": start,
-            "available_directions": [d for d,v in surroundings.items() if v],
+            "available_directions": [d for d, v in surroundings.items() if v],
             "end": m.end
         },
         "solved_maze": solved_maze,
@@ -130,15 +207,15 @@ def clamp_and_pad(ids: List[int], max_len: int, pad_id: int) -> List[int]:
         ids = ids[:max_len]
     return ids + [pad_id] * (max_len - len(ids))
 
+
 def get_correct_direction_at(maze: str, position, maze_size):
     i, j = position
-    moves = {"up": (-1, 0), "down": (1, 0), "left": (0, -1), "right": (0, 1)}
-
-    for d, (di, dj) in moves.items():
+    for d, (di, dj) in DIRECTION_VECTORS.items():
         ni, nj = i + di, j + dj
         if 0 <= ni <= maze_size and 0 <= nj <= maze_size:
-            if (maze_value_at(maze, (ni, nj)) in ["+", "E"]):  # True if +, else False
+            if maze_value_at(maze, (ni, nj)) in ["+", "E"]:
                 return d, (di, dj)
+
 
 def update_maze(maze, position, new_value):
     lines = maze.splitlines()
@@ -146,11 +223,6 @@ def update_maze(maze, position, new_value):
     new_line[position[1]] = new_value
     lines[position[0]] = "".join(new_line)
     return "\n".join(lines)
-
-def maze_value_at(maze, position):
-    lines = maze.splitlines()
-    new_line = list(lines[position[0]])
-    return new_line[position[1]]
 
 def get_solution(sample):
     maze = sample["solved_maze"]
@@ -167,5 +239,5 @@ def get_solution(sample):
         maze = update_maze(maze, current, "-")
         stages.append(maze)
         directions.append(surroundings[0])
-        current = current[0] + surroundings[1][0], current[1] + surroundings[1][1]
+        current = apply_direction(current, surroundings[0])
     return directions, stages
