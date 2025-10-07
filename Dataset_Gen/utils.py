@@ -122,6 +122,63 @@ def get_random_points(maze_ascii: str, n: int = 5) -> List[Tuple[int, int]]:
             points.append((i,j))
     return points
 
+def get_directions_with_reasoning(maze_ascii: str, n_points: int = 5) -> List[Dict[str, Any]]:
+    """Get walkable directions with detailed reasoning for n random points in the maze."""
+    points = get_random_points(maze_ascii, n_points)
+    results = []
+    lines = maze_ascii.splitlines()
+    
+    for point in points:
+        i, j = point
+        walkable = walkable_directions(maze_ascii, point)
+        current_row = lines[i]
+        above_row = lines[i-1] if i > 0 else None 
+        below_row = lines[i+1] if i < len(lines)-1 else None
+        
+        reasoning = f"Analysis for point at (row={i}, col={j}):\n"
+        reasoning += f"Current row: '{current_row}'\n"
+        if above_row:
+            reasoning += f"Row above:  '{above_row}'\n"
+        if below_row:
+            reasoning += f"Row below:  '{below_row}'\n"
+        
+        reasoning += "\nDirectional analysis:\n"
+        # Check up
+        if "up" in walkable:
+            reasoning += f"UP: Can move up because cell above ({i-1},{j}) contains '{maze_value_at(maze_ascii, (i-1,j))}'\n"
+        else:
+            cell = "#" if i == 0 else maze_value_at(maze_ascii, (i-1,j))
+            reasoning += f"UP: Cannot move up because cell above ({i-1},{j}) contains '{cell}' or is out of bounds\n"
+            
+        # Check down
+        if "down" in walkable:
+            reasoning += f"DOWN: Can move down because cell below ({i+1},{j}) contains '{maze_value_at(maze_ascii, (i+1,j))}'\n"
+        else:
+            cell = "#" if i == len(lines)-1 else maze_value_at(maze_ascii, (i+1,j))
+            reasoning += f"DOWN: Cannot move down because cell below ({i+1},{j}) contains '{cell}' or is out of bounds\n"
+            
+        # Check left
+        if "left" in walkable:
+            reasoning += f"LEFT: Can move left because cell to left ({i},{j-1}) contains '{maze_value_at(maze_ascii, (i,j-1))}'\n"
+        else:
+            cell = "#" if j == 0 else maze_value_at(maze_ascii, (i,j-1))
+            reasoning += f"LEFT: Cannot move left because cell to left ({i},{j-1}) contains '{cell}' or is out of bounds\n"
+            
+        # Check right
+        if "right" in walkable:
+            reasoning += f"RIGHT: Can move right because cell to right ({i},{j+1}) contains '{maze_value_at(maze_ascii, (i,j+1))}'\n"
+        else:
+            cell = "#" if j == len(current_row)-1 else maze_value_at(maze_ascii, (i,j+1))
+            reasoning += f"RIGHT: Cannot move right because cell to right ({i},{j+1}) contains '{cell}' or is out of bounds\n"
+        
+        results.append({
+            "position": point,
+            "walkable_directions": {k: v for k,v in walkable.items() if v},
+            "reasoning": reasoning
+        })
+        
+    return results
+
 def generate_move_samples(maze_ascii: str, n_points: int = 5) -> List[Dict[str, Any]]:
     """Generate positive and negative move samples from random points."""
     points = get_random_points(maze_ascii, n_points)
@@ -188,54 +245,58 @@ def update_maze(maze, position, new_value):
     return "\n".join(lines)
 
 def get_solution(maze_ascii: str, maze_size: int):
-    maze = maze_ascii
+    solved_maze = maze_ascii
+    maze = maze_ascii.replace("+", " ")
     start = find_start(maze)
     current = start
     stages = []
+    
     while True:
         # Exit if we reached the end
-        if maze_value_at(maze, current) == "E":
+        if maze_value_at(solved_maze, current) == "E":
             break
             
         # Get next optimal direction
-        direction = get_correct_direction_at(maze, current, maze_size)
+        direction = get_correct_direction_at(solved_maze, current, maze_size)
         if not direction:
             break
             
         # Calculate next position
         next_pos = apply_direction(current, direction[0])
         
+        # Update both mazes - mark current position with '-'
+        maze = update_maze(maze, current, "-")
+        solved_maze = update_maze(solved_maze, current, "-")
+
         # Build reasoning for this stage
         reasoning = (
             f"At position (row={current[0]}, col={current[1]}).\n"
             f"Checking possible directions...\n"
             f"Optimal direction is '{direction[0]}' to move towards the goal.\n"
             f"Moving {direction[0]} by vector {direction[1]} to position (row={next_pos[0]}, col={next_pos[1]}).\n"
-            f"Marking current position with '-' to track the path."
+            f"Marking current position with '-' to track the path.\n"
+            f"Maze after move:\n{maze}"
         )
             
-        # Store current stage info with path and reasoning
+        # Store current stage info
         stage = {
             "position": current,
             "optimal_step": direction[0],
             "maze_before": maze,
-            "maze_after": update_maze(maze, current, "-"),
+            "maze_after": maze,
             "path": direction[0],
             "reasoning": reasoning
         }
         stages.append(stage)
         
         # Move to next position
-        maze = stage["maze_after"]
         current = next_pos
-        
-        return stages
+    
+    return stages
 
 def generate_chain_of_thought(tasks: List[str], maze_ascii: str, start: Optional[Tuple[int, int]] = None,
                             end: Optional[Tuple[int, int]] = None,
-                            surroundings: Optional[Dict[str, bool]] = None,
-                            move: Optional[str] = None,
-                            optimal_step: Optional[str] = None) -> Dict[str, str]:
+                            surroundings: Optional[Dict[str, bool]] = None) -> Dict[str, str]:
     reasoning = {}
 
     for task in tasks:
@@ -258,107 +319,143 @@ def generate_chain_of_thought(tasks: List[str], maze_ascii: str, start: Optional
                     f"In row {e_row}, the line is: '{e_line}'\n"
                     f"'E' is at row={e_row}, col={e_col} (the {e_col}th character in the row).\n"
                 )
-            reasoning["start"] = reasoning_text
-            reasoning["end"] = reasoning_text
-
-        elif task == "AVAILABLE_DIRECTIONS":
-            if start is not None and surroundings is not None:
-                s_row, s_col = start
-                reasoning_text = (
-                    f"I am at position (row={s_row}, col={s_col}).\n"
-                    f"I check each neighbor cell to see if it's open or a wall:\n"
-                )
-                for d, v in surroundings.items():
-                    reasoning_text += f"- {d}: {'open' if v else 'wall'}\n"
-                reasoning["available_directions"] = reasoning_text
+            reasoning["start_end"] = reasoning_text
     return reasoning
 
-def make_training_example(m, tasks: List[str] = ["DETECT_START_END"]):
+def make_training_example(m, tasks: List[str] = ["DETECT_START_END"], id: Optional[str] = None) -> Dict[str, Any]:
     solved_maze = str(m)
     maze_ascii = clean_maze_ascii(m.tostring(True, True))
     start = m.start
     end = getattr(m, "end", None)
     surroundings = get_surroundings(maze_ascii, start)
-    maze_size = int((m.grid.shape[0] - 1)/2)
-    solution = get_solution(maze_ascii, maze_size)
-    
+    maze_size = m.generator.H
+    solution = get_solution(solved_maze, maze_size)
+    # Scale n_points based on maze size - more points for larger mazes
+    n_points = max(5, maze_size * 2)  # Minimum 5 points, scales up with maze size
+    move_samples = generate_move_samples(maze_ascii, n_points=n_points)
+    direction_samples = get_directions_with_reasoning(maze_ascii, n_points=n_points)
     return {
+        "id": id,
         "maze": maze_ascii,
         "prompt": "Identify the start location which is labelled with S in this maze.",
         "chain_of_thought": generate_chain_of_thought(
             tasks=tasks,
-            maze_ascii=maze_ascii,
+            maze_ascii=maze_ascii, 
             start=start,
             end=end,
             surroundings=surroundings,
-            optimal_step=solution[0]["path"] if solution else None
         ),
         "answer": {
             "start": start,
-            "available_directions": [d for d, v in surroundings.items() if v],
             "end": end,
         },
         "stages": solution,  # Includes stages with reasoning
         "solved_maze": solved_maze,
-        "maze_size": maze_size
+        "maze_size": maze_size,
+        "move_samples": move_samples,
+        "direction_samples": direction_samples
     }
 
-def dict_to_prompt_completion(ex, target_mode):
+def dict_to_prompt_completion(ex):
+    """Convert a single maze example into multiple training instances for different tasks."""
     maze = ex["maze"]
-    user_prompt = ex.get("prompt", "Identify the co ordinated of start 'S' and end 'E' location and available directions in this maze.")
-    # Ground truth:
-    ans = ex.get("answer", {})
-    start = ans.get("start", None)
-    dirs = ans.get("available_directions", None)
+    maze_id = ex.get("id", "unknown")
+    chain_of_thought = ex.get("chain_of_thought", {})
+    training_examples = []
 
+    # 1. Start/End Detection Task
+    start = ex["answer"]["start"]
+    end = ex["answer"]["end"]
+    start_end_prompt = (
+        "You are a maze assistant. Read the ASCII maze and answer in STRICT JSON.\n"
+        "Return only these keys: `start` (0-based [row,col]), `end` (0-based [row,col]), and `think` (string)\n\n"
+        f"<maze>\n{maze}\n</maze>\n\n"
+        "Identify the coordinates of start 'S' and end 'E' in the maze."
+    )
+    completion = f"<think>{chain_of_thought.get('start_end', '')}</think>" + json.dumps({
+        "start": start, 
+        "end": end
+    }, ensure_ascii=False)
     
-    target_text = ""
-    if target_mode == "start_only":
-        user_prompt = (
-        "You are a maze assistant. Read the ASCII maze and answer in STRICT JSON.\n"
-        "Return only these keys: `start` (0-based [row,col]).\n\n"
-        "<maze>\n" + maze + "\n</maze>\n\n"
-        + "Identify the co ordinated of start 'S' in the maze."
-    )
-        target_obj = {"start": start}
-        target_text = json.dumps(target_obj, ensure_ascii=False)
-    elif target_mode == "start_available_direction":
-        user_prompt = (
-        "You are a maze assistant. Read the ASCII maze and answer in STRICT JSON.\n"
-        "Return only these keys: `start` (0-based [row,col]) and `available_directions` "
-        "(array using 'up','down','left','right').\n\n"
-        "<maze>\n" + maze + "\n</maze>\n\n"
-        + "Identify the co ordinated of start 'S' in the maze."
-    )
-        target_text = build_target(start, dirs)
-    elif target_mode == "start_and_end":
-        user_prompt = (
-        "You are a maze assistant. Read the ASCII maze and answer in STRICT JSON.\n"
-        "Return only these keys: `start` (0-based [row,col]) and `end` (0-based [row,col])\n\n"
-        "<maze>\n" + maze + "\n</maze>\n\n"
-        + "Identify the co ordinated of start 'S' in the maze."
-    )
-        end = ans.get("end", None)
-        target_obj = {"start": start, "end": end}
-        target_text = json.dumps(target_obj, ensure_ascii=False)
-    elif target_mode == "optimal_next_step":
-        pass
-    # Build strings
-    prompt_text = build_prompt(maze, user_prompt)
+    training_examples.append({
+        "id": f"{maze_id}_start_end",
+        "task": "DETECT_START_END",
+        "prompt": start_end_prompt,
+        "completion": completion
+    })
 
-    return(json.dumps({
-        "prompt": prompt_text,
-        "completion": target_text
-    }) + "\n")
+    # 2. Available Directions Tasks - for multiple points
+    direction_samples = ex.get("direction_samples", [])
+    for idx, sample in enumerate(direction_samples):
+        position = sample["position"]
+        directions = sample["walkable_directions"]
+        dir_prompt = (
+            "You are a maze assistant. Read the ASCII maze and answer in STRICT JSON.\n"
+            "Return only these keys: `available_directions` (array using 'up','down','left','right') and `think` (string)\n\n"
+            f"<maze>\n{maze}\n</maze>\n\n"
+            f"From position {position}, list all available directions where movement is possible."
+        )
+        completion = f"<think>{sample.get('reasoning', '')}</think>" + json.dumps({
+            "available_directions": directions,
+        }, ensure_ascii=False)
+        
+        training_examples.append({
+            "id": f"{maze_id}_directions_{idx}",
+            "task": "AVAILABLE_DIRECTIONS",
+            "prompt": dir_prompt,
+            "completion": completion
+        })
 
+    # 3. Valid Move Tasks
+    move_samples = ex.get("move_samples", [])
+    for idx, sample in enumerate(move_samples):
+        move_prompt = (
+            "You are a maze assistant. Read the ASCII maze and answer in STRICT JSON.\n"
+            "Return only these keys: `is_valid` (boolean) and `think` (string)\n\n"
+            f"<maze>\n{maze}\n</maze>\n\n"
+            f"From position {sample['position']}, is moving {sample['move']} valid?"
+        )
+        completion = f"<think>{sample.get('reasoning', '')}</think>" + json.dumps({
+            "is_valid": sample["is_valid"],
+        }, ensure_ascii=False)
+        
+        training_examples.append({
+            "id": f"{maze_id}_valid_move_{idx}",
+            "task": "VALID_MOVE", 
+            "prompt": move_prompt,
+            "completion": completion
+        })
+
+    # 4. Optimal Next Step Tasks
+    solution_stages = ex.get("stages", [])
+    for idx, stage in enumerate(solution_stages):
+        step_prompt = (
+            "You are a maze assistant. Read the ASCII maze and answer in STRICT JSON.\n"
+            "Return only these keys: `optimal_step` (one of: 'up','down','left','right') and `think` (string)\n\n"
+            f"<maze>\n{maze}\n</maze>\n\n"
+            f"From position {stage['position']}, what is the optimal next step to reach the goal?"
+        )
+        completion = f"<think>{stage.get('reasoning', '')}</think>" + json.dumps({
+            "optimal_step": stage["optimal_step"],
+        }, ensure_ascii=False)
+        
+        training_examples.append({
+            "id": f"{maze_id}_optimal_step_{idx}",
+            "task": "OPTIMAL_NEXT_STEP",
+            "prompt": build_prompt(step_prompt),
+            "completion": completion
+        })
+
+    # Convert each example to JSONL format
+    return "\n".join(json.dumps(example) for example in training_examples) + "\n"
 
 # --------------------------
 # Dataset: JSONL → supervised pairs
 # --------------------------
-def build_prompt(maze_ascii: str, user_prompt: str) -> str:
+def build_prompt(user_prompt: str) -> str:
     # Keep formatting consistent so tokenization is stable.
     messages = [
-        {"role": "system", "content": "Follow the schema exactly. No extra text."},
+        {"role": "system", "content": "You are a maze-solving assistant. Analyze ASCII mazes to find start/end points, determine valid moves, list available directions, and provide optimal next steps. Always respond in strict JSON format with only the requested fields. Include step-by-step reasoning in the 'think' field when provided."},
         {"role": "user", "content": user_prompt},
     ]
     return tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)

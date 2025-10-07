@@ -1,6 +1,6 @@
 import json
 from sklearn.model_selection import train_test_split
-from utils import dict_to_prompt_completion, build_prompt, build_target, make_training_example, TASKS
+from utils import dict_to_prompt_completion, make_training_example, TASKS
 from mazelib import Maze
 from mazelib.generate.Prims import Prims
 from mazelib.solve.BacktrackingSolver import BacktrackingSolver
@@ -19,7 +19,7 @@ size_counts = {
     3: 500,   # 1000 mazes of size 5x5
     4: 5000,       # 500 mazes of size 7x7
     5: 7000,       # 250 mazes of size 9x9
-    6: 12000,
+    6: 10000,
     7: 15000,      # 100 mazes of size 11x11
 }
 
@@ -37,7 +37,7 @@ for g, n in size_counts.items():
             m.generate()
             m.generate_entrances(start_outer=False, end_outer=False)
         m.solve()
-        all_examples.append(make_training_example(m, TASKS))
+        all_examples.append(make_training_example(m, TASKS, id= f"{g}x{g}_{count}"))
 
 # --- Save to JSON ---
 with open(filename, "w") as f:
@@ -79,7 +79,7 @@ test_data = [data[i] for i in test_idx]
 def save_jsonl(examples, path):
     with open(path, "w") as fout:
         for ex in examples:
-            fout.write(dict_to_prompt_completion(ex, target_mode))
+            fout.write(dict_to_prompt_completion(ex))
 
 
 save_jsonl(train_data, f'{dataset_dir}/train.jsonl')
