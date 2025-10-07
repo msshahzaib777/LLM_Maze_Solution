@@ -1,21 +1,18 @@
 import json
 from sklearn.model_selection import train_test_split
-from utils import dict_to_prompt_completion, build_prompt, build_target
-from utils import make_training_example
+from utils import dict_to_prompt_completion, build_prompt, build_target, make_training_example, TASKS
 from mazelib import Maze
 from mazelib.generate.Prims import Prims
 from mazelib.solve.BacktrackingSolver import BacktrackingSolver
 import json, os
 
-split_name = "_start_and_end_1"
+split_name = "test"
 
 filename = f'../data/maze_training_{split_name}.json'
 dataset_dir = f'../data/custom_{split_name}'
 
 os.makedirs("../data", exist_ok=True)
 os.makedirs(dataset_dir, exist_ok=True)
-
-target_mode = "start_and_end" #"start_available_direction" # "right_dir" # "start_available_direction" # start_only, optimal_next_step.
 
 # --- Define sizes and counts ---
 size_counts = {
@@ -40,7 +37,7 @@ for g, n in size_counts.items():
             m.generate()
             m.generate_entrances(start_outer=False, end_outer=False)
         m.solve()
-        all_examples.append(make_training_example(m))
+        all_examples.append(make_training_example(m, TASKS))
 
 # --- Save to JSON ---
 with open(filename, "w") as f:
