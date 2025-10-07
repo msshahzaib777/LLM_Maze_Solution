@@ -16,11 +16,11 @@ os.makedirs(dataset_dir, exist_ok=True)
 
 # --- Define sizes and counts ---
 size_counts = {
-    3: 2500,   # 1000 mazes of size 5x5
+    3: 500,   # 1000 mazes of size 5x5
     4: 5000,       # 500 mazes of size 7x7
-    5: 8000,       # 250 mazes of size 9x9
-    6: 10000,
-    7: 20000,      # 100 mazes of size 11x11
+    5: 7000,       # 250 mazes of size 9x9
+    6: 12000,
+    7: 15000,      # 100 mazes of size 11x11
 }
 
 Maze.set_seed(123)
