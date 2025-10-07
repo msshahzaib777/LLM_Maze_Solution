@@ -272,8 +272,8 @@ def get_solution(maze_ascii: str, maze_size: int):
         reasoning = (
             f"At position (row={current[0]}, col={current[1]}).\n"
             f"Checking possible directions...\n"
-            f"Optimal direction is '{direction[0]}' to move towards the goal.\n"
-            f"Moving {direction[0]} by vector {direction[1]} to position (row={next_pos[0]}, col={next_pos[1]}).\n"
+            f"Optimal direction is '{direction[0]}' to move towards the goal.\n" 
+            f"Moving {direction[0]} to position (row={next_pos[0]}, col={next_pos[1]}) by vector {direction[1]}.\n"
             f"Marking current position with '-' to track the path.\n"
             f"Maze after move:\n{maze}"
         )
