@@ -8,10 +8,10 @@ import json, os
 
 split_name = "test"
 
-filename = f'../data/maze_training_{split_name}.json'
-dataset_dir = f'../data/custom_{split_name}'
+filename = f'./data/maze_training_{split_name}.json'
+dataset_dir = f'./data/custom_{split_name}'
 
-os.makedirs("../data", exist_ok=True)
+os.makedirs("./data", exist_ok=True)
 os.makedirs(dataset_dir, exist_ok=True)
 
 # --- Define sizes and counts ---
