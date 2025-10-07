@@ -43,7 +43,6 @@ def find_end(maze_ascii: str):
                 return (i, j)
     return None
 
-
 def maze_value_at(maze, position, default: str = "#"):
     lines = maze.splitlines()
     i, j = position
@@ -54,10 +53,8 @@ def maze_value_at(maze, position, default: str = "#"):
         return default
     return row[j]
 
-
 def is_walkable(maze_ascii: str, position: Tuple[int, int]) -> bool:
     return maze_value_at(maze_ascii, position) != "#"
-
 
 def walkable_directions(maze_ascii: str, position: Tuple[int, int]) -> Dict[str, bool]:
     i, j = position
@@ -73,14 +70,12 @@ def walkable_directions(maze_ascii: str, position: Tuple[int, int]) -> Dict[str,
         result[name] = in_bounds and maze_value_at(maze_ascii, (ni, nj)) != "#"
     return result
 
-
 def available_direction_enums(maze_ascii: str, position: Tuple[int, int]) -> List[str]:
     return [
         DIR_TEXT_TO_ENUM[name]
         for name, open_path in walkable_directions(maze_ascii, position).items()
         if open_path
     ]
-
 
 def apply_direction(position: Tuple[int, int], direction: str) -> Tuple[int, int]:
     key = direction.lower()
@@ -93,7 +88,6 @@ def apply_direction(position: Tuple[int, int], direction: str) -> Tuple[int, int
         di, dj = DIRECTION_VECTORS[DIR_ENUM_TO_TEXT[enum_key]]
     return position[0] + di, position[1] + dj
 
-
 def map_text_dirs_to_enum(text_dirs: List[str]) -> List[str]:
     out: List[str] = []
     for d in text_dirs:
@@ -102,11 +96,9 @@ def map_text_dirs_to_enum(text_dirs: List[str]) -> List[str]:
             out.append(DIR_TEXT_TO_ENUM[key])
     return out
 
-
 def get_surroundings(maze_ascii: str, start):
     directions = walkable_directions(maze_ascii, start)
     return directions
-
 
 def get_random_points(maze_ascii: str, n: int = 5) -> List[Tuple[int, int]]:
     """Get n random walkable points from the maze."""
@@ -235,7 +227,6 @@ def get_correct_direction_at(maze: str, position, maze_size):
         if 0 <= ni <= maze_size and 0 <= nj <= maze_size:
             if maze_value_at(maze, (ni, nj)) in ["+", "E"]:
                 return d, (di, dj)
-
 
 def update_maze(maze, position, new_value):
     lines = maze.splitlines()
@@ -467,10 +458,58 @@ def build_target(answer_start: List[int], answer_dirs: List[str]) -> str:
         "available_directions": list(answer_dirs)
     }, ensure_ascii=False)
 
-
 def clamp_and_pad(ids: List[int], max_len: int, pad_id: int) -> List[int]:
     if len(ids) > max_len:
         # For chat SFT, truncating the left (prompt side) is usually safer than chopping off the label.
         # But since we create the full sequence ourselves, keep it simple: right-truncate.
         ids = ids[:max_len]
     return ids + [pad_id] * (max_len - len(ids))
+
+def filter_jsonl_by_task_ratio(input_jsonl_path: str, task_ratios: Dict[str, float]) -> str:
+    """
+    Filter JSONL file to keep specified ratios of each task.
+    
+    Args:
+        input_jsonl_path: Path to input JSONL file
+        task_ratios: Dictionary mapping task names to desired ratios (0-1)
+        
+    Returns:
+        String containing filtered JSONL content
+    """
+    # Validate ratios sum to 1
+    if abs(sum(task_ratios.values()) - 1.0) > 0.001:
+        raise ValueError("Task ratios must sum to 1.0")
+
+    # Read all examples
+    examples = []
+    with open(input_jsonl_path) as f:
+        for line in f:
+            if line.strip():
+                examples.append(json.loads(line))
+                
+    # Group by task
+    task_groups = {}
+    for ex in examples:
+        task = ex["task"]
+        if task not in task_groups:
+            task_groups[task] = []
+        task_groups[task].append(ex)
+        
+    # Calculate counts to keep for each task
+    total_examples = len(examples)
+    keep_counts = {
+        task: int(ratio * total_examples) 
+        for task, ratio in task_ratios.items()
+    }
+    
+    # Sample examples to keep
+    filtered_examples = []
+    for task, count in keep_counts.items():
+        if task in task_groups:
+            task_examples = task_groups[task]
+            samples = random.sample(task_examples, min(count, len(task_examples)))
+            filtered_examples.extend(samples)
+            
+    # Convert back to JSONL
+    return "\n".join(json.dumps(ex) for ex in filtered_examples) + "\n"
+

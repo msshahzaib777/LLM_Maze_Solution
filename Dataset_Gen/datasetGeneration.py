@@ -1,6 +1,6 @@
 import json
 from sklearn.model_selection import train_test_split
-from utils import dict_to_prompt_completion, make_training_example, TASKS
+from utils import dict_to_prompt_completion, make_training_example, TASKS, filter_jsonl_by_task_ratio
 from mazelib import Maze
 from mazelib.generate.Prims import Prims
 from mazelib.solve.BacktrackingSolver import BacktrackingSolver
@@ -45,45 +45,65 @@ with open(filename, "w") as f:
 
 data = all_examples
 
-# Extract labels for stratification
+# First split: train vs rest
 labels = [d["maze_size"] for d in data]
-
-# Split indices instead of the dicts directly
 indices = list(range(len(data)))
-
-train_idx, valid_idx = train_test_split(
+train_idx, temp_idx = train_test_split(
     indices,
     test_size=0.30,
     stratify=labels,
     random_state=42
 )
 
-# Map back to dicts
-train_data = [data[i] for i in train_idx]
-valid_data = [data[i] for i in valid_idx]
-
-# Extract labels for stratification
-labels = [d["maze_size"] for d in valid_data]
-# Split indices instead of the dicts directly
-indices = list(range(len(valid_data)))
-
+# Second split: valid vs test from the remaining data
+temp_data = [data[i] for i in temp_idx]
+temp_labels = [d["maze_size"] for d in temp_data]
+temp_indices = list(range(len(temp_data)))
 valid_idx, test_idx = train_test_split(
-    indices,
+    temp_indices,
     test_size=0.33,
-    stratify=labels,
+    stratify=temp_labels,
     random_state=42
 )
-valid_data = [data[i] for i in valid_idx]
-test_data = [data[i] for i in test_idx]
+
+# Create final datasets
+train_data = [data[i] for i in train_idx]
+valid_data = [temp_data[i] for i in valid_idx]
+test_data = [temp_data[i] for i in test_idx]
 
 def save_jsonl(examples, path):
     with open(path, "w") as fout:
         for ex in examples:
             fout.write(dict_to_prompt_completion(ex))
 
+# Define task ratios (must sum to 1.0)
+task_ratios = {
+    "DETECT_START_END": 0.1,
+    "AVAILABLE_DIRECTIONS": 0.2,
+    "VALID_MOVE": 0.2,
+    "OPTIMAL_NEXT_STEP": 0.5
+}
 
-save_jsonl(train_data, f'{dataset_dir}/train.jsonl')
-save_jsonl(valid_data, f'{dataset_dir}/valid.jsonl')
-save_jsonl(test_data, f'{dataset_dir}/test.jsonl')
+# Process each split
+splits = {
+    'train': train_data,
+    'valid': valid_data,
+    'test': test_data
+}
+
+for split_name, split_data in splits.items():
+    # First save the original data
+    original_path = f'{dataset_dir}/{split_name}.jsonl'
+    save_jsonl(split_data, original_path)
+    
+    # Then filter and save to final location
+    filtered_jsonl = filter_jsonl_by_task_ratio(
+        input_jsonl_path=original_path,
+        task_ratios=task_ratios
+    )
+    
+    filtered_path = f'{dataset_dir}/filtered_{split_name}.jsonl'
+    with open(filtered_path, "w") as f:
+        f.write(filtered_jsonl)
 
 print(f"Wrote {len(train_data)} train and {len(valid_data)} valid and {len(test_data)} test examples")
