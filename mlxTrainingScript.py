@@ -43,13 +43,13 @@ lora_config = {
 }
 
 # Training settings
-MAX_SEQ_LEN = 256  # enough for 7x7 grid + prompt + short JSON answer
+MAX_SEQ_LEN = 512  # enough for 7x7 grid + prompt + short JSON answer
 BASE_LR = 4.0e-5        # LoRA LR (cosine schedule handled inside trainer if available)
-ITERS = 5000       # ~few epochs over 25–50k rows; adjust to your dataset size
+ITERS = 10000       # ~few epochs over 25–50k rows; adjust to your dataset size
 WARMUP = int(0.03 * ITERS)
 DECAY_STEPS = ITERS - WARMUP
 LR_FLOOR = 0.1 * BASE_LR
-EVAL_EVERY = 100
+EVAL_EVERY = 500
 TRAINING_CONTINUE = False
 # --------------------------
 # Load model + tokenizer
