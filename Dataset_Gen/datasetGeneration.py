@@ -84,6 +84,12 @@ task_ratios = {
     "OPTIMAL_NEXT_STEP": 0.5
 }
 
+# Clean up any existing files first
+for file in ['train.jsonl', 'test.jsonl', 'valid.jsonl']:
+    file_path = os.path.join(dataset_dir, file)
+    if os.path.exists(file_path):
+        os.remove(file_path)
+
 # Process each split
 splits = {
     'train': train_data,
@@ -92,18 +98,14 @@ splits = {
 }
 
 for split_name, split_data in splits.items():
-    # First save the original data
-    original_path = f'{dataset_dir}/{split_name}.jsonl'
-    save_jsonl(split_data, original_path)
-    
-    # Then filter and save to final location
+    # Filter and save directly to final location
     filtered_jsonl = filter_jsonl_by_task_ratio(
-        input_jsonl_path=original_path,
+        input_data=split_data,
         task_ratios=task_ratios
     )
     
-    filtered_path = f'{dataset_dir}/filtered_{split_name}.jsonl'
-    with open(filtered_path, "w") as f:
+    output_path = f'{dataset_dir}/{split_name}.jsonl'
+    with open(output_path, "w") as f:
         f.write(filtered_jsonl)
 
 print(f"Wrote {len(train_data)} train and {len(valid_data)} valid and {len(test_data)} test examples")

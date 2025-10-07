@@ -19,8 +19,8 @@ from classes.metrics import LRSchedulerCallback, SimpleMetrics
 # --------------------------
 # Config
 # --------------------------
-model_path = "Qwen/Qwen3-4B-MLX-bf16"
-adapter_dir = "finetuned_model/adapters_dir_start_end"
+model_path = "./finetuned_model/models/Qwen3-4B-MLX-bf16_start_end"
+adapter_dir = "./finetuned_model/adapter/adapters_merged"
 # --------------------------
 # Datasets
 # --------------------------
