@@ -465,7 +465,7 @@ def clamp_and_pad(ids: List[int], max_len: int, pad_id: int) -> List[int]:
         ids = ids[:max_len]
     return ids + [pad_id] * (max_len - len(ids))
 
-def filter_jsonl_by_task_ratio(input_jsonl_path: str, task_ratios: Dict[str, float]) -> str:
+def filter_jsonl_by_task_ratio(input_data, task_ratios: Dict[str, float]) -> str:
     """
     Filter JSONL file to keep specified ratios of each task.
     
@@ -481,22 +481,17 @@ def filter_jsonl_by_task_ratio(input_jsonl_path: str, task_ratios: Dict[str, flo
         raise ValueError("Task ratios must sum to 1.0")
 
     # Read all examples
-    examples = []
-    with open(input_jsonl_path) as f:
-        for line in f:
-            if line.strip():
-                examples.append(json.loads(line))
                 
     # Group by task
     task_groups = {}
-    for ex in examples:
+    for ex in input_data:
         task = ex["task"]
         if task not in task_groups:
             task_groups[task] = []
         task_groups[task].append(ex)
         
     # Calculate counts to keep for each task
-    total_examples = len(examples)
+    total_examples = len(input_data)
     keep_counts = {
         task: int(ratio * total_examples) 
         for task, ratio in task_ratios.items()
