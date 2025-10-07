@@ -76,6 +76,10 @@ def save_jsonl(examples, path):
         for ex in examples:
             fout.write(dict_to_prompt_completion(ex))
 
+save_jsonl(train_data, f'{dataset_dir}/train_full.jsonl')
+save_jsonl(valid_data, f'{dataset_dir}/valid_full.jsonl')
+save_jsonl(test_data, f'{dataset_dir}/test_full.jsonl') 
+
 # Define task ratios (must sum to 1.0)
 task_ratios = {
     "DETECT_START_END": 0.1,
@@ -83,18 +87,19 @@ task_ratios = {
     "VALID_MOVE": 0.2,
     "OPTIMAL_NEXT_STEP": 0.5
 }
-
-# Clean up any existing files first
-for file in ['train.jsonl', 'test.jsonl', 'valid.jsonl']:
-    file_path = os.path.join(dataset_dir, file)
-    if os.path.exists(file_path):
-        os.remove(file_path)
+def open_jsonl(input_jsonl_path):
+    examples = []
+    with open(input_jsonl_path) as f:
+        for line in f:
+            if line.strip():
+                examples.append(json.loads(line))
+    return examples
 
 # Process each split
 splits = {
-    'train': train_data,
-    'valid': valid_data,
-    'test': test_data
+    'train': open_jsonl(f'{dataset_dir}/train_full.jsonl'),
+    'valid': open_jsonl(f'{dataset_dir}/valid_full.jsonl'),
+    'test': open_jsonl(f'{dataset_dir}/test_full.jsonl')
 }
 
 for split_name, split_data in splits.items():
