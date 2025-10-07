@@ -6,7 +6,7 @@ from mazelib.generate.Prims import Prims
 from mazelib.solve.BacktrackingSolver import BacktrackingSolver
 import json, os
 
-split_name = "test"
+split_name = "curriculum_1"
 
 filename = f'./data/maze_training_{split_name}.json'
 dataset_dir = f'./data/custom_{split_name}'
