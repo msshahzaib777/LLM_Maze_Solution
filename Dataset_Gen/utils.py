@@ -1,7 +1,9 @@
 import json
-from mlx_lm import load, generate
+import math
+import os
 from typing import List, Dict, Any, Optional, Tuple
 import random
+from mlx_lm import load, generate
 
 _, tokenizer = load("nightmedia/Qwen3-4B-Thinking-2507-bf16-mlx")
 
@@ -22,6 +24,57 @@ DIR_TEXT_TO_ENUM = {
 }
 
 DIR_ENUM_TO_TEXT = {v: k for k, v in DIR_TEXT_TO_ENUM.items()}
+
+def suggest_optimal_max_seq_length(
+    jsonl_path: str,
+    percentile: float = 0.995,
+    safety_margin: float = 1.05,
+    *,
+    tokenizer_override=None
+) -> Dict[str, float]:
+    """
+    Estimate a safe max sequence length for a JSONL dataset and return summary stats.
+
+    Args:
+        jsonl_path: Path to the JSONL file containing `prompt` plus `completion` or `target`.
+        percentile: Fraction of samples that should fit without truncation.
+        safety_margin: Multiplier applied to the percentile length.
+        tokenizer_override: Optional tokenizer to use instead of the module-level tokenizer.
+    """
+    if not os.path.exists(jsonl_path):
+        raise FileNotFoundError(f"Dataset file not found: {jsonl_path}")
+    if not 0 < percentile <= 1:
+        raise ValueError("percentile must be in the interval (0, 1].")
+
+    tok = tokenizer_override or tokenizer
+
+    def _completion(entry: Dict[str, Any]) -> str:
+        value = entry.get("completion", entry.get("target", ""))
+        return json.dumps(value) if isinstance(value, (dict, list)) else (value or "")
+
+    with open(jsonl_path, "r") as handle:
+        lengths = [
+            len(tok.encode(sample.get("prompt", ""), add_special_tokens=True))
+            + len(tok.encode(_completion(sample), add_special_tokens=False))
+            for sample in map(json.loads, handle)
+        ]
+
+    if not lengths:
+        raise ValueError(f"No records found in {jsonl_path}")
+
+    lengths.sort()
+    idx = min(len(lengths) - 1, math.ceil(percentile * len(lengths)) - 1)
+    percentile_len = lengths[idx]
+    max_len = lengths[-1]
+    recommended = max(max_len, math.ceil(percentile_len * safety_margin))
+
+    return {
+        "recommended": recommended,
+        "max_observed": max_len,
+        "percentile_length": percentile_len,
+        "percentile": percentile,
+        "dataset_size": len(lengths),
+    }
 
 
 def clean_maze_ascii(maze_ascii: str) -> str:
@@ -371,7 +424,7 @@ def dict_to_prompt_completion(ex):
     training_examples.append({
         "id": f"{maze_id}_start_end",
         "task": "DETECT_START_END",
-        "prompt": start_end_prompt,
+        "prompt":  build_prompt(start_end_prompt),
         "completion": completion
     })
 
@@ -393,7 +446,7 @@ def dict_to_prompt_completion(ex):
         training_examples.append({
             "id": f"{maze_id}_directions_{idx}",
             "task": "AVAILABLE_DIRECTIONS",
-            "prompt": dir_prompt,
+            "prompt":  build_prompt(dir_prompt),
             "completion": completion
         })
 
@@ -413,7 +466,7 @@ def dict_to_prompt_completion(ex):
         training_examples.append({
             "id": f"{maze_id}_valid_move_{idx}",
             "task": "VALID_MOVE", 
-            "prompt": move_prompt,
+            "prompt":  build_prompt(move_prompt),
             "completion": completion
         })
 
@@ -436,7 +489,35 @@ def dict_to_prompt_completion(ex):
             "prompt": build_prompt(step_prompt),
             "completion": completion
         })
-
+    # 5. Full Solution Task
+    if solution_stages:
+        # Build thinking block
+        full_solution_thinking = chain_of_thought.get('start_end', '') + "\n\nPath finding steps:\n"
+        path_sequence = []
+        
+        for stage in solution_stages:
+            full_solution_thinking += stage.get('reasoning', '') + "\n"
+            path_sequence.append(stage["optimal_step"])
+            
+        solution_prompt = (
+            "You are a maze assistant. Read the ASCII maze and solve it step by step. Answer in STRICT JSON.\n"
+            "Return only these keys: `path` (array of directions), `think` (detailed reasoning)\n\n"
+            "Walk through the maze from start 'S' to end 'E', listing each step of the solution.\n"
+            "Consider walls, optimal path, and explain your thinking process.\n\n"
+            f"<maze>\n{maze}\n</maze>\n\n"
+            "Provide the complete solution path with detailed reasoning."
+        )
+        
+        completion = f"<think>{full_solution_thinking}</think>" + json.dumps({
+            "path": path_sequence,
+        }, ensure_ascii=False)
+        
+        training_examples.append({
+            "id": f"{maze_id}_full_solution",
+            "task": "MAZE_SOLUTION",
+            "prompt": build_prompt(solution_prompt),
+            "completion": completion
+        })
     # Convert each example to JSONL format
     return "\n".join(json.dumps(example) for example in training_examples) + "\n"
 
@@ -508,3 +589,15 @@ def filter_jsonl_by_task_ratio(input_data, task_ratios: Dict[str, float]) -> str
     # Convert back to JSONL
     return "\n".join(json.dumps(ex) for ex in filtered_examples) + "\n"
 
+
+# Update dict_to_prompt_completion to include full solution
+def dict_to_prompt_completion(ex):
+    # Keep existing code...
+    result = dict_to_prompt_completion_original(ex)  # Store original function output
+    
+    # Add full solution task
+    full_solution = add_full_solution_to_dict_prompt(ex)
+    if full_solution:
+        result += full_solution
+        
+    return result

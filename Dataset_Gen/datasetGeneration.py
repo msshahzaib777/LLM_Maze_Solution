@@ -1,10 +1,16 @@
 import json
 from sklearn.model_selection import train_test_split
-from utils import dict_to_prompt_completion, make_training_example, TASKS, filter_jsonl_by_task_ratio
+from utils import (
+    dict_to_prompt_completion,
+    make_training_example,
+    TASKS,
+    filter_jsonl_by_task_ratio,
+    suggest_optimal_max_seq_length,
+)
 from mazelib import Maze
 from mazelib.generate.Prims import Prims
 from mazelib.solve.BacktrackingSolver import BacktrackingSolver
-import json, os
+import os
 import argparse
 
 def generate_maze_examples(size_counts):
@@ -104,7 +110,7 @@ def main():
         print("Loading existing maze examples...")
         with open(filename) as f:
             all_examples = json.load(f)
-
+    train_data = valid_data = test_data = None
     # Step 2: Create or load full splits
     if not args.skip_full_splits:
         print("Creating train/valid/test splits...")
@@ -127,13 +133,20 @@ def main():
     }
 
     splits = {
-        'train': train_data,
-        'valid': valid_data,
         'test': test_data
     }
 
     print("Processing splits with task ratios...")
     process_splits_with_ratios(dataset_dir, task_ratios, splits)
+
+    summary = {
+        split: suggest_optimal_max_seq_length(os.path.join(dataset_dir, f"{split}.jsonl"))
+        for split in splits
+    }
+    summary_path = os.path.join(dataset_dir, "sequence_length_summary.json")
+    with open(summary_path, "w") as fout:
+        json.dump(summary, fout, indent=2)
+    print(f"Sequence length summary written to {summary_path}")
     
     print(f"Wrote {len(train_data)} train and {len(valid_data)} valid and {len(test_data)} test examples")
 

@@ -1,37 +1,32 @@
 # --------------------------
 # Batched eval on test.jsonl + save per-example outputs
 # --------------------------
-import os, re, json, math
+import os, json, sys
 from typing import List
-from mlx_lm import generate, load
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import mlx.core as mx
+from tqdm.auto import tqdm
+
+from mlx_lm import load, generate, batch_generate
 
 # --------------------------
 # Paths & constants
 # --------------------------
-ds_dir = "data/custom__start_and_end_1"
-adapter_dir = "finetuned_model/adapters_dir_start_end"
-model_path = "Qwen/Qwen3-4B-MLX-bf16"
+ds_dir = "data/custom_curriculum_1"
+adapter_dir = "finetuned_model/adapter/adapters_merged_2"
+model_path = "finetuned_model/models/Qwen3-4B-MLX-bf16_start_end"
 
 ALLOWED_DIRS = {"up", "down", "left", "right"}
 test_path = os.path.join(ds_dir, "test.jsonl")
 
-eval_dir = os.path.join(adapter_dir, "eval_2")
-os.makedirs(eval_dir, exist_ok=True)
-preds_jsonl = os.path.join(eval_dir, "test_predictions.jsonl")
-summary_json = os.path.join(eval_dir, "summary.json")
-
 # Tune batch throughput vs. memory
-BATCH_SIZE = 500          # try 8–64 depending on VRAM
-MAX_TOKENS = 64          # decoding budget per sample
+# Larger batch size for systems with high RAM (64GB)
+BATCH_SIZE = 64  # Increased batch size for faster processing with sufficient memory
+MAX_TOKENS = 512          # decoding budget per sample
 TEMPERATURE = 0.0        # deterministic
 TOP_P = 1.0
 SEED = 0
 VERBOSE = False
-
-# If your mlx_lm version doesn't support batched `prompts=[...]`,
-# set this to True to use a small thread pool fallback.
-USE_THREADPOOL_FALLBACK = False
-THREADS = 4
 
 # --------------------------
 # Load model
@@ -42,233 +37,149 @@ model_lora, tokenizer = load(
     adapter_path=adapter_dir
 )
 
-# preds_jsonl_data = []
-# if os.path.isfile(preds_jsonl) and os.path.getsize(preds_jsonl) > 0:
-#     with open(preds_jsonl, "r", encoding="utf-8") as f:
-#         for i, line in enumerate(f, 1):
-#             line = line.strip()
-#             if not line:
-#                 continue
-#         try:
-#             preds_jsonl_data.append(json.loads(line))
-#         except json.JSONDecodeError as e:
-#             print(f"Skipping line {i}: {e}")
+model_lora.eval()
+mx.random.seed(SEED)
 
 # --------------------------
-# Utils
+# Load test data & run inference
 # --------------------------
-def _extract_first_json(s: str):
-    try:
-        return json.loads(s)
-    except Exception:
-        m = re.search(r"\{.*?\}", s, flags=re.S)
-        if not m:
-            return None
-        try:
-            return json.loads(m.group(0))
-        except Exception:
-            return None
+eval_dir = os.path.join(adapter_dir, "eval_1")
+os.makedirs(eval_dir, exist_ok=True)
+preds_jsonl = os.path.join(eval_dir, "test_predictions.jsonl")
+summary_json = os.path.join(eval_dir, "summary.json")
 
-def _norm_dirs(dirs):
-    if not isinstance(dirs, (list, tuple)): return set()
-    return {str(x).strip().lower() for x in dirs if str(x).strip().lower() in ALLOWED_DIRS}
+def batch_inference():
+    # Check if predictions already exist
+    # Load test data
+    with open(test_path, 'r') as f:
+        test_data = [json.loads(line) for line in f]
 
-def _build_chat_prompt(user_prompt: str) -> str:
-    # Wrap as a user message and add generation tag
-    messages = [{"role": "user", "content": user_prompt}]
-    return tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
-
-def _batched_generate(prompts: List[str]) -> List[str]:
-    """
-    Try true batched generation (vectorized).
-    If not supported by your mlx_lm version and fallback is enabled, use threads.
-    """
-    try:
-        # Many mlx_lm builds support a list under the `prompts` argument
-        return generate(
-            model_lora,
-            tokenizer,
-            prompts=prompts,
-            max_tokens=MAX_TOKENS,
-            verbose=VERBOSE,
-        )
-    except TypeError:
-        # Fallback: per-prompt generate (optionally in a small thread pool)
-        if not USE_THREADPOOL_FALLBACK:
-            return [
-                generate(
-                    model_lora, tokenizer,
-                    prompt=p,
-                    max_tokens=MAX_TOKENS,
-                    verbose=VERBOSE,
-                )
-                for p in prompts
-            ]
+    # Check for existing predictions and resume if possible
+    existing_preds = []
+    if os.path.exists(preds_jsonl):
+        with open(preds_jsonl, 'r') as f:
+            for line in f:
+                if line.strip():
+                    existing_preds.append(json.loads(line))
+        completed = len(existing_preds)
+        if completed >= len(test_data):
+            print(f"Predictions already complete at {preds_jsonl}, skipping inference...")
+            return existing_preds
         else:
-            from concurrent.futures import ThreadPoolExecutor, as_completed
-            outs = [None] * len(prompts)
-            with ThreadPoolExecutor(max_workers=THREADS) as ex:
-                futs = {
-                    ex.submit(
-                        generate,
-                        model_lora, tokenizer,
-                        p, MAX_TOKENS, TEMPERATURE, TOP_P, SEED, VERBOSE
-                    ): idx
-                    for idx, p in enumerate(prompts)
+            print(f"Resuming from {completed} / {len(test_data)} predictions in {preds_jsonl}...")
+    else:
+        completed = 0
+
+    predictions = existing_preds.copy()
+    total_batches = (len(test_data) + BATCH_SIZE - 1) // BATCH_SIZE
+    with open(preds_jsonl, 'a') as outfile:
+        for batch_start in tqdm(
+            range(completed, len(test_data), BATCH_SIZE),
+            total=total_batches - (completed // BATCH_SIZE),
+            desc="Evaluating",
+            unit="batch"
+        ):
+            batch = test_data[batch_start:batch_start + BATCH_SIZE]
+            prompts = [item['prompt'] for item in batch]
+            tokenized_prompts = [tokenizer.encode(prompt) for prompt in prompts]
+
+            outputs = batch_generate(
+                model_lora,
+                tokenizer,
+                prompts=tokenized_prompts,
+                max_tokens=MAX_TOKENS,
+                verbose=VERBOSE,
+            )
+
+            for offset, (item, output) in enumerate(zip(batch, outputs.texts)):
+                pred_item = {
+                    'id': item.get('id', batch_start + offset),
+                    'prompt': item['prompt'],
+                    'target': item.get('completion', ''),
+                    'prediction': output
                 }
-                for fut in as_completed(futs):
-                    idx = futs[fut]
-                    outs[idx] = fut.result()
-            return outs
+                predictions.append(pred_item)
+                outfile.write(json.dumps(pred_item) + '\n')
+
+    return predictions
+
+# Run inference
+predictions = batch_inference()
 
 # --------------------------
-# Read dataset into memory (single pass I/O)
+# Evaluate predictions by task type
 # --------------------------
-records = []
-with open(test_path, "r", encoding="utf-8") as fin:
-    for line in fin:
-        ex = json.loads(line)
-        user_prompt = ex["prompt"]
-        gt = json.loads(ex["completion"])  # {"start":[r,c], "available_directions":[...]}
-        gt_start = [int(gt["start"][0]), int(gt["start"][1])]
-        gt_end = [int(gt["end"][0]), int(gt["end"][1])]
-        gt_dirs  = _norm_dirs(gt.get("available_directions", []))
-        chat_prompt = _build_chat_prompt(user_prompt)
-        records.append({
-            "prompt_raw": user_prompt,
-            "chat_prompt": chat_prompt,
-            "gt_start": gt_start,
-            "gt_dirs": gt_dirs,
-            "gt_end": gt_end,
-        })
+def evaluate_start_end_task(pred_item):
+    # Extract ground truth and prediction
+    try:
+        target = json.loads(pred_item['target'])
+        prediction = json.loads(pred_item['prediction'])
+        return (target['start'] == prediction['start'] and 
+                target['end'] == prediction['end'])
+    except:
+        return False
 
-# --------------------------
-# Batched inference + scoring
-# --------------------------
-total = correct_start = correct_dirs = exact_all = bad_json = correct_end = 0
-tp = fp = fn = 0  # micro P/R/F1 for directions
+def evaluate_directions_task(pred_item):
+    try:
+        target = json.loads(pred_item['target'])
+        prediction = json.loads(pred_item['prediction'])
+        return target['available_directions'] == prediction['available_directions']
+    except:
+        return False
 
-with open(preds_jsonl, "w", encoding="utf-8") as fout:
-    for b in range(0, len(records), BATCH_SIZE):
-        batch = records[b:b+BATCH_SIZE]
-        chat_prompts = [r["chat_prompt"] for r in batch]
-        outs = _batched_generate(chat_prompts)
-        # Normalize to list
-        if isinstance(outs, str):
-            outs = [outs]
+def evaluate_valid_move_task(pred_item):
+    try:
+        target = json.loads(pred_item['target'])
+        prediction = json.loads(pred_item['prediction'])
+        return target['is_valid'] == prediction['is_valid']
+    except:
+        return False
 
-        for j, out in enumerate(outs):
-            rec = batch[j]
-            i_global = b + j
+def evaluate_optimal_step_task(pred_item):
+    try:
+        target = json.loads(pred_item['target'])
+        prediction = json.loads(pred_item['prediction'])
+        return target['optimal_step'] == prediction['optimal_step']
+    except:
+        return False
 
-            pred = _extract_first_json(out)
-            record = {
-                "id": i_global,
-                "prompt": rec["prompt_raw"],
-                "ground_truth": {
-                    "start": rec["gt_start"],
-                    "available_directions": sorted(rec["gt_dirs"]),
-                    "end": rec["gt_end"],
-                },
-                "raw_output": out,
-                "parsed": pred,
-            }
-
-            if not pred or "start" not in pred:
-                bad_json += 1
-                record["prediction"] = None
-                record["match"] = {"start": False, "available_directions": False, "both": False}
-                fout.write(json.dumps(record, ensure_ascii=False) + "\n")
-                total += 1
-                continue
-
-            record["match"] = {"start": True, "available_directions": True, "both": True, "end": True}
-            # Parse prediction
-            try:
-                pred_start = [int(pred["start"][0]), int(pred["start"][1])]
-            except Exception:
-                bad_json += 1
-                record["prediction"] = None
-                record["match"]["start"] = False
-                fout.write(json.dumps(record, ensure_ascii=False) + "\n")
-                total += 1
-                continue
-                # Parse prediction
-            try:
-                pred_end = [int(pred["end"][0]), int(pred["end"][1])]
-            except Exception:
-                bad_json += 1
-                record["prediction"] = None
-                record["match"]["end"] =  False
-                fout.write(json.dumps(record, ensure_ascii=False) + "\n")
-                total += 1
-                continue
-
-            pred_dirs = _norm_dirs(pred.get("available_directions", []))
-            start_ok = (pred_start == rec["gt_start"])
-            end_ok = (pred_end == rec["gt_end"])
-            dirs_ok  = (pred_dirs == rec["gt_dirs"])
-
-            # Update set metrics
-            tp += len(pred_dirs & rec["gt_dirs"])
-            fp += len(pred_dirs - rec["gt_dirs"])
-            fn += len(rec["gt_dirs"] - pred_dirs)
-
-            record["prediction"] = {
-                "start": pred_start,
-                "available_directions": sorted(pred_dirs),
-                "end": pred_end,
-            }
-            record["match"] = {
-                "start": start_ok,
-                "available_directions": dirs_ok,
-                "end": end_ok,
-                "all": start_ok and dirs_ok and end_ok,
-            }
-
-            fout.write(json.dumps(record, ensure_ascii=False) + "\n")
-
-            total += 1
-            if start_ok: correct_start += 1
-            if dirs_ok:  correct_dirs  += 1
-            if end_ok: correct_end += 1
-            if start_ok and dirs_ok and end_ok : exact_all += 1
-
-# --------------------------
-# Aggregate metrics
-# --------------------------
-acc_start = 0.0 if total == 0 else correct_start / total
-acc_dirs  = 0.0 if total == 0 else correct_dirs  / total
-acc_end = 0.0 if total == 0 else correct_end / total
-acc_all  = 0.0 if total == 0 else exact_all    / total
-valid_json_rate = 0.0 if total == 0 else 1.0 - (bad_json / total)
-precision = 0.0 if (tp + fp) == 0 else tp / (tp + fp)
-recall    = 0.0 if (tp + fn) == 0 else tp / (tp + fn)
-f1        = 0.0 if (precision + recall) == 0 else 2 * precision * recall / (precision + recall)
-
-summary = {
-    "total": total,
-    "start_accuracy": acc_start,
-    "end_accuracy": acc_end,
-    "dirs_accuracy": acc_dirs,
-    "exact_both_accuracy": acc_all,
-    "dirs_micro_precision": precision,
-    "dirs_micro_recall": recall,
-    "dirs_micro_f1": f1,
-    "valid_json_rate": valid_json_rate,
-    "invalid_json": bad_json,
-    "preds_file": preds_jsonl,
-    "batch_size": BATCH_SIZE,
-    "max_tokens": MAX_TOKENS,
-    "temperature": TEMPERATURE,
-    "top_p": TOP_P,
+# Calculate metrics per task
+results = {
+    'DETECT_START_END': {'correct': 0, 'total': 0},
+    'AVAILABLE_DIRECTIONS': {'correct': 0, 'total': 0}, 
+    'VALID_MOVE': {'correct': 0, 'total': 0},
+    'OPTIMAL_NEXT_STEP': {'correct': 0, 'total': 0}
 }
-with open(summary_json, "w", encoding="utf-8") as f:
+
+for pred in predictions:
+    task = json.loads(pred['prompt'])['task']
+    if task == 'DETECT_START_END':
+        results[task]['total'] += 1
+        results[task]['correct'] += evaluate_start_end_task(pred)
+    elif task == 'AVAILABLE_DIRECTIONS':
+        results[task]['total'] += 1
+        results[task]['correct'] += evaluate_directions_task(pred)
+    elif task == 'VALID_MOVE':
+        results[task]['total'] += 1
+        results[task]['correct'] += evaluate_valid_move_task(pred)
+    elif task == 'OPTIMAL_NEXT_STEP':
+        results[task]['total'] += 1
+        results[task]['correct'] += evaluate_optimal_step_task(pred)
+
+# Calculate accuracies and save results
+summary = {}
+for task, counts in results.items():
+    if counts['total'] > 0:
+        accuracy = counts['correct'] / counts['total']
+        summary[task] = {
+            'accuracy': accuracy,
+            'correct': counts['correct'],
+            'total': counts['total']
+        }
+
+with open(summary_json, 'w') as f:
     json.dump(summary, f, indent=2)
 
-print("\nSaved predictions to:", preds_jsonl)
-print("Saved summary to    :", summary_json)
-print(
-    f"\nStart acc={acc_start:.2%} | Dirs acc={acc_dirs:.2%} | Both={acc_all:.2%} | "
-    f"P={precision:.2%} R={recall:.2%} F1={f1:.2%} | Valid JSON={valid_json_rate:.2%}"
-)
+print("\nEvaluation Results:")
+for task, metrics in summary.items():
+    print(f"{task}: {metrics['accuracy']:.2%} ({metrics['correct']}/{metrics['total']})")
