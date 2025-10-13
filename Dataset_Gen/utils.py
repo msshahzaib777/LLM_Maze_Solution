@@ -589,15 +589,15 @@ def filter_jsonl_by_task_ratio(input_data, task_ratios: Dict[str, float]) -> str
     # Convert back to JSONL
     return "\n".join(json.dumps(ex) for ex in filtered_examples) + "\n"
 
+def save_jsonl(examples, path, mapper=None):
+    with open(path, "w") as fout:
+        for ex in examples:
+            fout.write(mapper(ex))
 
-# Update dict_to_prompt_completion to include full solution
-def dict_to_prompt_completion(ex):
-    # Keep existing code...
-    result = dict_to_prompt_completion_original(ex)  # Store original function output
-    
-    # Add full solution task
-    full_solution = add_full_solution_to_dict_prompt(ex)
-    if full_solution:
-        result += full_solution
-        
-    return result
+def open_jsonl(input_jsonl_path):
+    examples = []
+    with open(input_jsonl_path) as f:
+        for line in f:
+            if line.strip():
+                examples.append(json.loads(line))
+    return examples

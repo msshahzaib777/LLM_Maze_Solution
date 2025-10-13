@@ -6,6 +6,8 @@ from utils import (
     TASKS,
     filter_jsonl_by_task_ratio,
     suggest_optimal_max_seq_length,
+    open_jsonl,
+    save_jsonl
 )
 from mazelib import Maze
 from mazelib.generate.Prims import Prims
@@ -13,17 +15,17 @@ from mazelib.solve.BacktrackingSolver import BacktrackingSolver
 import os
 import argparse
 
-def generate_maze_examples(size_counts):
+def generate_maze_examples(config):
     """Generate maze examples based on size counts"""
     Maze.set_seed(123)
     all_examples = []
-    for g, n in size_counts.items():
+    for g, n in config['maze_sizes'].items():
         for count in range(n):
             m = Maze()
             m.generator = Prims(g, g)
             m.solver = BacktrackingSolver()
             if count < n//4:
-                m.generate_monte_carlo(5, 10, 0.5)
+                m.generate_monte_carlo(config["monte_carlo_params"]["repeat"], config["monte_carlo_params"]["entrances"], config["monte_carlo_params"]['difficulty'])
             else:
                 m.generate()
                 m.generate_entrances(start_outer=False, end_outer=False)
@@ -52,19 +54,6 @@ def split_data(data):
     
     return train_data, valid_data, test_data
 
-def save_jsonl(examples, path):
-    with open(path, "w") as fout:
-        for ex in examples:
-            fout.write(dict_to_prompt_completion(ex))
-
-def open_jsonl(input_jsonl_path):
-    examples = []
-    with open(input_jsonl_path) as f:
-        for line in f:
-            if line.strip():
-                examples.append(json.loads(line))
-    return examples
-
 def process_splits_with_ratios(dataset_dir, task_ratios, splits):
     """Process splits with given task ratios"""
     for split_name, split_data in splits.items():
@@ -77,71 +66,44 @@ def process_splits_with_ratios(dataset_dir, task_ratios, splits):
         with open(output_path, "w") as f:
             f.write(filtered_jsonl)
 
-def main():
-    parser = argparse.ArgumentParser(description='Generate maze dataset with checkpoints')
-    parser.add_argument('--skip-generation', action='store_true', help='Skip maze generation and load from JSON')
-    parser.add_argument('--skip-full-splits', action='store_true', help='Skip full splits generation and load existing')
-    parser.add_argument('--split-name', default='curriculum_1', help='Name of the split')
-    args = parser.parse_args()
-
-    split_name = args.split_name
-    filename = f'./data/maze_training_{split_name}.json'
-    dataset_dir = f'./data/custom_{split_name}'
+def main(CONFIG=None):
+    filename = f'./data/maze_training_{CONFIG["dataset_name"]}.json'
+    dataset_dir = f'./data/{CONFIG["dataset_name"]}'
 
     os.makedirs("./data", exist_ok=True)
     os.makedirs(dataset_dir, exist_ok=True)
 
-    # Define sizes and counts
-    size_counts = {
-        3: 500,
-        4: 5000,
-        5: 7000,
-        6: 10000,
-        7: 15000,
-    }
-
     # Step 1: Generate or load maze examples
-    if not args.skip_generation and not os.path.exists(filename):
+    if not CONFIG['skip_generation'] and not os.path.exists(filename):
         print("Generating maze examples...")
-        all_examples = generate_maze_examples(size_counts)
+        all_examples = generate_maze_examples(CONFIG['maze_sizes'])
         with open(filename, "w") as f:
             json.dump(all_examples, f, indent=2)
     else:
         print("Loading existing maze examples...")
         with open(filename) as f:
             all_examples = json.load(f)
+        
     train_data = valid_data = test_data = None
     # Step 2: Create or load full splits
-    if not args.skip_full_splits:
+    if not CONFIG['skip_full_splits']:
         print("Creating train/valid/test splits...")
         train_data, valid_data, test_data = split_data(all_examples)
-        save_jsonl(train_data, f'{dataset_dir}/train_full.jsonl')
-        save_jsonl(valid_data, f'{dataset_dir}/valid_full.jsonl')
-        save_jsonl(test_data, f'{dataset_dir}/test_full.jsonl')
+        save_jsonl(train_data, f'{dataset_dir}/train_full.jsonl', mapper=dict_to_prompt_completion)
+        save_jsonl(valid_data, f'{dataset_dir}/valid_full.jsonl', mapper=dict_to_prompt_completion)
+        save_jsonl(test_data, f'{dataset_dir}/test_full.jsonl', mapper=dict_to_prompt_completion)
     else:
         print("Loading existing splits...")
         train_data = open_jsonl(f'{dataset_dir}/train_full.jsonl')
         valid_data = open_jsonl(f'{dataset_dir}/valid_full.jsonl')
         test_data = open_jsonl(f'{dataset_dir}/test_full.jsonl')
 
-    # Step 3: Process with task ratios
-    task_ratios = {
-        "DETECT_START_END": 0.1,
-        "AVAILABLE_DIRECTIONS": 0.2,
-        "VALID_MOVE": 0.2,
-        "OPTIMAL_NEXT_STEP": 0.5
-    }
-
-    splits = {
-        'test': test_data
-    }
-
     print("Processing splits with task ratios...")
-    process_splits_with_ratios(dataset_dir, task_ratios, splits)
+    process_splits_with_ratios(dataset_dir, CONFIG['task_ratios'], CONFIG['splits'])
 
     summary = {
         split: suggest_optimal_max_seq_length(os.path.join(dataset_dir, f"{split}.jsonl"))
-        for split in splits
+        for split in CONFIG['splits']
     }
     summary_path = os.path.join(dataset_dir, "sequence_length_summary.json")
     with open(summary_path, "w") as fout:
@@ -151,4 +113,34 @@ def main():
     print(f"Wrote {len(train_data)} train and {len(valid_data)} valid and {len(test_data)} test examples")
 
 if __name__ == "__main__":
-    main()
+    CONFIG = {
+        'random_seed': 123,
+        'monte_carlo_params': {
+            'repeat': 5,
+            'entrance': 10,
+            'difficulty': 0.5
+        },
+        'maze_sizes': {
+            3: 500,
+            4: 5000,
+            5: 7000,
+            6: 10000,
+            7: 15000,
+        },
+        'splits': ['train', 'valid', 'test'],
+        'split_params': {
+            'test_size': 0.30,
+            'valid_test_split': 0.33,
+            'random_state': 42
+        },
+        'task_ratios': {
+            "DETECT_START_END": 0.1,
+            "AVAILABLE_DIRECTIONS": 0.2,
+            "VALID_MOVE": 0.2,
+            "OPTIMAL_NEXT_STEP": 0.5
+        },
+        'skip_generation': False,
+        'skip_full_splits': False,
+        'dataset_name': 'curriculum_1'
+    }
+    main(CONFIG)
