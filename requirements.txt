@@ -1,0 +1,26 @@
+# PyTorch Dependencies for LLM Maze Solution
+# Install with: pip install -r requirements.txt
+
+# Core PyTorch and ML libraries
+torch>=2.0.0
+transformers>=4.36.0
+datasets>=2.14.0
+peft>=0.7.0
+accelerate>=0.24.0
+
+# Data processing
+numpy>=1.21.0
+matplotlib>=3.5.0
+pillow>=8.3.0
+
+# Utility libraries
+tqdm>=4.64.0
+safetensors>=0.4.0
+
+# Optional: For better performance
+# bitsandbytes>=0.41.0  # For 8-bit training (Linux/Windows with CUDA)
+# flash-attn>=2.0.0     # For flash attention (requires specific setup)
+
+# Development and testing
+pytest>=7.0.0
+jupyter>=1.0.0
