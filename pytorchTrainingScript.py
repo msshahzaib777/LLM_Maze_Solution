@@ -5,13 +5,13 @@ from peft import LoraConfig, get_peft_model
 from datasets import load_dataset
 
 # Updated constants for Mac MPS
-MODEL = "Qwen/Qwen3-7B"  # Updated to Qwen3
-DATA  = "data/train.jsonl"
+MODEL = "Qwen/Qwen3-4B"  # Updated to Qwen3
+DATA  = "data/custom_test/train.jsonl"
 BATCH = 1  # Reduced batch size for MPS memory constraints
 ACCUM = 8
 LR    = 2e-4
 EPOCHS= 2
-MAXLEN= 2048
+MAXLEN= 512
 DEVICE= "mps"  # Force MPS device for Mac
 
 # Check MPS availability
