@@ -1,6 +1,6 @@
 import torch, math
 from torch.utils.data import DataLoader
-from transformers import AutoModelForCausalLM, AutoTokenizer, get_cosine_schedule_with_warmup
+from transformers import AutoModelForCausalLM, AutoTokenizer, get_cosine_with_min_lr_schedule_with_warmup
 from peft import LoraConfig, get_peft_model
 from datasets import load_dataset
 
@@ -67,7 +67,7 @@ model.to(DEVICE)
 model.train()
 
 opt = torch.optim.AdamW(model.parameters(), lr=BASE_LR)
-sched = get_cosine_schedule_with_warmup(opt, WARMUP, ITERS, min_lr_ratio=(LR_FLOOR/BASE_LR))
+sched = get_cosine_with_min_lr_schedule_with_warmup(opt, WARMUP, ITERS, min_lr=BASE_LR)
 
 # Training loop - iteration-based instead of epoch-based
 global_step = 0
