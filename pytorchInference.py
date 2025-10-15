@@ -25,8 +25,12 @@ if not loss_history:
 else:
     # Find the checkpoint with minimum loss
     min_loss_step, min_loss = min(loss_history, key=lambda x: x[1])
-    best_checkpoint = os.path.join(adapter_base_path, f"checkpoint-{min_loss_step}")
-    print(f"Loading best checkpoint: checkpoint-{min_loss_step} with loss: {min_loss}")
+    # Get all checkpoint steps
+    checkpoint_steps = [int(d.split('-')[1]) for d in checkpoint_dirs]
+    # Find the nearest available checkpoint to min_loss_step
+    nearest_checkpoint_step = min(checkpoint_steps, key=lambda x: abs(x - min_loss_step))
+    best_checkpoint = os.path.join(adapter_base_path, f"checkpoint-{nearest_checkpoint_step}")
+    print(f"Loading best checkpoint: checkpoint-{nearest_checkpoint_step} with loss: {min_loss} (from step {min_loss_step})")
 
 # Load the model with best checkpoint
 tok = AutoTokenizer.from_pretrained(base_id)
