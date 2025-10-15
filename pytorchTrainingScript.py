@@ -13,9 +13,9 @@ ACCUM = 8
 # Learning rate schedule parameters
 BASE_LR = 4.0e-5
 ITERS = 10000
-WARMUP = 0.03 * iters
-DECAY_STEPS = iters - warmup
-LR_FLOOR = 0.1 * base_lr
+WARMUP = 0.03 * ITERS
+DECAY_STEPS = ITERS - WARMUP
+LR_FLOOR = 0.1 * BASE_LR
 EVAL_EVERY = 50
 
 MAXLEN= 512
