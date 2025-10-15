@@ -5,34 +5,29 @@ from peft import PeftModel
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from peft import PeftModel
 import json, os
+from tqdm import tqdm
 
 base_id = "Qwen/Qwen3-4B"          # example
 adapter_base_path = "./finetuned_model/adapters_dir_qwen3"     # PEFT-style adapter
 
-# Find all checkpoint directories
+# Get the last checkpoint directory
 checkpoint_dirs = [d for d in os.listdir(adapter_base_path) if os.path.isdir(os.path.join(adapter_base_path, d))]
+last_checkpoint = sorted(checkpoint_dirs)[-1]  # Assuming directories are named with step numbers
+last_checkpoint_path = os.path.join(adapter_base_path, last_checkpoint)
 
-# Track best checkpoint
-best_loss = float('inf')
-best_checkpoint = None
-best_step = None
+# Load the training state from the last checkpoint
+training_state = torch.load(os.path.join(last_checkpoint_path, 'training_state.pt'))
+loss_history = training_state.get('loss_history', [])
 
-# Iterate through checkpoints
-for checkpoint in checkpoint_dirs:
-    checkpoint_path = os.path.join(adapter_base_path, checkpoint)
-    training_state_path = os.path.join(checkpoint_path, 'training_state.pt')
-    
-    if os.path.exists(training_state_path):
-        # Load training state
-        training_state = torch.load(training_state_path)
-        current_loss = training_state.get('loss', float('inf'))
-        
-        if current_loss < best_loss:
-            best_loss = current_loss
-            best_checkpoint = checkpoint_path
-            best_step = checkpoint
-
-print(f"Loading best checkpoint: {best_step} with loss: {best_loss}")
+if not loss_history:
+    print("No loss history found, using last checkpoint")
+    best_checkpoint = last_checkpoint_path
+else:
+    # Find the checkpoint with minimum loss
+    min_loss_step = min(range(len(loss_history)), key=lambda i: loss_history[i])
+    best_step = min_loss_step + 1  # Adding 1 because steps typically start from 1
+    best_checkpoint = os.path.join(adapter_base_path, f"checkpoint-{best_step}")
+    print(f"Loading best checkpoint: checkpoint-{best_step} with loss: {loss_history[min_loss_step]}")
 
 # Load the model with best checkpoint
 tok = AutoTokenizer.from_pretrained(base_id)
@@ -59,7 +54,7 @@ BATCH_SIZE = 8
 
 # Generate responses in batches
 print("Generating responses...\n")
-for i in range(0, len(test_examples), BATCH_SIZE):
+for i in tqdm(range(0, len(test_examples), BATCH_SIZE), desc="Generating", unit="batch"):
     batch = test_examples[i:i + BATCH_SIZE]
     prompts = [example['prompt'] for example in batch]
     
