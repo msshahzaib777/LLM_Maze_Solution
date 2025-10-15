@@ -106,9 +106,6 @@ def maze_value_at(maze, position, default: str = "#"):
         return default
     return row[j]
 
-def is_walkable(maze_ascii: str, position: Tuple[int, int]) -> bool:
-    return maze_value_at(maze_ascii, position) != "#"
-
 def walkable_directions(maze_ascii: str, position: Tuple[int, int]) -> Dict[str, bool]:
     i, j = position
     lines = maze_ascii.splitlines()
@@ -123,13 +120,6 @@ def walkable_directions(maze_ascii: str, position: Tuple[int, int]) -> Dict[str,
         result[name] = in_bounds and maze_value_at(maze_ascii, (ni, nj)) != "#"
     return result
 
-def available_direction_enums(maze_ascii: str, position: Tuple[int, int]) -> List[str]:
-    return [
-        DIR_TEXT_TO_ENUM[name]
-        for name, open_path in walkable_directions(maze_ascii, position).items()
-        if open_path
-    ]
-
 def apply_direction(position: Tuple[int, int], direction: str) -> Tuple[int, int]:
     key = direction.lower()
     if key in DIRECTION_VECTORS:
@@ -140,14 +130,6 @@ def apply_direction(position: Tuple[int, int], direction: str) -> Tuple[int, int
             raise ValueError(f"Unknown direction: {direction}")
         di, dj = DIRECTION_VECTORS[DIR_ENUM_TO_TEXT[enum_key]]
     return position[0] + di, position[1] + dj
-
-def map_text_dirs_to_enum(text_dirs: List[str]) -> List[str]:
-    out: List[str] = []
-    for d in text_dirs:
-        key = d.strip().lower()
-        if key in DIR_TEXT_TO_ENUM:
-            out.append(DIR_TEXT_TO_ENUM[key])
-    return out
 
 def get_surroundings(maze_ascii: str, start):
     directions = walkable_directions(maze_ascii, start)
@@ -538,56 +520,6 @@ def build_target(answer_start: List[int], answer_dirs: List[str]) -> str:
         "start": [int(answer_start[0]), int(answer_start[1])],
         "available_directions": list(answer_dirs)
     }, ensure_ascii=False)
-
-def clamp_and_pad(ids: List[int], max_len: int, pad_id: int) -> List[int]:
-    if len(ids) > max_len:
-        # For chat SFT, truncating the left (prompt side) is usually safer than chopping off the label.
-        # But since we create the full sequence ourselves, keep it simple: right-truncate.
-        ids = ids[:max_len]
-    return ids + [pad_id] * (max_len - len(ids))
-
-def filter_jsonl_by_task_ratio(input_data, task_ratios: Dict[str, float]) -> str:
-    """
-    Filter JSONL file to keep specified ratios of each task.
-    
-    Args:
-        input_jsonl_path: Path to input JSONL file
-        task_ratios: Dictionary mapping task names to desired ratios (0-1)
-        
-    Returns:
-        String containing filtered JSONL content
-    """
-    # Validate ratios sum to 1
-    if abs(sum(task_ratios.values()) - 1.0) > 0.001:
-        raise ValueError("Task ratios must sum to 1.0")
-
-    # Read all examples
-                
-    # Group by task
-    task_groups = {}
-    for ex in input_data:
-        task = ex["task"]
-        if task not in task_groups:
-            task_groups[task] = []
-        task_groups[task].append(ex)
-        
-    # Calculate counts to keep for each task
-    total_examples = len(input_data)
-    keep_counts = {
-        task: int(ratio * total_examples) 
-        for task, ratio in task_ratios.items()
-    }
-    
-    # Sample examples to keep
-    filtered_examples = []
-    for task, count in keep_counts.items():
-        if task in task_groups:
-            task_examples = task_groups[task]
-            samples = random.sample(task_examples, min(count, len(task_examples)))
-            filtered_examples.extend(samples)
-            
-    # Convert back to JSONL
-    return "\n".join(json.dumps(ex) for ex in filtered_examples) + "\n"
 
 def save_jsonl(examples, path, mapper=None):
     with open(path, "w") as fout:

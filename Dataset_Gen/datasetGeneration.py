@@ -33,38 +33,119 @@ def generate_maze_examples(config):
             all_examples.append(make_training_example(m, TASKS, id=f"{g}x{g}_{count}"))
     return all_examples
 
-def split_data(data):
-    """Split data into train, valid, and test sets"""
+def split_data(data, splits):
+    """Split data into sets based on provided split names"""
+    if len(splits) < 2:
+        raise ValueError("At least two splits are required")
+    
     labels = [d["maze_size"] for d in data]
     indices = list(range(len(data)))
-    train_idx, temp_idx = train_test_split(
-        indices, test_size=0.30, stratify=labels, random_state=42
-    )
-
-    temp_data = [data[i] for i in temp_idx]
-    temp_labels = [d["maze_size"] for d in temp_data]
-    temp_indices = list(range(len(temp_data)))
-    valid_idx, test_idx = train_test_split(
-        temp_indices, test_size=0.33, stratify=temp_labels, random_state=42
-    )
-
-    train_data = [data[i] for i in train_idx]
-    valid_data = [temp_data[i] for i in valid_idx]
-    test_data = [temp_data[i] for i in test_idx]
+    result = {}
     
-    return train_data, valid_data, test_data
-
-def process_splits_with_ratios(dataset_dir, task_ratios, splits):
-    """Process splits with given task ratios"""
-    for split_name, split_data in splits.items():
-        filtered_jsonl = filter_jsonl_by_task_ratio(
-            input_data=split_data,
-            task_ratios=task_ratios
+    # Handle the first split
+    remaining_idx = indices
+    remaining_data = data
+    remaining_labels = labels
+    
+    # Split data sequentially based on split names
+    for i in range(len(splits) - 1):
+        split_name = splits[i]
+        
+        # Set fixed split sizes: 70% train, 15% valid, 15% test
+        if i == 0:  # first split (train)
+            test_size = 0.3  # keep 70%, split off 30%
+        else:  # second split (valid)
+            test_size = 0.5  # split remaining 30% equally
+        
+        split_idx, remaining_idx = train_test_split(
+            remaining_idx, 
+            test_size=test_size,
+            stratify=remaining_labels,
+            random_state=42
         )
         
-        output_path = f'{dataset_dir}/{split_name}.jsonl'
-        with open(output_path, "w") as f:
-            f.write(filtered_jsonl)
+        result[split_name] = [data[i] for i in split_idx]
+        remaining_data = [data[i] for i in remaining_idx]
+        remaining_labels = [d["maze_size"] for d in remaining_data]
+    
+    # Last split gets the remaining data
+    result[splits[-1]] = remaining_data
+    
+    # Return splits in the same order as input splits list
+    return result
+
+def process_splits_with_ratios(dataset_dir, task_ratios, splits, seed=42):
+    import math, random, json
+    rng = random.Random(seed)
+    if abs(sum(task_ratios.values()) - 1.0) > 1e-9:
+        raise ValueError("Ratios must sum to 1.0")
+
+    for split_name, raw_data in splits.items():
+        # Convert each raw example into one-or-more JSONL lines, then parse
+        all_task_examples = []
+        for maze_ex in raw_data:
+            task_jsonl = dict_to_prompt_completion(maze_ex)
+            for line in task_jsonl.strip().split('\n'):
+                if line.strip():
+                    all_task_examples.append(json.loads(line))
+
+        # Group by task
+        by_task = {}
+        for ex in all_task_examples:
+            by_task.setdefault(ex['task'], []).append(ex)
+
+        # Max feasible total T given availability and ratios
+        caps = []
+        for task, ratio in task_ratios.items():
+            if ratio <= 0:
+                continue
+            available = len(by_task.get(task, []))
+            # IMPORTANT: include zero-availability tasks (cap becomes 0)
+            caps.append(math.floor(available / ratio))
+        T = min(len(all_task_examples), min(caps) if caps else 0)
+
+        if T <= 0:
+            print(f"Warning: No feasible allocation for {split_name} given ratios and availability.")
+            with open(f"{dataset_dir}/{split_name}.jsonl", "w") as f:
+                pass
+            continue
+
+        # Floors + largest remainders
+        counts = {t: int(task_ratios[t] * T) for t in task_ratios}
+        leftover = T - sum(counts.values())
+
+        order = sorted(
+            task_ratios,
+            key=lambda t: (task_ratios[t] * T) - counts[t],
+            reverse=True
+        )
+        for t in order:
+            if leftover == 0:
+                break
+            avail = len(by_task.get(t, []))
+            take = min(leftover, max(0, avail - counts[t]))
+            if take:
+                counts[t] += take
+                leftover -= take
+
+        # Defensive clamp (should be no-op if T was computed correctly)
+        for t in counts:
+            counts[t] = min(counts[t], len(by_task.get(t, [])))
+
+        # Sample, merge, shuffle, save
+        chosen = []
+        for t, k in counts.items():
+            pool = by_task.get(t, [])
+            if k > 0 and pool:
+                rng.shuffle(pool)
+                chosen.extend(pool[:k])
+        rng.shuffle(chosen)
+
+        with open(f"{dataset_dir}/{split_name}.jsonl", "w") as f:
+            for ex in chosen:
+                f.write(json.dumps(ex) + "\n")
+
+        print(f"{split_name}: {len(chosen)} examples (from {len(all_task_examples)})")
 
 def main(CONFIG=None):
     filename = f'./data/maze_training_{CONFIG["dataset_name"]}.json'
@@ -84,22 +165,21 @@ def main(CONFIG=None):
         with open(filename) as f:
             all_examples = json.load(f)
         
-    train_data = valid_data = test_data = None
+    splits_data = None
     # Step 2: Create or load full splits
     if not CONFIG['skip_full_splits']:
         print("Creating train/valid/test splits...")
-        train_data, valid_data, test_data = split_data(all_examples)
-        save_jsonl(train_data, f'{dataset_dir}/train_full.jsonl', mapper=dict_to_prompt_completion)
-        save_jsonl(valid_data, f'{dataset_dir}/valid_full.jsonl', mapper=dict_to_prompt_completion)
-        save_jsonl(test_data, f'{dataset_dir}/test_full.jsonl', mapper=dict_to_prompt_completion)
+        splits_data = split_data(all_examples, CONFIG["splits"])
+        for split_name, split_data in splits_data.items():
+            save_jsonl(split_data, f'{dataset_dir}/{split_name}_full.jsonl', mapper=dict_to_prompt_completion)
     else:
         print("Loading existing splits...")
-        train_data = open_jsonl(f'{dataset_dir}/train_full.jsonl')
-        valid_data = open_jsonl(f'{dataset_dir}/valid_full.jsonl')
-        test_data = open_jsonl(f'{dataset_dir}/test_full.jsonl')
+        splits_data = {}
+        for split_name in CONFIG['splits']:
+            splits_data[split_name] = open_jsonl(f'{dataset_dir}/{split_name}_full.jsonl')
 
     print("Processing splits with task ratios...")
-    process_splits_with_ratios(dataset_dir, CONFIG['task_ratios'], CONFIG['splits'])
+    process_splits_with_ratios(dataset_dir, CONFIG['task_ratios'], splits_data)
 
     summary = {
         split: suggest_optimal_max_seq_length(os.path.join(dataset_dir, f"{split}.jsonl"))
@@ -109,8 +189,10 @@ def main(CONFIG=None):
     with open(summary_path, "w") as fout:
         json.dump(summary, fout, indent=2)
     print(f"Sequence length summary written to {summary_path}")
-    
-    print(f"Wrote {len(train_data)} train and {len(valid_data)} valid and {len(test_data)} test examples")
+    datasets_len = ""
+    for split_name in CONFIG['splits']:
+        datasets_len += f"{split_name}: {len(splits_data[split_name])} "
+    print(datasets_len)
 
 if __name__ == "__main__":
     CONFIG = {
@@ -139,8 +221,8 @@ if __name__ == "__main__":
             "VALID_MOVE": 0.2,
             "OPTIMAL_NEXT_STEP": 0.5
         },
-        'skip_generation': False,
-        'skip_full_splits': False,
+        'skip_generation': True,
+        'skip_full_splits': True,
         'dataset_name': 'curriculum_1'
     }
     main(CONFIG)
