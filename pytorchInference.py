@@ -10,7 +10,7 @@ base_id = "Qwen/Qwen3-4B"          # example
 adapter_path = "./finetuned_model/adapter/adapters_merged_2"     # PEFT-style adapter
 
 tok = AutoTokenizer.from_pretrained(base_id)
-base = AutoModelForCausalLM.from_pretrained(base_id, torch_dtype="auto")
+base = AutoModelForCausalLM.from_pretrained(base_id, dtype="auto")
 model = PeftModel.from_pretrained(base, adapter_path)
 model.eval()
 
