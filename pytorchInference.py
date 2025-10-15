@@ -29,7 +29,7 @@ else:
     checkpoint_steps = [int(d.split('_')[1]) for d in checkpoint_dirs]
     # Find the nearest available checkpoint to min_loss_step
     nearest_checkpoint_step = min(checkpoint_steps, key=lambda x: abs(x - min_loss_step))
-    best_checkpoint = os.path.join(adapter_base_path, f"checkpoint-{nearest_checkpoint_step}")
+    best_checkpoint = os.path.join(adapter_base_path, f"{checkpoint_dirs[0].split('_')[0]}_{nearest_checkpoint_step}")
     print(f"Loading best checkpoint: checkpoint-{nearest_checkpoint_step} with loss: {min_loss} (from step {min_loss_step})")
 
 # Load the model with best checkpoint
