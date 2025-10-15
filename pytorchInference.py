@@ -26,7 +26,7 @@ else:
     # Find the checkpoint with minimum loss
     min_loss_step, min_loss = min(loss_history, key=lambda x: x[1])
     # Get all checkpoint steps
-    checkpoint_steps = [int(d.split('-')[1]) for d in checkpoint_dirs]
+    checkpoint_steps = [int(d.split('_')[1]) for d in checkpoint_dirs]
     # Find the nearest available checkpoint to min_loss_step
     nearest_checkpoint_step = min(checkpoint_steps, key=lambda x: abs(x - min_loss_step))
     best_checkpoint = os.path.join(adapter_base_path, f"checkpoint-{nearest_checkpoint_step}")
