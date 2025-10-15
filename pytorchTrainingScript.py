@@ -6,7 +6,7 @@ from datasets import load_dataset
 
 # Updated constants for Mac MPS
 MODEL = "Qwen/Qwen3-4B"  # Updated to Qwen3
-DATA  = "data/custom_test/train.jsonl"
+DATA  = "data/custom_curriculum_1/train.jsonl"
 BATCH = 1  # Reduced batch size for MPS memory constraints
 ACCUM = 8
 LR    = 2e-4
