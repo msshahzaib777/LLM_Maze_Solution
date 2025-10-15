@@ -34,9 +34,18 @@ else:
 
 # Load the model with best checkpoint
 tok = AutoTokenizer.from_pretrained(base_id)
+tok.padding_side = 'left'  # Set left padding for decoder-only models
+if tok.pad_token is None:
+    tok.pad_token = tok.eos_token
 base = AutoModelForCausalLM.from_pretrained(base_id, dtype="auto")
 model = PeftModel.from_pretrained(base, best_checkpoint)
 model.eval()
+
+# Setup evaluation directory
+eval_dir = os.path.join(best_checkpoint, "eval_1")
+os.makedirs(eval_dir, exist_ok=True)
+preds_jsonl = os.path.join(eval_dir, "test_predictions.jsonl")
+summary_json = os.path.join(eval_dir, "summary.json")
 
 # Load and process test examples
 test_file = "data/custom_curriculum_1/test.jsonl"
@@ -57,25 +66,57 @@ BATCH_SIZE = 8
 
 # Generate responses in batches
 print("Generating responses...\n")
-for i in tqdm(range(0, len(test_examples), BATCH_SIZE), desc="Generating", unit="batch"):
-    batch = test_examples[i:i + BATCH_SIZE]
-    prompts = [example['prompt'] for example in batch]
+predictions = []
+total_batches = (len(test_examples) + BATCH_SIZE - 1) // BATCH_SIZE
+
+with open(preds_jsonl, 'w') as outfile:
+    pbar = tqdm(range(0, len(test_examples), BATCH_SIZE), 
+                desc="Evaluating", 
+                unit="batch",
+                total=total_batches,
+                postfix={"examples": 0})
     
-    # Tokenize batch
-    inputs = tok(prompts, padding=True, return_tensors="pt").to(model.device)
-    
-    # Generate
-    with torch.no_grad():
-        outputs = model.generate(
-            **inputs,
-            **gen_config
-        )
-    
-    # Decode and print responses
-    responses = tok.batch_decode(outputs, skip_special_tokens=True)
-    
-    for j, (prompt, response) in enumerate(zip(prompts, responses)):
-        print(f"Example {i+j+1}:")
-        print(f"Prompt: {prompt}\n")
-        print(f"Generated Response: {response}\n")
-        print("-" * 80 + "\n")
+    for i in pbar:
+        batch = test_examples[i:i + BATCH_SIZE]
+        prompts = [example['prompt'] for example in batch]
+        
+        # Tokenize batch
+        inputs = tok(prompts, padding=True, return_tensors="pt").to(model.device)
+        
+        # Generate
+        with torch.no_grad():
+            outputs = model.generate(
+                **inputs,
+                **gen_config
+            )
+        
+        # Decode responses
+        responses = tok.batch_decode(outputs, skip_special_tokens=True)
+        
+        # Extract only the generated part (remove the prompt)
+        generated_responses = []
+        for prompt, response in zip(prompts, responses):
+            # Remove the prompt from the response to get only the generated part
+            if response.startswith(prompt):
+                generated_part = response[len(prompt):].strip()
+            else:
+                generated_part = response.strip()
+            generated_responses.append(generated_part)
+        
+        # Save predictions and display
+        for j, (item, prompt, generated_response) in enumerate(zip(batch, prompts, generated_responses)):
+            pred_item = {
+                'id': item.get('id', i + j),
+                'prompt': item['prompt'],
+                'target': item.get('completion', ''),
+                'prediction': generated_response,
+                'task': item.get('task', 'UNKNOWN')
+            }
+            predictions.append(pred_item)
+            outfile.write(json.dumps(pred_item) + '\n')
+        
+        # Update progress bar with current example count
+        pbar.set_postfix({"examples": len(predictions)})
+
+print(f"\nPredictions saved to: {preds_jsonl}")
+print(f"Total examples processed: {len(predictions)}")
