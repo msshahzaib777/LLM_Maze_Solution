@@ -12,7 +12,7 @@ adapter_base_path = "./finetuned_model/adapters_dir_qwen3"     # PEFT-style adap
 
 # Get the last checkpoint directory
 checkpoint_dirs = [d for d in os.listdir(adapter_base_path) if os.path.isdir(os.path.join(adapter_base_path, d))]
-last_checkpoint = sorted(checkpoint_dirs)[-1]  # Assuming directories are named with step numbers
+last_checkpoint = sorted(checkpoint_dirs, key=lambda x: int(x.split('_')[1]))[-1]  # Sort by step number
 last_checkpoint_path = os.path.join(adapter_base_path, last_checkpoint)
 
 # Load the training state from the last checkpoint
