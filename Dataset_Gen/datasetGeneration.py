@@ -216,10 +216,11 @@ if __name__ == "__main__":
             'random_state': 42
         },
         'task_ratios': {
-            "DETECT_START_END": 0.1,
-            "AVAILABLE_DIRECTIONS": 0.2,
-            "VALID_MOVE": 0.2,
-            "OPTIMAL_NEXT_STEP": 0.5
+            "DETECT_START_END": 0.05,
+            "AVAILABLE_DIRECTIONS": 0.05,
+            "VALID_MOVE": 0.05,
+            "OPTIMAL_NEXT_STEP": 0.05,
+            "MAZE_SOLUTION": 0.8
         },
         'skip_generation': True,
         'skip_full_splits': True,
