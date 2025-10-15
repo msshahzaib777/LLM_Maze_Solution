@@ -7,15 +7,15 @@ from datasets import load_dataset
 # Updated constants for Mac MPS
 MODEL = "Qwen/Qwen3-4B"  # Updated to Qwen3
 DATA  = "data/custom_curriculum_1/train.jsonl"
-BATCH = 8  # Reduced batch size for MPS memory constraints
-ACCUM = 4
+BATCH = 2 # Reduced batch size for MPS memory constraints:
+ACCUM = 8
 
 # Learning rate schedule parameters
 BASE_LR = 4.0e-5
-ITERS = 1000
-WARMUP = 300  # 0.03 * iters
-DECAY_STEPS = 9700  # iters - warmup
-LR_FLOOR = 4.0e-6  # 0.1 * base_lr
+ITERS = 10000
+WARMUP = 0.03 * iters
+DECAY_STEPS = iters - warmup
+LR_FLOOR = 0.1 * base_lr
 EVAL_EVERY = 50
 
 MAXLEN= 512
@@ -23,7 +23,7 @@ DEVICE= "mps"  # Force MPS device for Mac
 
 # Checkpoint settings
 CHECKPOINT_DIR = "finetuned_model/adapters_dir_qwen3"
-RESUME_FROM_CHECKPOINT = True  # Set to False to start fresh
+RESUME_FROM_CHECKPOINT = False  # Set to False to start fresh
 
 # Check MPS availability
 assert torch.backends.mps.is_available(), "MPS not available. Make sure you're on MacOS 12.3+"
