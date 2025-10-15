@@ -150,33 +150,40 @@ def process_splits_with_ratios(dataset_dir, task_ratios, splits, seed=42):
 def main(CONFIG=None):
     filename = f'./data/maze_training_{CONFIG["dataset_name"]}.json'
     dataset_dir = f'./data/{CONFIG["dataset_name"]}'
+    if CONFIG["source"] is not None:
+        source_filename = f'./data/maze_training_{CONFIG["source"]}.json'
+        source_dataset_dir = f'./data/{CONFIG["source"]}'
 
     os.makedirs("./data", exist_ok=True)
     os.makedirs(dataset_dir, exist_ok=True)
 
-    # Step 1: Generate or load maze examples
-    if not CONFIG['skip_generation'] and not os.path.exists(filename):
-        print("Generating maze examples...")
-        all_examples = generate_maze_examples(CONFIG['maze_sizes'])
-        with open(filename, "w") as f:
-            json.dump(all_examples, f, indent=2)
-    else:
-        print("Loading existing maze examples...")
-        with open(filename) as f:
-            all_examples = json.load(f)
-        
     splits_data = None
-    # Step 2: Create or load full splits
-    if not CONFIG['skip_full_splits']:
-        print("Creating train/valid/test splits...")
-        splits_data = split_data(all_examples, CONFIG["splits"])
-        for split_name, split_data in splits_data.items():
-            save_jsonl(split_data, f'{dataset_dir}/{split_name}_full.jsonl', mapper=dict_to_prompt_completion)
-    else:
+    # Step 1: Check if we should load existing splits
+    if CONFIG['skip_full_splits']:
         print("Loading existing splits...")
         splits_data = {}
         for split_name in CONFIG['splits']:
             splits_data[split_name] = open_jsonl(f'{dataset_dir}/{split_name}_full.jsonl')
+    else:
+        # Step 2: Generate or load maze examples
+        if not CONFIG['skip_generation'] and not os.path.exists(filename):
+            print("Generating maze examples...")
+            all_examples = generate_maze_examples(CONFIG['maze_sizes'])
+            with open(filename, "w") as f:
+                json.dump(all_examples, f, indent=2)
+        else:
+            print("Loading existing maze examples...")
+            if CONFIG['source'] is not None:
+                with open(source_filename) as f:
+                    all_examples = json.load(f)
+            else:
+                with open(filename) as f:
+                    all_examples = json.load(f)
+        
+        print("Creating train/valid/test splits...")
+        splits_data = split_data(all_examples, CONFIG["splits"])
+        for split_name, split_data in splits_data.items():
+            save_jsonl(split_data, f'{dataset_dir}/{split_name}_full.jsonl', mapper=dict_to_prompt_completion)
 
     print("Processing splits with task ratios...")
     process_splits_with_ratios(dataset_dir, CONFIG['task_ratios'], splits_data)
@@ -224,6 +231,7 @@ if __name__ == "__main__":
         },
         'skip_generation': True,
         'skip_full_splits': True,
-        'dataset_name': 'curriculum_1'
+        'dataset_name': 'curriculum_2',
+        "source": "curriculum_1"
     }
     main(CONFIG)
