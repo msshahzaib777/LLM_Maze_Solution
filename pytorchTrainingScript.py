@@ -120,7 +120,19 @@ if latest_checkpoint and RESUME_FROM_CHECKPOINT:
     
     # Load the fine-tuned adapter
     model = PeftModel.from_pretrained(base_model, latest_checkpoint)
+    
+    # Ensure LoRA training is enabled (base model frozen, adapters trainable)
+    model.train()  # Set to training mode
+    for param in model.base_model.parameters():
+        param.requires_grad = False  # Freeze base model
+    
+    # Enable gradients for LoRA adapters only
+    for name, param in model.named_parameters():
+        if "lora_" in name:
+            param.requires_grad = True
+    
     print(f"Resumed from checkpoint at step {resume_step}")
+    print("LoRA adapters enabled for training, base model frozen")
     
 else:
     print("Starting fresh training...")
@@ -144,9 +156,25 @@ else:
     
     model = get_peft_model(model, lora)
     resume_step = 0
+    print("Fresh LoRA model created - base model frozen, adapters trainable")
 
 model.to(DEVICE)
 model.train()
+
+# Debug: Print trainable parameters
+def print_trainable_parameters(model):
+    trainable_params = 0
+    all_param = 0
+    for name, param in model.named_parameters():
+        all_param += param.numel()
+        if param.requires_grad:
+            trainable_params += param.numel()
+            if "lora_" in name:
+                print(f"  Trainable LoRA: {name} - {param.numel()} params")
+    print(f"Trainable params: {trainable_params:,} || All params: {all_param:,} || Trainable %: {100 * trainable_params / all_param:.4f}")
+
+print("Model parameter status:")
+print_trainable_parameters(model)
 
 # Create custom cosine schedule with minimum LR
 def get_cosine_with_min_lr(optimizer, warmup_steps, total_steps, min_lr_ratio=0.1):
