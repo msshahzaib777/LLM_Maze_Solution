@@ -177,7 +177,7 @@ def main(CONFIG=None):
         # Step 2: Generate or load maze examples
         if not CONFIG['skip_generation'] and not os.path.exists(filename):
             print("Generating maze examples...")
-            all_examples = generate_maze_examples(CONFIG['maze_sizes'])
+            all_examples = generate_maze_examples(CONFIG)
             with open(filename, "w") as f:
                 json.dump(all_examples, f, indent=2)
         else:
@@ -215,14 +215,14 @@ if __name__ == "__main__":
         'random_seed': 123,
         'monte_carlo_params': {
             'repeat': 5,
-            'entrance': 10,
-            'difficulty': 0.5
+            'entrances': 10,
+            'difficulty': 0.9
         },
         'maze_sizes': {
-            3: 500,
-            4: 5000,
-            5: 7000,
-            6: 10000,
+            3: 15000,
+            4: 15000,
+            5: 15000,
+            6: 15000,
             7: 15000,
         },
         'splits': ['train', 'valid', 'test'],
@@ -232,15 +232,15 @@ if __name__ == "__main__":
             'random_state': 42
         },
         'task_ratios': {
-            "DETECT_START_END": 0.02,
-            "AVAILABLE_DIRECTIONS": 0.03,
-            "VALID_MOVE": 0.03,
-            "OPTIMAL_NEXT_STEP": 0.12,
-            "MAZE_SOLUTION": 0.8
+            "DETECT_START_END": 0.33,
+            "AVAILABLE_DIRECTIONS": 0.33,
+            "VALID_MOVE": 0.34,
+            "OPTIMAL_NEXT_STEP": 0,
+            "MAZE_SOLUTION": 0
         },
-        'skip_generation': True,
+        'skip_generation': False,
         'skip_full_splits': False,
-        'dataset_name': 'curriculum_2_45',
-        "source": "curriculum_1"
+        'dataset_name': 'curriculum_1_123',
+        "source": None 
     }
     main(CONFIG)
