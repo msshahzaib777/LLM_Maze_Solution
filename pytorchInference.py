@@ -7,20 +7,6 @@ from tqdm import tqdm
 base_id = "Qwen/Qwen3-4B"          # example
 adapter_base_path = "./finetuned_model/adapters_dir_qwen3"     # PEFT-style adapter
 
-# Device detection
-if torch.cuda.is_available():
-    device = "cuda"
-    device_name = torch.cuda.get_device_name()
-    print(f"Using CUDA device: {device_name}")
-elif torch.backends.mps.is_available():
-    device = "mps"
-    print("Using MPS (Metal Performance Shaders) on Mac")
-else:
-    device = "cpu"
-    print("Using CPU")
-
-
-
 # Get the last checkpoint directory
 checkpoint_dirs = [d for d in os.listdir(adapter_base_path) if os.path.isdir(os.path.join(adapter_base_path, d))]
 last_checkpoint = sorted(checkpoint_dirs, key=lambda x: int(x.split('_')[1]))[-1]  # Sort by step number
@@ -48,44 +34,9 @@ tok = AutoTokenizer.from_pretrained(base_id)
 tok.padding_side = 'left'  # Set left padding for decoder-only models
 if tok.pad_token is None:
     tok.pad_token = tok.eos_token
-
-# Load base model with device-appropriate settings
-if device == "mps":
-    # MPS-specific loading
-    base = AutoModelForCausalLM.from_pretrained(
-        base_id, 
-        torch_dtype=torch.float16,
-        low_cpu_mem_usage=True
-    )
-    base = base.to(device)
-elif device == "cuda":
-    base = AutoModelForCausalLM.from_pretrained(
-        base_id, 
-        torch_dtype=torch.float16,
-        device_map="auto"
-    )
-else:
-    # CPU loading
-    base = AutoModelForCausalLM.from_pretrained(
-        base_id, 
-        torch_dtype=torch.float32  # Use float32 for CPU
-    )
-
+base = AutoModelForCausalLM.from_pretrained(base_id, dtype="auto")
 model = PeftModel.from_pretrained(base, best_checkpoint)
 model.eval()
-
-# Move model to appropriate device if not using device_map
-if device in ["mps", "cpu"]:
-    model = model.to(device)
-
-# Print memory usage
-if device == "cuda":
-    print(f"CUDA memory allocated: {torch.cuda.memory_allocated() / 1024**3:.2f} GB")
-    print(f"CUDA memory reserved: {torch.cuda.memory_reserved() / 1024**3:.2f} GB")
-elif device == "mps":
-    print(f"MPS memory allocated: {torch.mps.current_allocated_memory() / 1024**3:.2f} GB")
-else:
-    print("Running on CPU - no GPU memory monitoring")
 
 # Setup evaluation directory
 eval_dir = os.path.join(best_checkpoint, "eval_1")
@@ -109,16 +60,6 @@ gen_config = {
 
 # Batch size for processing
 BATCH_SIZE = 6
-
-# Adjust batch size based on device capabilities
-if device == "mps":
-    # MPS can be more memory constrained
-    BATCH_SIZE = min(BATCH_SIZE, 4)
-    print(f"Adjusted batch size for MPS: {BATCH_SIZE}")
-elif device == "cpu":
-    # CPU is typically more memory constrained
-    BATCH_SIZE = min(BATCH_SIZE, 2)
-    print(f"Adjusted batch size for CPU: {BATCH_SIZE}")
 
 # Load existing predictions if file exists
 existing_predictions = set()
