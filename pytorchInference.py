@@ -64,13 +64,26 @@ gen_config = {
 # Batch size for processing
 BATCH_SIZE = 6
 
+# Load existing predictions if file exists
+existing_predictions = set()
+if os.path.exists(preds_jsonl):
+    with open(preds_jsonl, 'r') as f:
+        for line in f:
+            pred = json.loads(line)
+            existing_predictions.add(pred['id'])
+    print(f"Found {len(existing_predictions)} existing predictions")
+
+# Filter out examples that already have predictions
+test_examples = [ex for ex in test_examples if ex['id'] not in existing_predictions]
+if not test_examples:
+    print("All examples have already been processed")
+    exit(0)
+
 # Group examples by maze size and task
 print("Grouping examples by maze size and task...\n")
 grouped_examples = {}
 for example in test_examples:
-    # Extract maze size from the id (e.g., "7x7_4549_start_end")
-    maze_size = example['id'].split('_')[0]  # Gets "7x7"
-    
+    maze_size = example['id'].split('_')[0]
     task = example.get('task', 'UNKNOWN')
     key = (maze_size, task)
     if key not in grouped_examples:
@@ -79,39 +92,32 @@ for example in test_examples:
 
 # Generate responses in batches for each group
 print("Generating responses...\n")
-predictions = []
 total_examples = len(test_examples)
 processed = 0
 
-with open(preds_jsonl, 'w') as outfile:
+with open(preds_jsonl, 'a') as outfile:  # Open in append mode
     pbar = tqdm(total=total_examples, 
                 desc="Evaluating", 
                 unit="example",
                 postfix={"examples": 0})
     
-    # Process each group separately
     for (maze_size, task), group in grouped_examples.items():
         print(f"\nProcessing {maze_size}, {task} - {len(group)} examples")
         
-        # Process the group in batches
         for i in range(0, len(group), BATCH_SIZE):
             batch = group[i:i + BATCH_SIZE]
             prompts = [example['prompt'] for example in batch]
             
-            # Tokenize batch
             inputs = tok(prompts, padding=True, return_tensors="pt").to(model.device)
             
-            # Generate
             with torch.no_grad():
                 outputs = model.generate(
                     **inputs,
                     **gen_config
                 )
             
-            # Decode responses
             responses = tok.batch_decode(outputs, skip_special_tokens=True)
             
-            # Extract only the generated part
             generated_responses = []
             for prompt, response in zip(prompts, responses):
                 if response.startswith(prompt):
@@ -120,7 +126,6 @@ with open(preds_jsonl, 'w') as outfile:
                     generated_part = response.strip()
                 generated_responses.append(generated_part)
             
-            # Save predictions
             for j, (item, prompt, generated_response) in enumerate(zip(batch, prompts, generated_responses)):
                 pred_item = {
                     'id': item.get('id', processed + j),
@@ -129,7 +134,6 @@ with open(preds_jsonl, 'w') as outfile:
                     'prediction': generated_response,
                     'task': item.get('task', 'UNKNOWN')
                 }
-                predictions.append(pred_item)
                 outfile.write(json.dumps(pred_item) + '\n')
             
             processed += len(batch)
@@ -137,4 +141,4 @@ with open(preds_jsonl, 'w') as outfile:
             pbar.set_postfix({"examples": processed})
 
 print(f"\nPredictions saved to: {preds_jsonl}")
-print(f"Total examples processed: {len(predictions)}")
+print(f"Total new examples processed: {processed}")
