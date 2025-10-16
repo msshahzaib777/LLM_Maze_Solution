@@ -32,7 +32,7 @@ def generate_maze_examples(config):
             all_examples.append(make_training_example(m, TASKS, id=f"{g}x{g}_{count}"))
     return all_examples
 
-def data_splitter(data, splits):
+def data_splitter(data, splits, split_ratio=None):
     """Split data into sets based on provided split names"""
     if len(splits) < 2:
         raise ValueError("At least two splits are required")
@@ -52,10 +52,10 @@ def data_splitter(data, splits):
         
         # Set fixed split sizes: 70% train, 15% valid, 15% test
         if i == 0:  # first split (train)
-            test_size = 0.3  # keep 70%, split off 30%
+            test_size = split_ratio.get("test", 0.3)  # keep 70%, split off 30%
         else:  # second split (valid)
-            test_size = 0.5  # split remaining 30% equally
-        
+            test_size = split_ratio.get("valid", 0.5)  # split remaining 30% equally
+
         split_idx, remaining_idx = train_test_split(
             remaining_idx, 
             test_size=test_size,
@@ -190,7 +190,7 @@ def main(CONFIG=None):
                     all_examples = json.load(f)
         
         print("Creating train/valid/test splits...")
-        splits_data = data_splitter(all_examples, CONFIG["splits"])
+        splits_data = data_splitter(all_examples, CONFIG["splits"], CONFIG['split_params'])
         for split_name, split_data in splits_data.items():
             save_jsonl(split_data, f'{dataset_dir}/{split_name}_full.jsonl', mapper=dict_to_prompt_completion)
 
@@ -227,8 +227,8 @@ if __name__ == "__main__":
         },
         'splits': ['train', 'valid', 'test'],
         'split_params': {
-            'test_size': 0.20,
-            'valid_test_split': 0.50,
+            'test': 0.20,
+            'valid': 0.50,
             'random_state': 42
         },
         'task_ratios': {

@@ -52,7 +52,7 @@ def find_latest_checkpoint(checkpoint_dir):
     latest_step, latest_dir = max(steps, key=lambda x: x[0])
     return os.path.join(checkpoint_dir, latest_dir), latest_step
 
-def save_training_state(checkpoint_dir, step, optimizer, scheduler, loss_history=None):
+def save_training_state(checkpoint_dir, step, optimizer, scheduler, loss_history=None, eval_loss_history=None):
     """Save complete training state"""
     os.makedirs(checkpoint_dir, exist_ok=True)
     
@@ -60,7 +60,8 @@ def save_training_state(checkpoint_dir, step, optimizer, scheduler, loss_history
         'step': step,
         'optimizer_state_dict': optimizer.state_dict(),
         'scheduler_state_dict': scheduler.state_dict(),
-        'loss_history': loss_history or []
+        'loss_history': loss_history or [],
+        'eval_loss_history': eval_loss_history or []
     }
     
     torch.save(state, os.path.join(checkpoint_dir, 'training_state.pt'))
@@ -79,9 +80,10 @@ def load_training_state(checkpoint_dir, optimizer, scheduler):
     
     step = state.get('step', 0)
     loss_history = state.get('loss_history', [])
+    eval_loss_history = state.get('eval_loss_history', [])
     
     print(f"Loaded training state from step {step}")
-    return step, loss_history
+    return step, loss_history, eval_loss_history
 
 ds = load_dataset("json", data_files={"train": DATA})
 
@@ -103,6 +105,10 @@ def collate_fn(batch):
     }
 
 dl = DataLoader(ds["train"], batch_size=BATCH, shuffle=True, collate_fn=collate_fn)
+
+# Load validation dataset
+val_ds = load_dataset("json", data_files={"validation": "data/curriculum_2_123/valid.json"})
+val_dl = DataLoader(val_ds["validation"], batch_size=BATCH, shuffle=False, collate_fn=collate_fn)
 
 # Check for existing checkpoints
 latest_checkpoint, resume_step = find_latest_checkpoint(CHECKPOINT_DIR) if RESUME_FROM_CHECKPOINT else (None, 0)
@@ -174,7 +180,7 @@ def print_trainable_parameters(model):
     print(f"Trainable params: {trainable_params:,} || All params: {all_param:,} || Trainable %: {100 * trainable_params / all_param:.4f}")
 
 print("Model parameter status:")
-print_trainable_parameters(model)
+# print_trainable_parameters(model)
 
 # Create custom cosine schedule with minimum LR
 def get_cosine_with_min_lr(optimizer, warmup_steps, total_steps, min_lr_ratio=0.1):
@@ -197,6 +203,7 @@ if latest_checkpoint and RESUME_FROM_CHECKPOINT:
 else:
     global_step = 0
     loss_history = []
+    eval_loss_history = []
 
 # Training loop - iteration-based instead of epoch-based
 opt.zero_grad()
@@ -241,19 +248,34 @@ while global_step < ITERS:
         
         # Track loss history
         loss_history.append({"step": global_step, "loss": avg_loss, "lr": current_lr})
-        
-        # Print progress
-        if global_step % 50 == 0:
-            progress = (global_step / ITERS) * 100
-            print(f"Step: {global_step}/{ITERS} ({progress:.1f}%), Loss: {avg_loss:.6f}, LR: {current_lr:.2e}")
+        progress = (global_step / ITERS) * 100
+        print(f"Step: {global_step}/{ITERS} ({progress:.1f}%), Loss: {avg_loss:.6f}, LR: {current_lr:.2e}")
         
         running_loss = 0.0
     
     # Save checkpoint every EVAL_EVERY steps
     if global_step > 0 and global_step % EVAL_EVERY == 0:
+        # Evaluate on validation set
+        model.eval()
+        val_loss = 0
+        val_steps = 0
+
+        with torch.no_grad():
+            for batch in val_dl:
+                input_ids = batch["input_ids"].to(DEVICE)
+                attn = batch["attention_mask"].to(DEVICE)
+                outputs = model(input_ids=input_ids, attention_mask=attn, labels=input_ids)
+                val_loss += outputs.loss.item()
+                val_steps += 1
+
+        avg_val_loss = val_loss / val_steps
+        eval_loss_history.append({"step": global_step, "val_loss": avg_val_loss})
+        print(f"Validation loss at step {global_step}: {avg_val_loss:.6f}")
+        model.train()
+
         checkpoint_dir = f"{CHECKPOINT_DIR}/step_{global_step}"
         model.save_pretrained(checkpoint_dir)
-        save_training_state(checkpoint_dir, global_step, opt, sched, loss_history)
+        save_training_state(checkpoint_dir, global_step, opt, sched, loss_history, eval_loss_history)
         print(f"✓ Checkpoint saved at step {global_step}")
         
     global_step += 1
