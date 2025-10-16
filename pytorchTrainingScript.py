@@ -22,7 +22,7 @@ MAXLEN= 391
 DEVICE= "mps"  # Force MPS device for Mac
 
 # Checkpoint settings
-CHECKPOINT_DIR = "finetuned_model/adapters_qwen3_1_123"
+CHECKPOINT_DIR = "finetuned_model/adapter/qwen3_2_123"
 RESUME_FROM_CHECKPOINT = False  # Set to False to start fresh
 
 # Check MPS availability
