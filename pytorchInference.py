@@ -1,14 +1,32 @@
 import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM
-from peft import PeftModel
-
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 from peft import PeftModel
 import json, os
 from tqdm import tqdm
 
 base_id = "Qwen/Qwen3-4B"          # example
 adapter_base_path = "./finetuned_model/adapters_dir_qwen3"     # PEFT-style adapter
+
+# Quantization configuration (set USE_QUANTIZATION to False to disable)
+USE_QUANTIZATION = True
+QUANTIZATION_TYPE = "8bit"  # Options: "4bit", "8bit", "none"
+
+if USE_QUANTIZATION and QUANTIZATION_TYPE == "4bit":
+    quantization_config = BitsAndBytesConfig(
+        load_in_4bit=True,
+        bnb_4bit_compute_dtype=torch.float16,
+        bnb_4bit_use_double_quant=True,
+        bnb_4bit_quant_type="nf4"
+    )
+    print("Using 4-bit quantization")
+elif USE_QUANTIZATION and QUANTIZATION_TYPE == "8bit":
+    quantization_config = BitsAndBytesConfig(
+        load_in_8bit=True
+    )
+    print("Using 8-bit quantization")
+else:
+    quantization_config = None
+    print("No quantization - using full precision")
 
 # Get the last checkpoint directory
 checkpoint_dirs = [d for d in os.listdir(adapter_base_path) if os.path.isdir(os.path.join(adapter_base_path, d))]
@@ -37,9 +55,25 @@ tok = AutoTokenizer.from_pretrained(base_id)
 tok.padding_side = 'left'  # Set left padding for decoder-only models
 if tok.pad_token is None:
     tok.pad_token = tok.eos_token
-base = AutoModelForCausalLM.from_pretrained(base_id, dtype="auto")
+
+# Load base model with optional quantization
+if quantization_config is not None:
+    base = AutoModelForCausalLM.from_pretrained(
+        base_id, 
+        quantization_config=quantization_config,
+        device_map="auto",
+        torch_dtype=torch.float16
+    )
+else:
+    base = AutoModelForCausalLM.from_pretrained(base_id, dtype=torch.float16)
+
 model = PeftModel.from_pretrained(base, best_checkpoint)
 model.eval()
+
+# Print memory usage
+if torch.cuda.is_available():
+    print(f"GPU memory allocated: {torch.cuda.memory_allocated() / 1024**3:.2f} GB")
+    print(f"GPU memory reserved: {torch.cuda.memory_reserved() / 1024**3:.2f} GB")
 
 # Setup evaluation directory
 eval_dir = os.path.join(best_checkpoint, "eval_1")
