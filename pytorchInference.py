@@ -8,7 +8,7 @@ base_id = "Qwen/Qwen3-4B"          # example
 adapter_base_path = "./finetuned_model/adapters_dir_qwen3"     # PEFT-style adapter
 
 # Quantization configuration (set USE_QUANTIZATION to False to disable)
-USE_QUANTIZATION = True
+USE_QUANTIZATION = False
 QUANTIZATION_TYPE = "8bit"  # Options: "4bit", "8bit", "none"
 
 if USE_QUANTIZATION and QUANTIZATION_TYPE == "4bit":
