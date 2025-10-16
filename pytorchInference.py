@@ -4,6 +4,17 @@ from peft import PeftModel
 import json, os
 from tqdm import tqdm
 
+# Set device (prioritize MPS for Apple Silicon, then CUDA, then CPU)
+if torch.backends.mps.is_available():
+    device = torch.device("mps")
+    print("Using MPS backend (Apple Silicon)")
+elif torch.cuda.is_available():
+    device = torch.device("cuda")
+    print("Using CUDA backend")
+else:
+    device = torch.device("cpu")
+    print("Using CPU backend")
+
 base_id = "Qwen/Qwen3-4B"          # example
 adapter_base_path = "./finetuned_model/adapters_dir_qwen3"     # PEFT-style adapter
 
@@ -36,6 +47,7 @@ if tok.pad_token is None:
     tok.pad_token = tok.eos_token
 base = AutoModelForCausalLM.from_pretrained(base_id, dtype="auto")
 model = PeftModel.from_pretrained(base, best_checkpoint)
+model = model.to(device)  # Move model to the selected device
 model.eval()
 
 # Setup evaluation directory
@@ -105,7 +117,7 @@ with open(preds_jsonl, 'a') as outfile:  # Open in append mode
             batch = group[i:i + BATCH_SIZE]
             prompts = [example['prompt'] for example in batch]
             
-            inputs = tok(prompts, padding=True, return_tensors="pt").to(model.device)
+            inputs = tok(prompts, padding=True, return_tensors="pt").to(device)
             
             with torch.no_grad():
                 outputs = model.generate(
