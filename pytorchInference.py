@@ -1,5 +1,5 @@
 import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
+from transformers import AutoTokenizer, AutoModelForCausalLM
 from peft import PeftModel
 import json, os
 from tqdm import tqdm
@@ -19,29 +19,7 @@ else:
     device = "cpu"
     print("Using CPU")
 
-# Quantization configuration (BitsAndBytes only works on CUDA)
-USE_QUANTIZATION = False if device != "cuda" else False
-QUANTIZATION_TYPE = "8bit"  # Options: "4bit", "8bit", "none"
 
-if USE_QUANTIZATION and device == "cuda" and QUANTIZATION_TYPE == "4bit":
-    quantization_config = BitsAndBytesConfig(
-        load_in_4bit=True,
-        bnb_4bit_compute_dtype=torch.float16,
-        bnb_4bit_use_double_quant=True,
-        bnb_4bit_quant_type="nf4"
-    )
-    print("Using 4-bit quantization")
-elif USE_QUANTIZATION and device == "cuda" and QUANTIZATION_TYPE == "8bit":
-    quantization_config = BitsAndBytesConfig(
-        load_in_8bit=True
-    )
-    print("Using 8-bit quantization")
-else:
-    quantization_config = None
-    if device == "mps":
-        print("Quantization disabled on MPS - using full precision")
-    else:
-        print("No quantization - using full precision")
 
 # Get the last checkpoint directory
 checkpoint_dirs = [d for d in os.listdir(adapter_base_path) if os.path.isdir(os.path.join(adapter_base_path, d))]
@@ -72,14 +50,7 @@ if tok.pad_token is None:
     tok.pad_token = tok.eos_token
 
 # Load base model with device-appropriate settings
-if quantization_config is not None and device == "cuda":
-    base = AutoModelForCausalLM.from_pretrained(
-        base_id, 
-        quantization_config=quantization_config,
-        device_map="auto",
-        torch_dtype=torch.float16
-    )
-elif device == "mps":
+if device == "mps":
     # MPS-specific loading
     base = AutoModelForCausalLM.from_pretrained(
         base_id, 
@@ -104,7 +75,7 @@ model = PeftModel.from_pretrained(base, best_checkpoint)
 model.eval()
 
 # Move model to appropriate device if not using device_map
-if device in ["mps", "cpu"] and not quantization_config:
+if device in ["mps", "cpu"]:
     model = model.to(device)
 
 # Print memory usage
