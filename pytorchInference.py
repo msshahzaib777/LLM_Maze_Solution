@@ -88,7 +88,7 @@ gen_config = {
 }
 
 # Batch size for processing
-BATCH_SIZE = 8
+BATCH_SIZE = 44
 
 # Load existing predictions if file exists
 existing_predictions = set()

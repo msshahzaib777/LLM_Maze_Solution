@@ -4,7 +4,6 @@ from utils import (
     dict_to_prompt_completion,
     make_training_example,
     TASKS,
-    filter_jsonl_by_task_ratio,
     suggest_optimal_max_seq_length,
     open_jsonl,
     save_jsonl
@@ -33,7 +32,7 @@ def generate_maze_examples(config):
             all_examples.append(make_training_example(m, TASKS, id=f"{g}x{g}_{count}"))
     return all_examples
 
-def split_data(data, splits):
+def data_splitter(data, splits):
     """Split data into sets based on provided split names"""
     if len(splits) < 2:
         raise ValueError("At least two splits are required")
@@ -145,7 +144,13 @@ def process_splits_with_ratios(dataset_dir, task_ratios, splits, seed=42):
             for ex in chosen:
                 f.write(json.dumps(ex) + "\n")
 
+        # Count samples per task in final dataset
+        task_counts = {}
+        for ex in chosen:
+            task_counts[ex['task']] = task_counts.get(ex['task'], 0) + 1
+
         print(f"{split_name}: {len(chosen)} examples (from {len(all_task_examples)})")
+        print(f"  Task breakdown: {dict(sorted(task_counts.items()))}")
 
 def main(CONFIG=None):
     filename = f'./data/maze_training_{CONFIG["dataset_name"]}.json'
@@ -162,8 +167,12 @@ def main(CONFIG=None):
     if CONFIG['skip_full_splits']:
         print("Loading existing splits...")
         splits_data = {}
-        for split_name in CONFIG['splits']:
-            splits_data[split_name] = open_jsonl(f'{dataset_dir}/{split_name}_full.jsonl')
+        if CONFIG["source"] is not None:
+            for split_name in CONFIG['splits']:
+                splits_data[split_name] = open_jsonl(f'{source_dataset_dir}/{split_name}_full.jsonl')
+        else:
+            for split_name in CONFIG['splits']:
+                splits_data[split_name] = open_jsonl(f'{dataset_dir}/{split_name}_full.jsonl')
     else:
         # Step 2: Generate or load maze examples
         if not CONFIG['skip_generation'] and not os.path.exists(filename):
@@ -181,7 +190,7 @@ def main(CONFIG=None):
                     all_examples = json.load(f)
         
         print("Creating train/valid/test splits...")
-        splits_data = split_data(all_examples, CONFIG["splits"])
+        splits_data = data_splitter(all_examples, CONFIG["splits"])
         for split_name, split_data in splits_data.items():
             save_jsonl(split_data, f'{dataset_dir}/{split_name}_full.jsonl', mapper=dict_to_prompt_completion)
 
@@ -218,20 +227,20 @@ if __name__ == "__main__":
         },
         'splits': ['train', 'valid', 'test'],
         'split_params': {
-            'test_size': 0.30,
-            'valid_test_split': 0.33,
+            'test_size': 0.20,
+            'valid_test_split': 0.50,
             'random_state': 42
         },
         'task_ratios': {
-            "DETECT_START_END": 0.05,
-            "AVAILABLE_DIRECTIONS": 0.05,
-            "VALID_MOVE": 0.05,
-            "OPTIMAL_NEXT_STEP": 0.05,
+            "DETECT_START_END": 0.02,
+            "AVAILABLE_DIRECTIONS": 0.03,
+            "VALID_MOVE": 0.03,
+            "OPTIMAL_NEXT_STEP": 0.12,
             "MAZE_SOLUTION": 0.8
         },
         'skip_generation': True,
-        'skip_full_splits': True,
-        'dataset_name': 'curriculum_2',
+        'skip_full_splits': False,
+        'dataset_name': 'curriculum_2_45',
         "source": "curriculum_1"
     }
     main(CONFIG)

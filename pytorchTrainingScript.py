@@ -6,23 +6,23 @@ from datasets import load_dataset
 
 # Updated constants for Mac MPS
 MODEL = "Qwen/Qwen3-4B"  # Updated to Qwen3
-DATA  = "data/custom_curriculum_1/train.jsonl"
+DATA  = "data/curriculum_2_123/train.jsonl"
 BATCH = 2 # Reduced batch size for MPS memory constraints:
 ACCUM = 8
 
 # Learning rate schedule parameters
 BASE_LR = 4.0e-5
-ITERS = 10000
+ITERS = 50000
 WARMUP = 0.03 * ITERS
 DECAY_STEPS = ITERS - WARMUP
 LR_FLOOR = 0.1 * BASE_LR
 EVAL_EVERY = 50
 
-MAXLEN= 512
+MAXLEN= 391
 DEVICE= "mps"  # Force MPS device for Mac
 
 # Checkpoint settings
-CHECKPOINT_DIR = "finetuned_model/adapters_dir_qwen3"
+CHECKPOINT_DIR = "finetuned_model/adapters_qwen3_1_123"
 RESUME_FROM_CHECKPOINT = False  # Set to False to start fresh
 
 # Check MPS availability
@@ -212,6 +212,10 @@ data_iter = infinite_dataloader(dl)
 print(f"Starting training for {ITERS} iterations...")
 print(f"Base LR: {BASE_LR}, Warmup: {WARMUP}, LR Floor: {LR_FLOOR}")
 
+# Track metrics
+running_loss = 0.0
+log_interval = 10
+
 while global_step < ITERS:
     batch = next(data_iter)
     input_ids = batch["input_ids"].to(DEVICE)
@@ -221,39 +225,63 @@ while global_step < ITERS:
     loss = out.loss / ACCUM
     loss.backward()
     
+    # Accumulate loss for logging
+    running_loss += loss.item()
+    
     if (global_step + 1) % ACCUM == 0:
         torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
         opt.step()
         sched.step()
         opt.zero_grad()
-        
-    if global_step % 50 == 0:  # Print loss every 50 steps
+    
+    # Log every log_interval steps
+    if global_step % log_interval == 0:
+        avg_loss = (running_loss / log_interval) * ACCUM
         current_lr = sched.get_last_lr()[0]
-        print(f"Step: {global_step}/{ITERS}, Loss: {loss.item()*ACCUM:.6f}, LR: {current_lr:.2e}")
         
-    # Track loss history
-    if global_step % 10 == 0:
-        loss_history.append((global_step, loss.item() * ACCUM))
+        # Track loss history
+        loss_history.append({"step": global_step, "loss": avg_loss, "lr": current_lr})
+        
+        # Print progress
+        if global_step % 50 == 0:
+            progress = (global_step / ITERS) * 100
+            print(f"Step: {global_step}/{ITERS} ({progress:.1f}%), Loss: {avg_loss:.6f}, LR: {current_lr:.2e}")
+        
+        running_loss = 0.0
     
     # Save checkpoint every EVAL_EVERY steps
     if global_step > 0 and global_step % EVAL_EVERY == 0:
         checkpoint_dir = f"{CHECKPOINT_DIR}/step_{global_step}"
         model.save_pretrained(checkpoint_dir)
         save_training_state(checkpoint_dir, global_step, opt, sched, loss_history)
-        print(f"Saved checkpoint at step {global_step}")
+        print(f"✓ Checkpoint saved at step {global_step}")
         
     global_step += 1
 
 # Final save
+print(f"\n{'='*60}")
 print(f"Training completed after {ITERS} iterations!")
 final_dir = f"{CHECKPOINT_DIR}/final"
 model.save_pretrained(final_dir)
 tok.save_pretrained(final_dir)
 save_training_state(final_dir, global_step, opt, sched, loss_history)
-print(f"Final model saved to {final_dir}")
+print(f"✓ Final model saved to {final_dir}")
 
-# Print loss history summary
+# Save loss history to JSON
+loss_history_path = os.path.join(final_dir, "loss_history.json")
+with open(loss_history_path, 'w') as f:
+    json.dump(loss_history, f, indent=2)
+print(f"✓ Loss history saved to {loss_history_path}")
+
+# Print training summary
 if loss_history:
-    print("\nLoss History Summary:")
-    for step, loss_val in loss_history[-10:]:  # Show last 10 entries
-        print(f"  Step {step}: Loss {loss_val:.6f}")
+    print(f"\n{'='*60}")
+    print("Training Summary:")
+    print(f"  Total steps: {len(loss_history)}")
+    print(f"  Initial loss: {loss_history[0]['loss']:.6f}")
+    print(f"  Final loss: {loss_history[-1]['loss']:.6f}")
+    print(f"  Loss improvement: {loss_history[0]['loss'] - loss_history[-1]['loss']:.6f}")
+    print(f"\nLast 10 checkpoints:")
+    for entry in loss_history[-10:]:
+        print(f"  Step {entry['step']:>6}: Loss {entry['loss']:.6f}, LR {entry['lr']:.2e}")
+print(f"{'='*60}\n")
