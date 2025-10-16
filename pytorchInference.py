@@ -71,17 +71,18 @@ test_file = "data/custom_curriculum_1/test.jsonl"
 with open(test_file, 'r') as f:
     test_examples = [json.loads(line) for line in f]
 
-# Generation parameters
+# Generation parameters - conservative settings for MPS stability
 gen_config = {
     "max_new_tokens": 64,
-    "temperature": 0.7,
-    "top_p": 0.9,
-    "top_k": 50,  # Add top_k to limit vocabulary
+    "temperature": 0.3,  # Lower temperature for more stable sampling
+    "top_p": 0.95,       # Higher top_p for better probability mass
+    "top_k": 40,         # Lower top_k to avoid extreme probabilities
+    "min_p": 0.01,       # Minimum probability threshold
     "do_sample": True,
     "pad_token_id": tok.pad_token_id,
     "eos_token_id": tok.eos_token_id,
-    "repetition_penalty": 1.1,  # Prevent repetition
-    "no_repeat_ngram_size": 2  # Prevent n-gram repetition
+    "repetition_penalty": 1.05,  # Lighter repetition penalty
+    "no_repeat_ngram_size": 2
 }
 
 # Batch size for processing
@@ -133,29 +134,15 @@ with open(preds_jsonl, 'a') as outfile:  # Open in append mode
             
             inputs = tok(prompts, padding=True, return_tensors="pt").to(device)
             
+            # Ensure proper tensor types for MPS stability
+            if device.type == "mps":
+                inputs = {k: v.float() if v.dtype == torch.float16 else v for k, v in inputs.items()}
+            
             with torch.no_grad():
-                try:
-                    outputs = model.generate(
-                        **inputs,
-                        **gen_config
-                    )
-                except RuntimeError as e:
-                    if "probability tensor contains" in str(e):
-                        print(f"Warning: Sampling failed, falling back to greedy decoding for batch {i//BATCH_SIZE + 1}")
-                        # Fallback to greedy decoding
-                        fallback_config = gen_config.copy()
-                        fallback_config.update({
-                            "do_sample": False,
-                            "temperature": None,
-                            "top_p": None,
-                            "top_k": None
-                        })
-                        outputs = model.generate(
-                            **inputs,
-                            **fallback_config
-                        )
-                    else:
-                        raise e
+                outputs = model.generate(
+                    **inputs,
+                    **gen_config
+                )
             
             responses = tok.batch_decode(outputs, skip_special_tokens=True)
             
