@@ -45,20 +45,24 @@ tok = AutoTokenizer.from_pretrained(base_id)
 tok.padding_side = 'left'  # Set left padding for decoder-only models
 if tok.pad_token is None:
     tok.pad_token = tok.eos_token
-# Load base model with appropriate dtype for MPS
+# Load base model with appropriate dtype for MPS (avoid float16 overflow issues)
 if device.type == "mps":
-    # Use float32 for MPS to avoid precision issues
-    base = AutoModelForCausalLM.from_pretrained(base_id, dtype=torch.float32)
+    # Use bfloat16 for MPS - better stability than float16, less memory than float32
+    target_dtype = torch.bfloat16
+    base = AutoModelForCausalLM.from_pretrained(base_id, torch_dtype=target_dtype)
+    print(f"Loading model with {target_dtype} for MPS stability")
+elif device.type == "cuda":
+    # CUDA handles float16 well
+    base = AutoModelForCausalLM.from_pretrained(base_id, torch_dtype=torch.float16)
+    target_dtype = torch.float16
 else:
-    base = AutoModelForCausalLM.from_pretrained(base_id, dtype="auto")
+    # CPU - use float32
+    base = AutoModelForCausalLM.from_pretrained(base_id, torch_dtype=torch.float32)
+    target_dtype = torch.float32
 
 model = PeftModel.from_pretrained(base, best_checkpoint)
-model = model.to(device)  # Move model to the selected device
+model = model.to(device, dtype=target_dtype)  # Move model to device with consistent dtype
 model.eval()
-
-# Set model to use float32 on MPS to prevent numerical instabilities
-if device.type == "mps":
-    model = model.float()
 
 # Setup evaluation directory
 eval_dir = os.path.join(best_checkpoint, "eval_1")
@@ -130,9 +134,11 @@ with open(preds_jsonl, 'a') as outfile:  # Open in append mode
             
             inputs = tok(prompts, padding=True, return_tensors="pt").to(device)
             
-            # Ensure proper tensor types for MPS stability
-            if device.type == "mps":
-                inputs = {k: v.float() if v.dtype == torch.float16 else v for k, v in inputs.items()}
+            # Ensure input tensors match model dtype for stability
+            if device.type == "mps" and target_dtype == torch.bfloat16:
+                # Convert float tensors to bfloat16, keep integer tensors as-is
+                inputs = {k: v.to(dtype=target_dtype) if v.dtype.is_floating_point else v 
+                         for k, v in inputs.items()}
             
             with torch.no_grad():
                 outputs = model.generate(
