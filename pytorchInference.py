@@ -20,6 +20,7 @@ else:
 base_id = "Qwen/Qwen3-4B"
 adapter_base_path = "./finetuned_model/adapters_dir_qwen3"
 
+
 # ----- pick best checkpoint (your logic preserved) -----
 checkpoint_dirs = [d for d in os.listdir(adapter_base_path) if os.path.isdir(os.path.join(adapter_base_path, d))]
 last_checkpoint = sorted(checkpoint_dirs, key=lambda x: int(x.split('_')[1]))[-1]
@@ -66,7 +67,7 @@ gen_config = dict(
 )
 
 # Setup evaluation directory
-eval_dir = os.path.join(best_checkpoint, "eval_1")
+eval_dir = os.path.join(f"results/{'/'.join(best_checkpoint.split('/')[-2:])}", "eval_1")
 os.makedirs(eval_dir, exist_ok=True)
 preds_jsonl = os.path.join(eval_dir, "test_predictions.jsonl")
 summary_json = os.path.join(eval_dir, "summary.json")
