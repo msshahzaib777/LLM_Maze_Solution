@@ -48,7 +48,7 @@ if tok.pad_token is None:
 # Load base model with appropriate dtype for MPS
 if device.type == "mps":
     # Use float32 for MPS to avoid precision issues
-    base = AutoModelForCausalLM.from_pretrained(base_id, torch_dtype=torch.float32)
+    base = AutoModelForCausalLM.from_pretrained(base_id, dtype=torch.float32)
 else:
     base = AutoModelForCausalLM.from_pretrained(base_id, dtype="auto")
 
