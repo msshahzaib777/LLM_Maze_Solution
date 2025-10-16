@@ -45,10 +45,20 @@ tok = AutoTokenizer.from_pretrained(base_id)
 tok.padding_side = 'left'  # Set left padding for decoder-only models
 if tok.pad_token is None:
     tok.pad_token = tok.eos_token
-base = AutoModelForCausalLM.from_pretrained(base_id, dtype="auto")
+# Load base model with appropriate dtype for MPS
+if device.type == "mps":
+    # Use float32 for MPS to avoid precision issues
+    base = AutoModelForCausalLM.from_pretrained(base_id, torch_dtype=torch.float32)
+else:
+    base = AutoModelForCausalLM.from_pretrained(base_id, dtype="auto")
+
 model = PeftModel.from_pretrained(base, best_checkpoint)
 model = model.to(device)  # Move model to the selected device
 model.eval()
+
+# Set model to use float32 on MPS to prevent numerical instabilities
+if device.type == "mps":
+    model = model.float()
 
 # Setup evaluation directory
 eval_dir = os.path.join(best_checkpoint, "eval_1")
@@ -66,8 +76,12 @@ gen_config = {
     "max_new_tokens": 64,
     "temperature": 0.7,
     "top_p": 0.9,
+    "top_k": 50,  # Add top_k to limit vocabulary
     "do_sample": True,
-    "pad_token_id": tok.pad_token_id
+    "pad_token_id": tok.pad_token_id,
+    "eos_token_id": tok.eos_token_id,
+    "repetition_penalty": 1.1,  # Prevent repetition
+    "no_repeat_ngram_size": 2  # Prevent n-gram repetition
 }
 
 # Batch size for processing
@@ -120,10 +134,28 @@ with open(preds_jsonl, 'a') as outfile:  # Open in append mode
             inputs = tok(prompts, padding=True, return_tensors="pt").to(device)
             
             with torch.no_grad():
-                outputs = model.generate(
-                    **inputs,
-                    **gen_config
-                )
+                try:
+                    outputs = model.generate(
+                        **inputs,
+                        **gen_config
+                    )
+                except RuntimeError as e:
+                    if "probability tensor contains" in str(e):
+                        print(f"Warning: Sampling failed, falling back to greedy decoding for batch {i//BATCH_SIZE + 1}")
+                        # Fallback to greedy decoding
+                        fallback_config = gen_config.copy()
+                        fallback_config.update({
+                            "do_sample": False,
+                            "temperature": None,
+                            "top_p": None,
+                            "top_k": None
+                        })
+                        outputs = model.generate(
+                            **inputs,
+                            **fallback_config
+                        )
+                    else:
+                        raise e
             
             responses = tok.batch_decode(outputs, skip_special_tokens=True)
             
