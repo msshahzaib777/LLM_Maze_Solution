@@ -64,59 +64,77 @@ gen_config = {
 # Batch size for processing
 BATCH_SIZE = 8
 
-# Generate responses in batches
+# Group examples by maze size and task
+print("Grouping examples by maze size and task...\n")
+grouped_examples = {}
+for example in test_examples:
+    # Extract maze size from the id (e.g., "7x7_4549_start_end")
+    maze_size = example['id'].split('_')[0]  # Gets "7x7"
+    
+    task = example.get('task', 'UNKNOWN')
+    key = (maze_size, task)
+    if key not in grouped_examples:
+        grouped_examples[key] = []
+    grouped_examples[key].append(example)
+
+# Generate responses in batches for each group
 print("Generating responses...\n")
 predictions = []
-total_batches = (len(test_examples) + BATCH_SIZE - 1) // BATCH_SIZE
+total_examples = len(test_examples)
+processed = 0
 
 with open(preds_jsonl, 'w') as outfile:
-    pbar = tqdm(range(0, len(test_examples), BATCH_SIZE), 
+    pbar = tqdm(total=total_examples, 
                 desc="Evaluating", 
-                unit="batch",
-                total=total_batches,
+                unit="example",
                 postfix={"examples": 0})
     
-    for i in pbar:
-        batch = test_examples[i:i + BATCH_SIZE]
-        prompts = [example['prompt'] for example in batch]
+    # Process each group separately
+    for (maze_size, task), group in grouped_examples.items():
+        print(f"\nProcessing {maze_size}, {task} - {len(group)} examples")
         
-        # Tokenize batch
-        inputs = tok(prompts, padding=True, return_tensors="pt").to(model.device)
-        
-        # Generate
-        with torch.no_grad():
-            outputs = model.generate(
-                **inputs,
-                **gen_config
-            )
-        
-        # Decode responses
-        responses = tok.batch_decode(outputs, skip_special_tokens=True)
-        
-        # Extract only the generated part (remove the prompt)
-        generated_responses = []
-        for prompt, response in zip(prompts, responses):
-            # Remove the prompt from the response to get only the generated part
-            if response.startswith(prompt):
-                generated_part = response[len(prompt):].strip()
-            else:
-                generated_part = response.strip()
-            generated_responses.append(generated_part)
-        
-        # Save predictions and display
-        for j, (item, prompt, generated_response) in enumerate(zip(batch, prompts, generated_responses)):
-            pred_item = {
-                'id': item.get('id', i + j),
-                'prompt': item['prompt'],
-                'target': item.get('completion', ''),
-                'prediction': generated_response,
-                'task': item.get('task', 'UNKNOWN')
-            }
-            predictions.append(pred_item)
-            outfile.write(json.dumps(pred_item) + '\n')
-        
-        # Update progress bar with current example count
-        pbar.set_postfix({"examples": len(predictions)})
+        # Process the group in batches
+        for i in range(0, len(group), BATCH_SIZE):
+            batch = group[i:i + BATCH_SIZE]
+            prompts = [example['prompt'] for example in batch]
+            
+            # Tokenize batch
+            inputs = tok(prompts, padding=True, return_tensors="pt").to(model.device)
+            
+            # Generate
+            with torch.no_grad():
+                outputs = model.generate(
+                    **inputs,
+                    **gen_config
+                )
+            
+            # Decode responses
+            responses = tok.batch_decode(outputs, skip_special_tokens=True)
+            
+            # Extract only the generated part
+            generated_responses = []
+            for prompt, response in zip(prompts, responses):
+                if response.startswith(prompt):
+                    generated_part = response[len(prompt):].strip()
+                else:
+                    generated_part = response.strip()
+                generated_responses.append(generated_part)
+            
+            # Save predictions
+            for j, (item, prompt, generated_response) in enumerate(zip(batch, prompts, generated_responses)):
+                pred_item = {
+                    'id': item.get('id', processed + j),
+                    'prompt': item['prompt'],
+                    'target': item.get('completion', ''),
+                    'prediction': generated_response,
+                    'task': item.get('task', 'UNKNOWN')
+                }
+                predictions.append(pred_item)
+                outfile.write(json.dumps(pred_item) + '\n')
+            
+            processed += len(batch)
+            pbar.update(len(batch))
+            pbar.set_postfix({"examples": processed})
 
 print(f"\nPredictions saved to: {preds_jsonl}")
 print(f"Total examples processed: {len(predictions)}")
