@@ -1,68 +1,69 @@
-import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM
+import torch, os, json
+from transformers import AutoTokenizer, AutoModelForCausalLM, LogitsProcessorList, InfNanRemoveLogitsProcessor
 from peft import PeftModel
-import json, os
 from tqdm import tqdm
 
-# Set device (prioritize MPS for Apple Silicon, then CUDA, then CPU)
+# ----- Device & dtype -----
 if torch.backends.mps.is_available():
     device = torch.device("mps")
+    target_dtype = torch.bfloat16   # switch to float32 if you still see instability
     print("Using MPS backend (Apple Silicon)")
 elif torch.cuda.is_available():
     device = torch.device("cuda")
+    target_dtype = torch.float16
     print("Using CUDA backend")
 else:
     device = torch.device("cpu")
+    target_dtype = torch.float32
     print("Using CPU backend")
 
-base_id = "Qwen/Qwen3-4B"          # example
-adapter_base_path = "./finetuned_model/adapters_dir_qwen3"     # PEFT-style adapter
+base_id = "Qwen/Qwen3-4B"
+adapter_base_path = "./finetuned_model/adapters_dir_qwen3"
 
-# Get the last checkpoint directory
+# ----- pick best checkpoint (your logic preserved) -----
 checkpoint_dirs = [d for d in os.listdir(adapter_base_path) if os.path.isdir(os.path.join(adapter_base_path, d))]
-last_checkpoint = sorted(checkpoint_dirs, key=lambda x: int(x.split('_')[1]))[-1]  # Sort by step number
+last_checkpoint = sorted(checkpoint_dirs, key=lambda x: int(x.split('_')[1]))[-1]
 last_checkpoint_path = os.path.join(adapter_base_path, last_checkpoint)
-
-# Load the training state from the last checkpoint
 training_state = torch.load(os.path.join(last_checkpoint_path, 'training_state.pt'))
 loss_history = training_state.get('loss_history', [])
-
 if not loss_history:
     print("No loss history found, using last checkpoint")
     best_checkpoint = last_checkpoint_path
 else:
-    # Find the checkpoint with minimum loss
     min_loss_step, min_loss = min(loss_history, key=lambda x: x[1])
-    # Get all checkpoint steps
-    checkpoint_steps = [int(d.split('_')[1]) for d in checkpoint_dirs]
-    # Find the nearest available checkpoint to min_loss_step
-    nearest_checkpoint_step = min(checkpoint_steps, key=lambda x: abs(x - min_loss_step))
-    best_checkpoint = os.path.join(adapter_base_path, f"{checkpoint_dirs[0].split('_')[0]}_{nearest_checkpoint_step}")
-    print(f"Loading best checkpoint: checkpoint-{nearest_checkpoint_step} with loss: {min_loss} (from step {min_loss_step})")
+    steps = [int(d.split('_')[1]) for d in checkpoint_dirs]
+    nearest_step = min(steps, key=lambda x: abs(x - min_loss_step))
+    best_checkpoint = os.path.join(adapter_base_path, f"{checkpoint_dirs[0].split('_')[0]}_{nearest_step}")
+    print(f"Loading best checkpoint: checkpoint-{nearest_step} with loss: {min_loss} (from step {min_loss_step})")
 
-# Load the model with best checkpoint
-tok = AutoTokenizer.from_pretrained(base_id)
-tok.padding_side = 'left'  # Set left padding for decoder-only models
+# ----- tokenizer -----
+tok = AutoTokenizer.from_pretrained(base_id, use_fast=True)
+tok.padding_side = "left"
 if tok.pad_token is None:
     tok.pad_token = tok.eos_token
-# Load base model with appropriate dtype for MPS (avoid float16 overflow issues)
-if device.type == "mps":
-    # Use bfloat16 for MPS - better stability than float16, less memory than float32
-    target_dtype = torch.bfloat16
-    base = AutoModelForCausalLM.from_pretrained(base_id, torch_dtype=target_dtype)
-    print(f"Loading model with {target_dtype} for MPS stability")
-elif device.type == "cuda":
-    # CUDA handles float16 well
-    base = AutoModelForCausalLM.from_pretrained(base_id, torch_dtype=torch.float16)
-    target_dtype = torch.float16
-else:
-    # CPU - use float32
-    base = AutoModelForCausalLM.from_pretrained(base_id, torch_dtype=torch.float32)
-    target_dtype = torch.float32
 
-model = PeftModel.from_pretrained(base, best_checkpoint)
-model = model.to(device, dtype=target_dtype)  # Move model to device with consistent dtype
-model.eval()
+# ----- load base on CPU to merge safely, then move -----
+base = AutoModelForCausalLM.from_pretrained(base_id, torch_dtype=torch.float32)  # merge in fp32
+peft_model = PeftModel.from_pretrained(base, best_checkpoint, torch_dtype=torch.float32, is_trainable=False)
+
+# ----- MERGE -----
+merged = peft_model.merge_and_unload()   # LoRA weights baked into base; no PEFT wrappers left
+
+# (Optional) cast to your runtime dtype and move to device
+merged = merged.to(device, dtype=target_dtype)
+merged.eval()
+
+# ----- generation knobs -----
+logits_processor = LogitsProcessorList([InfNanRemoveLogitsProcessor()])
+gen_config = dict(
+    max_new_tokens=127,
+    do_sample=True,
+    temperature=0.7,   # > 0
+    top_p=0.9,
+    num_beams=1,
+    pad_token_id=tok.pad_token_id,
+    eos_token_id=tok.eos_token_id,
+)
 
 # Setup evaluation directory
 eval_dir = os.path.join(best_checkpoint, "eval_1")
@@ -132,18 +133,13 @@ with open(preds_jsonl, 'a') as outfile:  # Open in append mode
             batch = group[i:i + BATCH_SIZE]
             prompts = [example['prompt'] for example in batch]
             
-            inputs = tok(prompts, padding=True, return_tensors="pt").to(device)
-            
-            # Ensure input tensors match model dtype for stability
-            if device.type == "mps" and target_dtype == torch.bfloat16:
-                # Convert float tensors to bfloat16, keep integer tensors as-is
-                inputs = {k: v.to(dtype=target_dtype) if v.dtype.is_floating_point else v 
-                         for k, v in inputs.items()}
+            inputs = tok(prompts, padding=True, return_tensors="pt").to(device)  # keep ids/mask as integers
             
             with torch.no_grad():
-                outputs = model.generate(
+                outputs = merged.generate(
                     **inputs,
-                    **gen_config
+                    **gen_config,
+                    logits_processor=logits_processor
                 )
             
             responses = tok.batch_decode(outputs, skip_special_tokens=True)
@@ -172,3 +168,12 @@ with open(preds_jsonl, 'a') as outfile:  # Open in append mode
 
 print(f"\nPredictions saved to: {preds_jsonl}")
 print(f"Total new examples processed: {processed}")
+
+# ----- example batch (optional test) -----
+# prompts = ["Solve this 5x5 maze..."]
+# inputs = tok(prompts, padding=True, return_tensors="pt").to(device)  # keep ids/mask as integers
+# 
+# with torch.no_grad():
+#     out = merged.generate(**inputs, **gen_config, logits_processor=logits_processor)
+# 
+# print(tok.batch_decode(out, skip_special_tokens=True))
