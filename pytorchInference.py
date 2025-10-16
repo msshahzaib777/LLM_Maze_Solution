@@ -136,6 +136,8 @@ with open(preds_jsonl, 'a') as outfile:  # Open in append mode
                 postfix={"examples": 0})
     
     for (maze_size, task), group in grouped_examples.items():
+        if task != "OPTIMAL_NEXT_STEP":
+            break
         print(f"\nProcessing {maze_size}, {task} - {len(group)} examples")
         
         for i in range(0, len(group), BATCH_SIZE):
