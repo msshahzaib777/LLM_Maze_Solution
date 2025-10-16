@@ -73,16 +73,12 @@ with open(test_file, 'r') as f:
 
 # Generation parameters - conservative settings for MPS stability
 gen_config = {
-    "max_new_tokens": 64,
-    "temperature": 0.3,  # Lower temperature for more stable sampling
-    "top_p": 0.95,       # Higher top_p for better probability mass
-    "top_k": 40,         # Lower top_k to avoid extreme probabilities
-    "min_p": 0.01,       # Minimum probability threshold
+    "max_new_tokens": 127,
+    "temperature": 0.7,
+    "top_p": 0.9,
     "do_sample": True,
     "pad_token_id": tok.pad_token_id,
-    "eos_token_id": tok.eos_token_id,
-    "repetition_penalty": 1.05,  # Lighter repetition penalty
-    "no_repeat_ngram_size": 2
+    "num_beams": 1
 }
 
 # Batch size for processing
