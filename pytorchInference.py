@@ -62,7 +62,7 @@ gen_config = {
 }
 
 # Batch size for processing
-BATCH_SIZE = 8
+BATCH_SIZE = 6
 
 # Group examples by maze size and task
 print("Grouping examples by maze size and task...\n")
