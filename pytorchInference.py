@@ -43,8 +43,8 @@ if tok.pad_token is None:
     tok.pad_token = tok.eos_token
 
 # ----- load base on CPU to merge safely, then move -----
-base = AutoModelForCausalLM.from_pretrained(base_id, torch_dtype=torch.float32)  # merge in fp32
-peft_model = PeftModel.from_pretrained(base, best_checkpoint, torch_dtype=torch.float32, is_trainable=False)
+base = AutoModelForCausalLM.from_pretrained(base_id, dtype=torch.float32)  # merge in fp32
+peft_model = PeftModel.from_pretrained(base, best_checkpoint, dtype=torch.float32, is_trainable=False)
 
 # ----- MERGE -----
 merged = peft_model.merge_and_unload()   # LoRA weights baked into base; no PEFT wrappers left
