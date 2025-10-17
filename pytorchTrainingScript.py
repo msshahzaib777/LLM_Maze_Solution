@@ -6,13 +6,14 @@ from datasets import load_dataset
 
 # Updated constants for Mac MPS
 MODEL = "Qwen/Qwen3-4B"  # Updated to Qwen3
-DATA  = "data/curriculum_2_123/train.jsonl"
-BATCH = 2 # Reduced batch size for MPS memory constraints:
+DATA  = "data/curriculum_1_123/train.jsonl"
+DATA_DIR = "data/curriculum_1_123"
+BATCH = 4 # Reduced batch size for MPS memory constraints:
 ACCUM = 8
 
 # Learning rate schedule parameters
 BASE_LR = 4.0e-5
-ITERS = 50000
+ITERS = 10000
 WARMUP = 0.03 * ITERS
 DECAY_STEPS = ITERS - WARMUP
 LR_FLOOR = 0.1 * BASE_LR
@@ -107,7 +108,7 @@ def collate_fn(batch):
 dl = DataLoader(ds["train"], batch_size=BATCH, shuffle=True, collate_fn=collate_fn)
 
 # Load validation dataset
-val_ds = load_dataset("json", data_files={"validation": "data/curriculum_2_123/valid.json"})
+val_ds = load_dataset("json", data_files={"validation": f"{DATA_DIR}/valid.jsonl"})
 val_dl = DataLoader(val_ds["validation"], batch_size=BATCH, shuffle=False, collate_fn=collate_fn)
 
 # Check for existing checkpoints
@@ -176,11 +177,12 @@ def print_trainable_parameters(model):
         if param.requires_grad:
             trainable_params += param.numel()
             if "lora_" in name:
-                print(f"  Trainable LoRA: {name} - {param.numel()} params")
+                pass
+		#print(f"  Trainable LoRA: {name} - {param.numel()} params")
     print(f"Trainable params: {trainable_params:,} || All params: {all_param:,} || Trainable %: {100 * trainable_params / all_param:.4f}")
 
 print("Model parameter status:")
-# print_trainable_parameters(model)
+print_trainable_parameters(model)
 
 # Create custom cosine schedule with minimum LR
 def get_cosine_with_min_lr(optimizer, warmup_steps, total_steps, min_lr_ratio=0.1):
@@ -221,7 +223,7 @@ print(f"Base LR: {BASE_LR}, Warmup: {WARMUP}, LR Floor: {LR_FLOOR}")
 
 # Track metrics
 running_loss = 0.0
-log_interval = 10
+log_interval = 1
 
 while global_step < ITERS:
     batch = next(data_iter)
