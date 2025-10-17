@@ -3,6 +3,8 @@ from torch.utils.data import DataLoader
 from transformers import AutoModelForCausalLM, AutoTokenizer, get_cosine_schedule_with_warmup
 from peft import LoraConfig, get_peft_model, PeftModel
 from datasets import load_dataset
+import logging
+from datetime import datetime
 
 # Updated constants for Mac MPS
 MODEL = "Qwen/Qwen3-4B"  # Updated to Qwen3
@@ -25,6 +27,25 @@ DEVICE= "mps"  # Force MPS device for Mac
 # Checkpoint settings
 CHECKPOINT_DIR = "finetuned_model/adapter/qwen3_2_123"
 RESUME_FROM_CHECKPOINT = False  # Set to False to start fresh
+
+# Create logs directory if it doesn't exist
+log_dir = os.path.join("./logs", os.path.basename(CHECKPOINT_DIR.split('/')[-1]))
+os.makedirs(log_dir, exist_ok=True)
+
+# Set up logging to both file and console
+log_file = os.path.join(log_dir, f"training_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log")
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(message)s',
+    handlers=[
+        logging.FileHandler(log_file),
+        logging.StreamHandler()
+    ]
+)
+
+# Replace print statements with logging.info in the code above
+logger = logging.getLogger(__name__)
+logger.info(f"Log file created at: {log_file}")
 
 # Check MPS availability
 assert torch.backends.mps.is_available(), "MPS not available. Make sure you're on MacOS 12.3+"
@@ -72,7 +93,7 @@ def load_training_state(checkpoint_dir, optimizer, scheduler):
     state_path = os.path.join(checkpoint_dir, 'training_state.pt')
     
     if not os.path.exists(state_path):
-        print(f"No training state found at {state_path}")
+        logger.info(f"No training state found at {state_path}")
         return 0, []
     
     state = torch.load(state_path, map_location=DEVICE)
@@ -83,7 +104,7 @@ def load_training_state(checkpoint_dir, optimizer, scheduler):
     loss_history = state.get('loss_history', [])
     eval_loss_history = state.get('eval_loss_history', [])
     
-    print(f"Loaded training state from step {step}")
+    logger.info(f"Loaded training state from step {step}")
     return step, loss_history, eval_loss_history
 
 ds = load_dataset("json", data_files={"train": DATA})
@@ -115,8 +136,8 @@ val_dl = DataLoader(val_ds["validation"], batch_size=BATCH, shuffle=False, colla
 latest_checkpoint, resume_step = find_latest_checkpoint(CHECKPOINT_DIR) if RESUME_FROM_CHECKPOINT else (None, 0)
 
 if latest_checkpoint and RESUME_FROM_CHECKPOINT:
-    print(f"Found checkpoint at step {resume_step}: {latest_checkpoint}")
-    print("Loading model from checkpoint...")
+    logger.info(f"Found checkpoint at step {resume_step}: {latest_checkpoint}")
+    logger.info("Loading model from checkpoint...")
     
     # Load base model
     base_model = AutoModelForCausalLM.from_pretrained(
@@ -138,11 +159,11 @@ if latest_checkpoint and RESUME_FROM_CHECKPOINT:
         if "lora_" in name:
             param.requires_grad = True
     
-    print(f"Resumed from checkpoint at step {resume_step}")
-    print("LoRA adapters enabled for training, base model frozen")
+    logger.info(f"Resumed from checkpoint at step {resume_step}")
+    logger.info("LoRA adapters enabled for training, base model frozen")
     
 else:
-    print("Starting fresh training...")
+    logger.info("Starting fresh training...")
     
     # Load model with float16 for MPS
     model = AutoModelForCausalLM.from_pretrained(
@@ -163,7 +184,7 @@ else:
     
     model = get_peft_model(model, lora)
     resume_step = 0
-    print("Fresh LoRA model created - base model frozen, adapters trainable")
+    logger.info("Fresh LoRA model created - base model frozen, adapters trainable")
 
 model.to(DEVICE)
 model.train()
@@ -178,10 +199,10 @@ def print_trainable_parameters(model):
             trainable_params += param.numel()
             if "lora_" in name:
                 pass
-		#print(f"  Trainable LoRA: {name} - {param.numel()} params")
-    print(f"Trainable params: {trainable_params:,} || All params: {all_param:,} || Trainable %: {100 * trainable_params / all_param:.4f}")
+		#logger.info(f"  Trainable LoRA: {name} - {param.numel()} params")
+    logger.info(f"Trainable params: {trainable_params:,} || All params: {all_param:,} || Trainable %: {100 * trainable_params / all_param:.4f}")
 
-print("Model parameter status:")
+logger.info("Model parameter status:")
 print_trainable_parameters(model)
 
 # Create custom cosine schedule with minimum LR
@@ -218,8 +239,8 @@ def infinite_dataloader(dataloader):
 
 data_iter = infinite_dataloader(dl)
 
-print(f"Starting training for {ITERS} iterations...")
-print(f"Base LR: {BASE_LR}, Warmup: {WARMUP}, LR Floor: {LR_FLOOR}")
+logger.info(f"Starting training for {ITERS} iterations...")
+logger.info(f"Base LR: {BASE_LR}, Warmup: {WARMUP}, LR Floor: {LR_FLOOR}")
 
 # Track metrics
 running_loss = 0.0
@@ -251,7 +272,7 @@ while global_step < ITERS:
         # Track loss history
         loss_history.append({"step": global_step, "loss": avg_loss, "lr": current_lr})
         progress = (global_step / ITERS) * 100
-        print(f"Step: {global_step}/{ITERS} ({progress:.1f}%), Loss: {avg_loss:.6f}, LR: {current_lr:.2e}")
+        logger.info(f"Step: {global_step}/{ITERS} ({progress:.1f}%), Loss: {avg_loss:.6f}, LR: {current_lr:.2e}")
         
         running_loss = 0.0
     
@@ -272,40 +293,41 @@ while global_step < ITERS:
 
         avg_val_loss = val_loss / val_steps
         eval_loss_history.append({"step": global_step, "val_loss": avg_val_loss})
-        print(f"Validation loss at step {global_step}: {avg_val_loss:.6f}")
+        logger.info(f"Validation loss at step {global_step}: {avg_val_loss:.6f}")
         model.train()
 
         checkpoint_dir = f"{CHECKPOINT_DIR}/step_{global_step}"
         model.save_pretrained(checkpoint_dir)
         save_training_state(checkpoint_dir, global_step, opt, sched, loss_history, eval_loss_history)
-        print(f"✓ Checkpoint saved at step {global_step}")
+        logger.info(f"✓ Checkpoint saved at step {global_step}")
         
     global_step += 1
 
 # Final save
-print(f"\n{'='*60}")
-print(f"Training completed after {ITERS} iterations!")
+logger.info(f"\n{'='*60}")
+logger.info(f"Training completed after {ITERS} iterations!")
 final_dir = f"{CHECKPOINT_DIR}/final"
 model.save_pretrained(final_dir)
 tok.save_pretrained(final_dir)
 save_training_state(final_dir, global_step, opt, sched, loss_history)
-print(f"✓ Final model saved to {final_dir}")
+logger.info(f"✓ Final model saved to {final_dir}")
 
 # Save loss history to JSON
 loss_history_path = os.path.join(final_dir, "loss_history.json")
 with open(loss_history_path, 'w') as f:
     json.dump(loss_history, f, indent=2)
-print(f"✓ Loss history saved to {loss_history_path}")
+logger.info(f"✓ Loss history saved to {loss_history_path}")
 
 # Print training summary
 if loss_history:
-    print(f"\n{'='*60}")
-    print("Training Summary:")
-    print(f"  Total steps: {len(loss_history)}")
-    print(f"  Initial loss: {loss_history[0]['loss']:.6f}")
-    print(f"  Final loss: {loss_history[-1]['loss']:.6f}")
-    print(f"  Loss improvement: {loss_history[0]['loss'] - loss_history[-1]['loss']:.6f}")
-    print(f"\nLast 10 checkpoints:")
+    logger.info(f"\n{'='*60}")
+    logger.info("Training Summary:")
+    logger.info(f"  Total steps: {len(loss_history)}")
+    logger.info(f"  Initial loss: {loss_history[0]['loss']:.6f}")
+    logger.info(f"  Final loss: {loss_history[-1]['loss']:.6f}")
+    logger.info(f"  Loss improvement: {loss_history[0]['loss'] - loss_history[-1]['loss']:.6f}")
+    logger.info(f"\nLast 10 checkpoints:")
     for entry in loss_history[-10:]:
-        print(f"  Step {entry['step']:>6}: Loss {entry['loss']:.6f}, LR {entry['lr']:.2e}")
-print(f"{'='*60}\n")
+        logger.info(f"  Step {entry['step']:>6}: Loss {entry['loss']:.6f}, LR {entry['lr']:.2e}")
+logger.info(f"{'='*60}\n")
+
