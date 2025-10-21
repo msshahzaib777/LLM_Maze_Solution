@@ -1,0 +1,11 @@
+2025-10-18 00:23:14,145 - Log file created at: ./logs/qwen3_2_123/training_20251018_002314.log
+2025-10-18 00:23:15,901 - Found checkpoint at step 100: finetuned_model/adapter/qwen3_2_123/step_100
+2025-10-18 00:23:15,901 - Loading model from checkpoint...
+2025-10-18 00:23:18,223 - Resumed from checkpoint at step 100
+2025-10-18 00:23:18,223 - LoRA adapters enabled for training, base model frozen
+2025-10-18 00:23:19,186 - Model parameter status:
+2025-10-18 00:23:19,188 - Trainable params: 33,030,144 || All params: 4,055,498,240 || Trainable %: 0.8145
+2025-10-18 00:23:19,672 - Loaded training state from step 100
+2025-10-18 00:23:19,672 - Starting training for 10000 iterations...
+2025-10-18 00:23:19,672 - Base LR: 4e-05, Warmup: 300.0, LR Floor: 4.000000000000001e-06
+2025-10-18 00:23:30,661 - Step: 100/10000 (1.0%), Loss: 5.877134, LR: 1.60e-06

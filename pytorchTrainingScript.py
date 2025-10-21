@@ -10,7 +10,7 @@ from datetime import datetime
 MODEL = "Qwen/Qwen3-4B"  # Updated to Qwen3
 DATA  = "data/curriculum_1_123/train.jsonl"
 DATA_DIR = "data/curriculum_1_123"
-BATCH = 4 # Reduced batch size for MPS memory constraints:
+BATCH = 2 # Reduced batch size for MPS memory constraints:
 ACCUM = 8
 
 # Learning rate schedule parameters
@@ -26,7 +26,7 @@ DEVICE= "mps"  # Force MPS device for Mac
 
 # Checkpoint settings
 CHECKPOINT_DIR = "finetuned_model/adapter/qwen3_2_123"
-RESUME_FROM_CHECKPOINT = False  # Set to False to start fresh
+RESUME_FROM_CHECKPOINT = True  # Set to False to start fresh
 
 # Create logs directory if it doesn't exist
 log_dir = os.path.join("./logs", os.path.basename(CHECKPOINT_DIR.split('/')[-1]))
@@ -40,7 +40,8 @@ logging.basicConfig(
     handlers=[
         logging.FileHandler(log_file),
         logging.StreamHandler()
-    ]
+    ],
+    force=True
 )
 
 # Replace print statements with logging.info in the code above
@@ -222,7 +223,7 @@ sched = get_cosine_with_min_lr(opt, WARMUP, ITERS, min_lr_ratio=(LR_FLOOR/BASE_L
 
 # Load training state if resuming
 if latest_checkpoint and RESUME_FROM_CHECKPOINT:
-    global_step, loss_history = load_training_state(latest_checkpoint, opt, sched)
+    global_step, loss_history, eval_loss_history = load_training_state(latest_checkpoint, opt, sched)
 else:
     global_step = 0
     loss_history = []
