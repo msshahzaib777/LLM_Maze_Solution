@@ -1,0 +1,11 @@
+2025-11-18 20:59:43,218 - Log file created at: ./logs/Adapter_qwen34B_123_234_20251118_205943.log
+2025-11-18 20:59:48,541 - Sample training data:
+2025-11-18 20:59:48,542 - 757668
+2025-11-18 20:59:50,060 - Resuming from step 35800: /home/mshahz02/fileserverdata/models/finetuned/adapter/Adapter_qwen34B_123_234/step_35800
+2025-11-18 21:01:10,933 - Resumed optimizer/scheduler at step 35800, LR: 9.45e-07
+2025-11-18 21:01:10,934 - Starting training from step 35801 to 118390
+2025-11-18 21:02:04,938 - Step 35850/118390 (30.3%), Loss: 0.2544, LR: 1.89e-06, Tokens: 1131
+2025-11-18 21:02:04,939 -   Scheduler step: 2243, Optimizer step count: 35850
+2025-11-18 21:02:58,834 - Step 35900/118390 (30.3%), Loss: 0.2181, LR: 1.90e-06, Tokens: 1164
+2025-11-18 21:02:58,834 -   Scheduler step: 2249, Optimizer step count: 35900
+2025-11-18 21:03:27,578 - ✓ New best validation loss: 0.245772

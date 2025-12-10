@@ -1,0 +1,13 @@
+2025-10-31 06:00:34,490 - Log file created at: ./logs/qwen3B_14BQ8_1_2_1_123_reasoning_20251031_060034.log
+2025-10-31 06:00:36,693 - Sample training data:
+2025-10-31 06:00:36,693 - 180000
+2025-10-31 06:00:39,012 - Resuming from step 42000: /home/mshahz02/fileserverdata/models/finetuned/adapter/qwen3B_14BQ8_1_2_1_123_reasoning/step_42000
+2025-10-31 06:05:43,525 - Resumed optimizer/scheduler at step 42000, LR: 5.00e-06
+2025-10-31 06:05:43,526 - Starting training from step 42001 to 42195
+2025-10-31 06:08:58,072 - Step 42050/42195 (99.7%), Loss: 0.2737, LR: 5.00e-06, Tokens: 665
+2025-10-31 06:08:58,072 -   Scheduler step: 2628, Optimizer step count: 42050
+2025-10-31 06:12:13,784 - Step 42100/42195 (99.8%), Loss: 0.2438, LR: 5.00e-06, Tokens: 629
+2025-10-31 06:12:13,784 -   Scheduler step: 2631, Optimizer step count: 42100
+2025-10-31 06:12:21,657 - ✓ New best validation loss: 0.220709
+2025-10-31 06:15:35,094 - Step 42150/42195 (99.9%), Loss: 0.2290, LR: 5.00e-06, Tokens: 630
+2025-10-31 06:15:35,095 -   Scheduler step: 2634, Optimizer step count: 42150

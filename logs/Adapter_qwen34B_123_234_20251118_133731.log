@@ -1,0 +1,4 @@
+2025-11-18 13:37:31,899 - Log file created at: ./logs/Adapter_qwen34B_123_234_20251118_133731.log
+2025-11-18 13:37:52,609 - Sample training data:
+2025-11-18 13:37:52,609 - 757668
+2025-11-18 13:37:54,900 - Starting fresh training with 16-bit quantization

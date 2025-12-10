@@ -1,0 +1,1174 @@
+2025-11-17 10:56:30,237 - Log file created at: ./logs/qwen34B_123_20251117_105630.log
+2025-11-17 10:56:32,074 - Sample training data:
+2025-11-17 10:56:32,074 - 136363
+2025-11-17 10:56:33,320 - Starting fresh training with 16-bit quantization
+2025-11-17 10:57:55,180 - Fresh training - Initial LR: 5.00e-06
+2025-11-17 10:57:55,180 - Starting training from step 1 to 21295
+2025-11-17 10:58:29,551 - Step 50/21295 (0.2%), Loss: 4.1401, LR: 1.41e-08, Tokens: 320
+2025-11-17 10:58:29,551 -   Scheduler step: 3, Optimizer step count: 50
+2025-11-17 10:59:02,561 - Step 100/21295 (0.5%), Loss: 4.5581, LR: 2.82e-08, Tokens: 292
+2025-11-17 10:59:02,562 -   Scheduler step: 6, Optimizer step count: 100
+2025-11-17 10:59:06,268 - ✓ New best validation loss: 4.514180
+2025-11-17 10:59:38,923 - Step 150/21295 (0.7%), Loss: 4.0981, LR: 4.23e-08, Tokens: 319
+2025-11-17 10:59:38,924 -   Scheduler step: 9, Optimizer step count: 150
+2025-11-17 11:00:13,102 - Step 200/21295 (0.9%), Loss: 4.4955, LR: 5.64e-08, Tokens: 295
+2025-11-17 11:00:13,102 -   Scheduler step: 12, Optimizer step count: 200
+2025-11-17 11:00:16,895 - ✓ New best validation loss: 4.513585
+2025-11-17 11:00:21,701 - ✓ Checkpoint saved at step 200
+2025-11-17 11:00:54,896 - Step 250/21295 (1.2%), Loss: 4.1199, LR: 7.05e-08, Tokens: 318
+2025-11-17 11:00:54,896 -   Scheduler step: 15, Optimizer step count: 250
+2025-11-17 11:01:29,128 - Step 300/21295 (1.4%), Loss: 5.2546, LR: 8.46e-08, Tokens: 263
+2025-11-17 11:01:29,128 -   Scheduler step: 18, Optimizer step count: 300
+2025-11-17 11:01:32,814 - ✓ New best validation loss: 4.513479
+2025-11-17 11:02:06,399 - Step 350/21295 (1.6%), Loss: 5.4387, LR: 9.87e-08, Tokens: 259
+2025-11-17 11:02:06,399 -   Scheduler step: 21, Optimizer step count: 350
+2025-11-17 11:02:39,567 - Step 400/21295 (1.9%), Loss: 4.3515, LR: 1.17e-07, Tokens: 316
+2025-11-17 11:02:39,567 -   Scheduler step: 25, Optimizer step count: 400
+2025-11-17 11:02:43,093 - ✓ New best validation loss: 4.512402
+2025-11-17 11:02:47,439 - ✓ Checkpoint saved at step 400
+2025-11-17 11:03:20,278 - Step 450/21295 (2.1%), Loss: 4.1252, LR: 1.32e-07, Tokens: 320
+2025-11-17 11:03:20,278 -   Scheduler step: 28, Optimizer step count: 450
+2025-11-17 11:03:53,116 - Step 500/21295 (2.3%), Loss: 4.1096, LR: 1.46e-07, Tokens: 313
+2025-11-17 11:03:53,116 -   Scheduler step: 31, Optimizer step count: 500
+2025-11-17 11:03:56,730 - ✓ New best validation loss: 4.509601
+2025-11-17 11:04:29,413 - Step 550/21295 (2.6%), Loss: 3.9298, LR: 1.60e-07, Tokens: 325
+2025-11-17 11:04:29,413 -   Scheduler step: 34, Optimizer step count: 550
+2025-11-17 11:05:02,537 - Step 600/21295 (2.8%), Loss: 4.1265, LR: 1.74e-07, Tokens: 328
+2025-11-17 11:05:02,538 -   Scheduler step: 37, Optimizer step count: 600
+2025-11-17 11:05:06,184 - ✓ New best validation loss: 4.508173
+2025-11-17 11:05:10,595 - ✓ Checkpoint saved at step 600
+2025-11-17 11:05:43,563 - Step 650/21295 (3.1%), Loss: 3.9824, LR: 1.88e-07, Tokens: 318
+2025-11-17 11:05:43,564 -   Scheduler step: 40, Optimizer step count: 650
+2025-11-17 11:06:16,479 - Step 700/21295 (3.3%), Loss: 4.5000, LR: 2.02e-07, Tokens: 296
+2025-11-17 11:06:16,479 -   Scheduler step: 43, Optimizer step count: 700
+2025-11-17 11:06:20,107 - ✓ New best validation loss: 4.502916
+2025-11-17 11:06:52,801 - Step 750/21295 (3.5%), Loss: 4.6428, LR: 2.16e-07, Tokens: 288
+2025-11-17 11:06:52,801 -   Scheduler step: 46, Optimizer step count: 750
+2025-11-17 11:07:26,589 - Step 800/21295 (3.8%), Loss: 4.3727, LR: 2.35e-07, Tokens: 314
+2025-11-17 11:07:26,589 -   Scheduler step: 50, Optimizer step count: 800
+2025-11-17 11:07:30,307 - ✓ New best validation loss: 4.498141
+2025-11-17 11:07:34,639 - ✓ Checkpoint saved at step 800
+2025-11-17 11:08:07,508 - Step 850/21295 (4.0%), Loss: 4.8737, LR: 2.49e-07, Tokens: 279
+2025-11-17 11:08:07,508 -   Scheduler step: 53, Optimizer step count: 850
+2025-11-17 11:08:41,872 - Step 900/21295 (4.2%), Loss: 4.7169, LR: 2.63e-07, Tokens: 289
+2025-11-17 11:08:41,872 -   Scheduler step: 56, Optimizer step count: 900
+2025-11-17 11:08:45,444 - ✓ New best validation loss: 4.489684
+2025-11-17 11:09:18,959 - Step 950/21295 (4.5%), Loss: 3.8998, LR: 2.77e-07, Tokens: 320
+2025-11-17 11:09:18,960 -   Scheduler step: 59, Optimizer step count: 950
+2025-11-17 11:09:51,974 - Step 1000/21295 (4.7%), Loss: 4.3812, LR: 2.91e-07, Tokens: 308
+2025-11-17 11:09:51,974 -   Scheduler step: 62, Optimizer step count: 1000
+2025-11-17 11:09:55,508 - ✓ New best validation loss: 4.480607
+2025-11-17 11:09:59,872 - ✓ Checkpoint saved at step 1000
+2025-11-17 11:10:32,745 - Step 1050/21295 (4.9%), Loss: 4.5204, LR: 3.05e-07, Tokens: 300
+2025-11-17 11:10:32,746 -   Scheduler step: 65, Optimizer step count: 1050
+2025-11-17 11:11:05,997 - Step 1100/21295 (5.2%), Loss: 4.2498, LR: 3.20e-07, Tokens: 312
+2025-11-17 11:11:05,998 -   Scheduler step: 68, Optimizer step count: 1100
+2025-11-17 11:11:09,617 - ✓ New best validation loss: 4.467382
+2025-11-17 11:11:42,371 - Step 1150/21295 (5.4%), Loss: 3.8383, LR: 3.34e-07, Tokens: 323
+2025-11-17 11:11:42,372 -   Scheduler step: 71, Optimizer step count: 1150
+2025-11-17 11:12:15,289 - Step 1200/21295 (5.6%), Loss: 4.0471, LR: 3.52e-07, Tokens: 321
+2025-11-17 11:12:15,289 -   Scheduler step: 75, Optimizer step count: 1200
+2025-11-17 11:12:18,827 - ✓ New best validation loss: 4.450565
+2025-11-17 11:12:23,119 - ✓ Checkpoint saved at step 1200
+2025-11-17 11:12:55,745 - Step 1250/21295 (5.9%), Loss: 4.9456, LR: 3.67e-07, Tokens: 285
+2025-11-17 11:12:55,745 -   Scheduler step: 78, Optimizer step count: 1250
+2025-11-17 11:13:29,089 - Step 1300/21295 (6.1%), Loss: 4.3530, LR: 3.81e-07, Tokens: 317
+2025-11-17 11:13:29,089 -   Scheduler step: 81, Optimizer step count: 1300
+2025-11-17 11:13:32,654 - ✓ New best validation loss: 4.432742
+2025-11-17 11:14:05,654 - Step 1350/21295 (6.3%), Loss: 5.3417, LR: 3.95e-07, Tokens: 261
+2025-11-17 11:14:05,655 -   Scheduler step: 84, Optimizer step count: 1350
+2025-11-17 11:14:39,441 - Step 1400/21295 (6.6%), Loss: 5.0405, LR: 4.09e-07, Tokens: 268
+2025-11-17 11:14:39,441 -   Scheduler step: 87, Optimizer step count: 1400
+2025-11-17 11:14:43,048 - ✓ New best validation loss: 4.411434
+2025-11-17 11:14:47,440 - ✓ Checkpoint saved at step 1400
+2025-11-17 11:15:20,627 - Step 1450/21295 (6.8%), Loss: 3.8061, LR: 4.23e-07, Tokens: 325
+2025-11-17 11:15:20,628 -   Scheduler step: 90, Optimizer step count: 1450
+2025-11-17 11:15:55,333 - Step 1500/21295 (7.0%), Loss: 4.4095, LR: 4.37e-07, Tokens: 292
+2025-11-17 11:15:55,333 -   Scheduler step: 93, Optimizer step count: 1500
+2025-11-17 11:15:59,323 - ✓ New best validation loss: 4.386055
+2025-11-17 11:16:32,510 - Step 1550/21295 (7.3%), Loss: 4.8634, LR: 4.51e-07, Tokens: 279
+2025-11-17 11:16:32,510 -   Scheduler step: 96, Optimizer step count: 1550
+2025-11-17 11:17:04,933 - Step 1600/21295 (7.5%), Loss: 3.7153, LR: 4.70e-07, Tokens: 324
+2025-11-17 11:17:04,933 -   Scheduler step: 100, Optimizer step count: 1600
+2025-11-17 11:17:08,653 - ✓ New best validation loss: 4.355199
+2025-11-17 11:17:13,043 - ✓ Checkpoint saved at step 1600
+2025-11-17 11:17:45,117 - Step 1650/21295 (7.7%), Loss: 4.5261, LR: 4.84e-07, Tokens: 289
+2025-11-17 11:17:45,118 -   Scheduler step: 103, Optimizer step count: 1650
+2025-11-17 11:18:17,832 - Step 1700/21295 (8.0%), Loss: 4.3254, LR: 4.98e-07, Tokens: 288
+2025-11-17 11:18:17,833 -   Scheduler step: 106, Optimizer step count: 1700
+2025-11-17 11:18:21,563 - ✓ New best validation loss: 4.324789
+2025-11-17 11:18:53,869 - Step 1750/21295 (8.2%), Loss: 4.1520, LR: 5.12e-07, Tokens: 311
+2025-11-17 11:18:53,870 -   Scheduler step: 109, Optimizer step count: 1750
+2025-11-17 11:19:26,348 - Step 1800/21295 (8.5%), Loss: 4.6846, LR: 5.26e-07, Tokens: 281
+2025-11-17 11:19:26,348 -   Scheduler step: 112, Optimizer step count: 1800
+2025-11-17 11:19:30,342 - ✓ New best validation loss: 4.293231
+2025-11-17 11:19:35,448 - ✓ Checkpoint saved at step 1800
+2025-11-17 11:20:07,860 - Step 1850/21295 (8.7%), Loss: 4.1258, LR: 5.40e-07, Tokens: 296
+2025-11-17 11:20:07,860 -   Scheduler step: 115, Optimizer step count: 1850
+2025-11-17 11:20:42,267 - Step 1900/21295 (8.9%), Loss: 4.0734, LR: 5.55e-07, Tokens: 288
+2025-11-17 11:20:42,267 -   Scheduler step: 118, Optimizer step count: 1900
+2025-11-17 11:20:45,949 - ✓ New best validation loss: 4.257699
+2025-11-17 11:21:19,142 - Step 1950/21295 (9.2%), Loss: 4.0307, LR: 5.69e-07, Tokens: 289
+2025-11-17 11:21:19,142 -   Scheduler step: 121, Optimizer step count: 1950
+2025-11-17 11:21:51,524 - Step 2000/21295 (9.4%), Loss: 5.0170, LR: 5.87e-07, Tokens: 262
+2025-11-17 11:21:51,524 -   Scheduler step: 125, Optimizer step count: 2000
+2025-11-17 11:21:55,297 - ✓ New best validation loss: 4.216513
+2025-11-17 11:21:59,700 - ✓ Checkpoint saved at step 2000
+2025-11-17 11:22:31,803 - Step 2050/21295 (9.6%), Loss: 3.6283, LR: 6.02e-07, Tokens: 319
+2025-11-17 11:22:31,804 -   Scheduler step: 128, Optimizer step count: 2050
+2025-11-17 11:23:04,613 - Step 2100/21295 (9.9%), Loss: 3.7106, LR: 6.16e-07, Tokens: 316
+2025-11-17 11:23:04,613 -   Scheduler step: 131, Optimizer step count: 2100
+2025-11-17 11:23:08,555 - ✓ New best validation loss: 4.178067
+2025-11-17 11:23:40,755 - Step 2150/21295 (10.1%), Loss: 3.7173, LR: 6.30e-07, Tokens: 317
+2025-11-17 11:23:40,756 -   Scheduler step: 134, Optimizer step count: 2150
+2025-11-17 11:24:13,711 - Step 2200/21295 (10.3%), Loss: 3.9710, LR: 6.44e-07, Tokens: 320
+2025-11-17 11:24:13,712 -   Scheduler step: 137, Optimizer step count: 2200
+2025-11-17 11:24:17,452 - ✓ New best validation loss: 4.138516
+2025-11-17 11:24:22,297 - ✓ Checkpoint saved at step 2200
+2025-11-17 11:24:55,267 - Step 2250/21295 (10.6%), Loss: 3.8843, LR: 6.58e-07, Tokens: 311
+2025-11-17 11:24:55,268 -   Scheduler step: 140, Optimizer step count: 2250
+2025-11-17 11:25:29,528 - Step 2300/21295 (10.8%), Loss: 3.9503, LR: 6.72e-07, Tokens: 293
+2025-11-17 11:25:29,528 -   Scheduler step: 143, Optimizer step count: 2300
+2025-11-17 11:25:33,244 - ✓ New best validation loss: 4.098129
+2025-11-17 11:26:06,280 - Step 2350/21295 (11.0%), Loss: 4.7427, LR: 6.86e-07, Tokens: 265
+2025-11-17 11:26:06,281 -   Scheduler step: 146, Optimizer step count: 2350
+2025-11-17 11:26:38,833 - Step 2400/21295 (11.3%), Loss: 4.0901, LR: 7.05e-07, Tokens: 290
+2025-11-17 11:26:38,833 -   Scheduler step: 150, Optimizer step count: 2400
+2025-11-17 11:26:42,770 - ✓ New best validation loss: 4.048704
+2025-11-17 11:26:48,134 - ✓ Checkpoint saved at step 2400
+2025-11-17 11:27:20,551 - Step 2450/21295 (11.5%), Loss: 4.0387, LR: 7.19e-07, Tokens: 284
+2025-11-17 11:27:20,551 -   Scheduler step: 153, Optimizer step count: 2450
+2025-11-17 11:27:52,905 - Step 2500/21295 (11.7%), Loss: 3.7865, LR: 7.33e-07, Tokens: 294
+2025-11-17 11:27:52,905 -   Scheduler step: 156, Optimizer step count: 2500
+2025-11-17 11:27:56,549 - ✓ New best validation loss: 4.004977
+2025-11-17 11:28:29,245 - Step 2550/21295 (12.0%), Loss: 3.8170, LR: 7.47e-07, Tokens: 291
+2025-11-17 11:28:29,246 -   Scheduler step: 159, Optimizer step count: 2550
+2025-11-17 11:29:02,286 - Step 2600/21295 (12.2%), Loss: 3.3964, LR: 7.61e-07, Tokens: 318
+2025-11-17 11:29:02,286 -   Scheduler step: 162, Optimizer step count: 2600
+2025-11-17 11:29:05,968 - ✓ New best validation loss: 3.960888
+2025-11-17 11:29:10,435 - ✓ Checkpoint saved at step 2600
+2025-11-17 11:29:43,155 - Step 2650/21295 (12.4%), Loss: 3.8500, LR: 7.75e-07, Tokens: 289
+2025-11-17 11:29:43,155 -   Scheduler step: 165, Optimizer step count: 2650
+2025-11-17 11:30:17,230 - Step 2700/21295 (12.7%), Loss: 3.6531, LR: 7.89e-07, Tokens: 315
+2025-11-17 11:30:17,230 -   Scheduler step: 168, Optimizer step count: 2700
+2025-11-17 11:30:21,002 - ✓ New best validation loss: 3.916294
+2025-11-17 11:30:53,903 - Step 2750/21295 (12.9%), Loss: 3.4861, LR: 8.04e-07, Tokens: 302
+2025-11-17 11:30:53,903 -   Scheduler step: 171, Optimizer step count: 2750
+2025-11-17 11:31:26,313 - Step 2800/21295 (13.1%), Loss: 4.6178, LR: 8.22e-07, Tokens: 263
+2025-11-17 11:31:26,313 -   Scheduler step: 175, Optimizer step count: 2800
+2025-11-17 11:31:30,121 - ✓ New best validation loss: 3.861743
+2025-11-17 11:31:35,203 - ✓ Checkpoint saved at step 2800
+2025-11-17 11:32:07,445 - Step 2850/21295 (13.4%), Loss: 3.4498, LR: 8.36e-07, Tokens: 313
+2025-11-17 11:32:07,446 -   Scheduler step: 178, Optimizer step count: 2850
+2025-11-17 11:32:39,888 - Step 2900/21295 (13.6%), Loss: 3.5131, LR: 8.51e-07, Tokens: 320
+2025-11-17 11:32:39,888 -   Scheduler step: 181, Optimizer step count: 2900
+2025-11-17 11:32:43,474 - ✓ New best validation loss: 3.815218
+2025-11-17 11:33:15,373 - Step 2950/21295 (13.9%), Loss: 3.2126, LR: 8.65e-07, Tokens: 322
+2025-11-17 11:33:15,373 -   Scheduler step: 184, Optimizer step count: 2950
+2025-11-17 11:33:48,714 - Step 3000/21295 (14.1%), Loss: 3.7406, LR: 8.79e-07, Tokens: 309
+2025-11-17 11:33:48,714 -   Scheduler step: 187, Optimizer step count: 3000
+2025-11-17 11:33:52,620 - ✓ New best validation loss: 3.767220
+2025-11-17 11:33:57,474 - ✓ Checkpoint saved at step 3000
+2025-11-17 11:34:30,537 - Step 3050/21295 (14.3%), Loss: 3.5086, LR: 8.93e-07, Tokens: 292
+2025-11-17 11:34:30,537 -   Scheduler step: 190, Optimizer step count: 3050
+2025-11-17 11:35:04,307 - Step 3100/21295 (14.6%), Loss: 3.5377, LR: 9.07e-07, Tokens: 322
+2025-11-17 11:35:04,308 -   Scheduler step: 193, Optimizer step count: 3100
+2025-11-17 11:35:07,977 - ✓ New best validation loss: 3.719359
+2025-11-17 11:35:40,503 - Step 3150/21295 (14.8%), Loss: 3.5918, LR: 9.21e-07, Tokens: 321
+2025-11-17 11:35:40,503 -   Scheduler step: 196, Optimizer step count: 3150
+2025-11-17 11:36:13,129 - Step 3200/21295 (15.0%), Loss: 3.4760, LR: 9.40e-07, Tokens: 311
+2025-11-17 11:36:13,130 -   Scheduler step: 200, Optimizer step count: 3200
+2025-11-17 11:36:16,960 - ✓ New best validation loss: 3.663264
+2025-11-17 11:36:21,491 - ✓ Checkpoint saved at step 3200
+2025-11-17 11:36:53,746 - Step 3250/21295 (15.3%), Loss: 3.4411, LR: 9.54e-07, Tokens: 302
+2025-11-17 11:36:53,746 -   Scheduler step: 203, Optimizer step count: 3250
+2025-11-17 11:37:26,221 - Step 3300/21295 (15.5%), Loss: 3.3153, LR: 9.68e-07, Tokens: 297
+2025-11-17 11:37:26,222 -   Scheduler step: 206, Optimizer step count: 3300
+2025-11-17 11:37:29,824 - ✓ New best validation loss: 3.615905
+2025-11-17 11:38:01,927 - Step 3350/21295 (15.7%), Loss: 3.4023, LR: 9.82e-07, Tokens: 295
+2025-11-17 11:38:01,927 -   Scheduler step: 209, Optimizer step count: 3350
+2025-11-17 11:38:35,742 - Step 3400/21295 (16.0%), Loss: 3.3764, LR: 9.96e-07, Tokens: 312
+2025-11-17 11:38:35,742 -   Scheduler step: 212, Optimizer step count: 3400
+2025-11-17 11:38:39,426 - ✓ New best validation loss: 3.568059
+2025-11-17 11:38:43,811 - ✓ Checkpoint saved at step 3400
+2025-11-17 11:39:17,220 - Step 3450/21295 (16.2%), Loss: 3.0236, LR: 1.01e-06, Tokens: 323
+2025-11-17 11:39:17,220 -   Scheduler step: 215, Optimizer step count: 3450
+2025-11-17 11:39:50,193 - Step 3500/21295 (16.4%), Loss: 3.1057, LR: 1.02e-06, Tokens: 326
+2025-11-17 11:39:50,193 -   Scheduler step: 218, Optimizer step count: 3500
+2025-11-17 11:39:53,957 - ✓ New best validation loss: 3.521024
+2025-11-17 11:40:26,300 - Step 3550/21295 (16.7%), Loss: 3.3144, LR: 1.04e-06, Tokens: 291
+2025-11-17 11:40:26,300 -   Scheduler step: 221, Optimizer step count: 3550
+2025-11-17 11:40:58,680 - Step 3600/21295 (16.9%), Loss: 3.4970, LR: 1.06e-06, Tokens: 307
+2025-11-17 11:40:58,680 -   Scheduler step: 225, Optimizer step count: 3600
+2025-11-17 11:41:02,501 - ✓ New best validation loss: 3.466013
+2025-11-17 11:41:06,811 - ✓ Checkpoint saved at step 3600
+2025-11-17 11:41:39,002 - Step 3650/21295 (17.1%), Loss: 3.5413, LR: 1.07e-06, Tokens: 294
+2025-11-17 11:41:39,002 -   Scheduler step: 228, Optimizer step count: 3650
+2025-11-17 11:42:11,594 - Step 3700/21295 (17.4%), Loss: 3.1512, LR: 1.09e-06, Tokens: 318
+2025-11-17 11:42:11,595 -   Scheduler step: 231, Optimizer step count: 3700
+2025-11-17 11:42:15,202 - ✓ New best validation loss: 3.419553
+2025-11-17 11:42:47,675 - Step 3750/21295 (17.6%), Loss: 4.1402, LR: 1.10e-06, Tokens: 257
+2025-11-17 11:42:47,675 -   Scheduler step: 234, Optimizer step count: 3750
+2025-11-17 11:43:21,776 - Step 3800/21295 (17.8%), Loss: 3.1318, LR: 1.11e-06, Tokens: 293
+2025-11-17 11:43:21,776 -   Scheduler step: 237, Optimizer step count: 3800
+2025-11-17 11:43:25,542 - ✓ New best validation loss: 3.373397
+2025-11-17 11:43:30,400 - ✓ Checkpoint saved at step 3800
+2025-11-17 11:44:04,247 - Step 3850/21295 (18.1%), Loss: 3.4617, LR: 1.13e-06, Tokens: 290
+2025-11-17 11:44:04,247 -   Scheduler step: 240, Optimizer step count: 3850
+2025-11-17 11:44:37,054 - Step 3900/21295 (18.3%), Loss: 3.4177, LR: 1.14e-06, Tokens: 306
+2025-11-17 11:44:37,055 -   Scheduler step: 243, Optimizer step count: 3900
+2025-11-17 11:44:40,665 - ✓ New best validation loss: 3.327040
+2025-11-17 11:45:12,985 - Step 3950/21295 (18.5%), Loss: 3.3854, LR: 1.16e-06, Tokens: 289
+2025-11-17 11:45:12,985 -   Scheduler step: 246, Optimizer step count: 3950
+2025-11-17 11:45:45,288 - Step 4000/21295 (18.8%), Loss: 3.2312, LR: 1.17e-06, Tokens: 287
+2025-11-17 11:45:45,288 -   Scheduler step: 250, Optimizer step count: 4000
+2025-11-17 11:45:49,069 - ✓ New best validation loss: 3.272062
+2025-11-17 11:45:53,520 - ✓ Checkpoint saved at step 4000
+2025-11-17 11:46:25,955 - Step 4050/21295 (19.0%), Loss: 3.1199, LR: 1.19e-06, Tokens: 283
+2025-11-17 11:46:25,956 -   Scheduler step: 253, Optimizer step count: 4050
+2025-11-17 11:46:58,466 - Step 4100/21295 (19.3%), Loss: 2.8916, LR: 1.20e-06, Tokens: 327
+2025-11-17 11:46:58,466 -   Scheduler step: 256, Optimizer step count: 4100
+2025-11-17 11:47:02,433 - ✓ New best validation loss: 3.224763
+2025-11-17 11:47:34,885 - Step 4150/21295 (19.5%), Loss: 3.2870, LR: 1.22e-06, Tokens: 288
+2025-11-17 11:47:34,886 -   Scheduler step: 259, Optimizer step count: 4150
+2025-11-17 11:48:09,513 - Step 4200/21295 (19.7%), Loss: 2.7643, LR: 1.23e-06, Tokens: 316
+2025-11-17 11:48:09,514 -   Scheduler step: 262, Optimizer step count: 4200
+2025-11-17 11:48:13,253 - ✓ New best validation loss: 3.178876
+2025-11-17 11:48:17,632 - ✓ Checkpoint saved at step 4200
+2025-11-17 11:48:51,691 - Step 4250/21295 (20.0%), Loss: 3.2591, LR: 1.25e-06, Tokens: 287
+2025-11-17 11:48:51,691 -   Scheduler step: 265, Optimizer step count: 4250
+2025-11-17 11:49:24,338 - Step 4300/21295 (20.2%), Loss: 3.1029, LR: 1.26e-06, Tokens: 310
+2025-11-17 11:49:24,339 -   Scheduler step: 268, Optimizer step count: 4300
+2025-11-17 11:49:28,079 - ✓ New best validation loss: 3.132319
+2025-11-17 11:50:00,628 - Step 4350/21295 (20.4%), Loss: 2.6062, LR: 1.27e-06, Tokens: 322
+2025-11-17 11:50:00,629 -   Scheduler step: 271, Optimizer step count: 4350
+2025-11-17 11:50:32,896 - Step 4400/21295 (20.7%), Loss: 2.8545, LR: 1.29e-06, Tokens: 295
+2025-11-17 11:50:32,896 -   Scheduler step: 275, Optimizer step count: 4400
+2025-11-17 11:50:36,825 - ✓ New best validation loss: 3.078851
+2025-11-17 11:50:41,892 - ✓ Checkpoint saved at step 4400
+2025-11-17 11:51:14,355 - Step 4450/21295 (20.9%), Loss: 2.8022, LR: 1.31e-06, Tokens: 320
+2025-11-17 11:51:14,355 -   Scheduler step: 278, Optimizer step count: 4450
+2025-11-17 11:51:46,942 - Step 4500/21295 (21.1%), Loss: 2.7851, LR: 1.32e-06, Tokens: 322
+2025-11-17 11:51:46,942 -   Scheduler step: 281, Optimizer step count: 4500
+2025-11-17 11:51:50,604 - ✓ New best validation loss: 3.032931
+2025-11-17 11:52:23,397 - Step 4550/21295 (21.4%), Loss: 2.7937, LR: 1.33e-06, Tokens: 315
+2025-11-17 11:52:23,398 -   Scheduler step: 284, Optimizer step count: 4550
+2025-11-17 11:52:57,730 - Step 4600/21295 (21.6%), Loss: 3.6459, LR: 1.35e-06, Tokens: 261
+2025-11-17 11:52:57,730 -   Scheduler step: 287, Optimizer step count: 4600
+2025-11-17 11:53:01,565 - ✓ New best validation loss: 2.987587
+2025-11-17 11:53:06,526 - ✓ Checkpoint saved at step 4600
+2025-11-17 11:53:40,665 - Step 4650/21295 (21.8%), Loss: 2.8544, LR: 1.36e-06, Tokens: 300
+2025-11-17 11:53:40,666 -   Scheduler step: 290, Optimizer step count: 4650
+2025-11-17 11:54:13,442 - Step 4700/21295 (22.1%), Loss: 3.6004, LR: 1.38e-06, Tokens: 261
+2025-11-17 11:54:13,443 -   Scheduler step: 293, Optimizer step count: 4700
+2025-11-17 11:54:17,286 - ✓ New best validation loss: 2.943005
+2025-11-17 11:54:49,584 - Step 4750/21295 (22.3%), Loss: 2.5120, LR: 1.39e-06, Tokens: 311
+2025-11-17 11:54:49,584 -   Scheduler step: 296, Optimizer step count: 4750
+2025-11-17 11:55:21,993 - Step 4800/21295 (22.5%), Loss: 2.8825, LR: 1.41e-06, Tokens: 290
+2025-11-17 11:55:21,994 -   Scheduler step: 300, Optimizer step count: 4800
+2025-11-17 11:55:25,808 - ✓ New best validation loss: 2.890698
+2025-11-17 11:55:30,691 - ✓ Checkpoint saved at step 4800
+2025-11-17 11:56:02,807 - Step 4850/21295 (22.8%), Loss: 2.7445, LR: 1.42e-06, Tokens: 288
+2025-11-17 11:56:02,808 -   Scheduler step: 303, Optimizer step count: 4850
+2025-11-17 11:56:35,405 - Step 4900/21295 (23.0%), Loss: 3.4183, LR: 1.44e-06, Tokens: 262
+2025-11-17 11:56:35,405 -   Scheduler step: 306, Optimizer step count: 4900
+2025-11-17 11:56:39,098 - ✓ New best validation loss: 2.845719
+2025-11-17 11:57:11,482 - Step 4950/21295 (23.2%), Loss: 2.5357, LR: 1.45e-06, Tokens: 324
+2025-11-17 11:57:11,483 -   Scheduler step: 309, Optimizer step count: 4950
+2025-11-17 11:57:46,008 - Step 5000/21295 (23.5%), Loss: 2.6700, LR: 1.47e-06, Tokens: 289
+2025-11-17 11:57:46,008 -   Scheduler step: 312, Optimizer step count: 5000
+2025-11-17 11:57:49,837 - ✓ New best validation loss: 2.801435
+2025-11-17 11:57:54,790 - ✓ Checkpoint saved at step 5000
+2025-11-17 11:58:28,583 - Step 5050/21295 (23.7%), Loss: 3.1919, LR: 1.48e-06, Tokens: 271
+2025-11-17 11:58:28,584 -   Scheduler step: 315, Optimizer step count: 5050
+2025-11-17 11:59:01,975 - Step 5100/21295 (23.9%), Loss: 3.0985, LR: 1.49e-06, Tokens: 268
+2025-11-17 11:59:01,976 -   Scheduler step: 318, Optimizer step count: 5100
+2025-11-17 11:59:05,532 - ✓ New best validation loss: 2.756952
+2025-11-17 11:59:37,992 - Step 5150/21295 (24.2%), Loss: 2.7456, LR: 1.51e-06, Tokens: 281
+2025-11-17 11:59:37,992 -   Scheduler step: 321, Optimizer step count: 5150
+2025-11-17 12:00:10,535 - Step 5200/21295 (24.4%), Loss: 2.5580, LR: 1.53e-06, Tokens: 294
+2025-11-17 12:00:10,536 -   Scheduler step: 325, Optimizer step count: 5200
+2025-11-17 12:00:14,087 - ✓ New best validation loss: 2.705994
+2025-11-17 12:00:18,485 - ✓ Checkpoint saved at step 5200
+2025-11-17 12:00:50,840 - Step 5250/21295 (24.7%), Loss: 2.5845, LR: 1.54e-06, Tokens: 320
+2025-11-17 12:00:50,841 -   Scheduler step: 328, Optimizer step count: 5250
+2025-11-17 12:01:23,185 - Step 5300/21295 (24.9%), Loss: 3.1204, LR: 1.56e-06, Tokens: 270
+2025-11-17 12:01:23,185 -   Scheduler step: 331, Optimizer step count: 5300
+2025-11-17 12:01:26,764 - ✓ New best validation loss: 2.661540
+2025-11-17 12:01:59,029 - Step 5350/21295 (25.1%), Loss: 2.4016, LR: 1.57e-06, Tokens: 320
+2025-11-17 12:01:59,029 -   Scheduler step: 334, Optimizer step count: 5350
+2025-11-17 12:02:33,133 - Step 5400/21295 (25.4%), Loss: 2.3766, LR: 1.58e-06, Tokens: 294
+2025-11-17 12:02:33,134 -   Scheduler step: 337, Optimizer step count: 5400
+2025-11-17 12:02:36,671 - ✓ New best validation loss: 2.615661
+2025-11-17 12:02:40,970 - ✓ Checkpoint saved at step 5400
+2025-11-17 12:03:14,622 - Step 5450/21295 (25.6%), Loss: 2.5220, LR: 1.60e-06, Tokens: 289
+2025-11-17 12:03:14,623 -   Scheduler step: 340, Optimizer step count: 5450
+2025-11-17 12:03:48,298 - Step 5500/21295 (25.8%), Loss: 2.2308, LR: 1.61e-06, Tokens: 321
+2025-11-17 12:03:48,298 -   Scheduler step: 343, Optimizer step count: 5500
+2025-11-17 12:03:51,842 - ✓ New best validation loss: 2.567447
+2025-11-17 12:04:23,922 - Step 5550/21295 (26.1%), Loss: 3.0310, LR: 1.63e-06, Tokens: 264
+2025-11-17 12:04:23,922 -   Scheduler step: 346, Optimizer step count: 5550
+2025-11-17 12:04:56,429 - Step 5600/21295 (26.3%), Loss: 2.1746, LR: 1.64e-06, Tokens: 317
+2025-11-17 12:04:56,430 -   Scheduler step: 350, Optimizer step count: 5600
+2025-11-17 12:04:59,959 - ✓ New best validation loss: 2.507323
+2025-11-17 12:05:04,259 - ✓ Checkpoint saved at step 5600
+2025-11-17 12:05:36,475 - Step 5650/21295 (26.5%), Loss: 2.4878, LR: 1.66e-06, Tokens: 307
+2025-11-17 12:05:36,475 -   Scheduler step: 353, Optimizer step count: 5650
+2025-11-17 12:06:09,049 - Step 5700/21295 (26.8%), Loss: 2.2247, LR: 1.67e-06, Tokens: 315
+2025-11-17 12:06:09,049 -   Scheduler step: 356, Optimizer step count: 5700
+2025-11-17 12:06:12,615 - ✓ New best validation loss: 2.451478
+2025-11-17 12:06:44,757 - Step 5750/21295 (27.0%), Loss: 2.1640, LR: 1.69e-06, Tokens: 319
+2025-11-17 12:06:44,757 -   Scheduler step: 359, Optimizer step count: 5750
+2025-11-17 12:07:18,808 - Step 5800/21295 (27.2%), Loss: 2.4363, LR: 1.70e-06, Tokens: 289
+2025-11-17 12:07:18,809 -   Scheduler step: 362, Optimizer step count: 5800
+2025-11-17 12:07:22,364 - ✓ New best validation loss: 2.394159
+2025-11-17 12:07:26,679 - ✓ Checkpoint saved at step 5800
+2025-11-17 12:08:00,181 - Step 5850/21295 (27.5%), Loss: 2.2970, LR: 1.72e-06, Tokens: 287
+2025-11-17 12:08:00,181 -   Scheduler step: 365, Optimizer step count: 5850
+2025-11-17 12:08:33,654 - Step 5900/21295 (27.7%), Loss: 2.2438, LR: 1.73e-06, Tokens: 291
+2025-11-17 12:08:33,654 -   Scheduler step: 368, Optimizer step count: 5900
+2025-11-17 12:08:37,822 - ✓ New best validation loss: 2.339556
+2025-11-17 12:09:09,885 - Step 5950/21295 (27.9%), Loss: 2.7556, LR: 1.74e-06, Tokens: 264
+2025-11-17 12:09:09,885 -   Scheduler step: 371, Optimizer step count: 5950
+2025-11-17 12:09:42,199 - Step 6000/21295 (28.2%), Loss: 2.2320, LR: 1.76e-06, Tokens: 283
+2025-11-17 12:09:42,199 -   Scheduler step: 375, Optimizer step count: 6000
+2025-11-17 12:09:46,300 - ✓ New best validation loss: 2.274462
+2025-11-17 12:09:50,632 - ✓ Checkpoint saved at step 6000
+2025-11-17 12:10:22,769 - Step 6050/21295 (28.4%), Loss: 2.0876, LR: 1.78e-06, Tokens: 321
+2025-11-17 12:10:22,769 -   Scheduler step: 378, Optimizer step count: 6050
+2025-11-17 12:10:54,640 - Step 6100/21295 (28.6%), Loss: 1.9455, LR: 1.79e-06, Tokens: 334
+2025-11-17 12:10:54,640 -   Scheduler step: 381, Optimizer step count: 6100
+2025-11-17 12:10:59,151 - ✓ New best validation loss: 2.217735
+2025-11-17 12:11:31,123 - Step 6150/21295 (28.9%), Loss: 2.0026, LR: 1.80e-06, Tokens: 293
+2025-11-17 12:11:31,124 -   Scheduler step: 384, Optimizer step count: 6150
+2025-11-17 12:12:05,195 - Step 6200/21295 (29.1%), Loss: 2.0579, LR: 1.82e-06, Tokens: 294
+2025-11-17 12:12:05,196 -   Scheduler step: 387, Optimizer step count: 6200
+2025-11-17 12:12:08,810 - ✓ New best validation loss: 2.164379
+2025-11-17 12:12:13,114 - ✓ Checkpoint saved at step 6200
+2025-11-17 12:12:46,675 - Step 6250/21295 (29.3%), Loss: 1.9706, LR: 1.83e-06, Tokens: 311
+2025-11-17 12:12:46,675 -   Scheduler step: 390, Optimizer step count: 6250
+2025-11-17 12:13:18,238 - Step 6300/21295 (29.6%), Loss: 1.9380, LR: 1.85e-06, Tokens: 320
+2025-11-17 12:13:18,239 -   Scheduler step: 393, Optimizer step count: 6300
+2025-11-17 12:13:22,702 - ✓ New best validation loss: 2.114138
+2025-11-17 12:13:54,159 - Step 6350/21295 (29.8%), Loss: 1.9039, LR: 1.86e-06, Tokens: 300
+2025-11-17 12:13:54,160 -   Scheduler step: 396, Optimizer step count: 6350
+2025-11-17 12:14:25,959 - Step 6400/21295 (30.1%), Loss: 1.9262, LR: 1.88e-06, Tokens: 295
+2025-11-17 12:14:25,959 -   Scheduler step: 400, Optimizer step count: 6400
+2025-11-17 12:14:30,720 - ✓ New best validation loss: 2.056004
+2025-11-17 12:14:35,032 - ✓ Checkpoint saved at step 6400
+2025-11-17 12:15:06,734 - Step 6450/21295 (30.3%), Loss: 2.4064, LR: 1.89e-06, Tokens: 262
+2025-11-17 12:15:06,735 -   Scheduler step: 403, Optimizer step count: 6450
+2025-11-17 12:15:41,211 - Step 6500/21295 (30.5%), Loss: 2.0944, LR: 1.91e-06, Tokens: 281
+2025-11-17 12:15:41,211 -   Scheduler step: 406, Optimizer step count: 6500
+2025-11-17 12:15:45,607 - ✓ New best validation loss: 2.003803
+2025-11-17 12:16:18,374 - Step 6550/21295 (30.8%), Loss: 1.8410, LR: 1.92e-06, Tokens: 294
+2025-11-17 12:16:18,374 -   Scheduler step: 409, Optimizer step count: 6550
+2025-11-17 12:16:50,178 - Step 6600/21295 (31.0%), Loss: 1.8708, LR: 1.94e-06, Tokens: 308
+2025-11-17 12:16:50,178 -   Scheduler step: 412, Optimizer step count: 6600
+2025-11-17 12:16:55,015 - ✓ New best validation loss: 1.948221
+2025-11-17 12:16:59,308 - ✓ Checkpoint saved at step 6600
+2025-11-17 12:17:30,830 - Step 6650/21295 (31.2%), Loss: 2.3776, LR: 1.95e-06, Tokens: 261
+2025-11-17 12:17:30,830 -   Scheduler step: 415, Optimizer step count: 6650
+2025-11-17 12:18:03,114 - Step 6700/21295 (31.5%), Loss: 2.2327, LR: 1.96e-06, Tokens: 265
+2025-11-17 12:18:03,115 -   Scheduler step: 418, Optimizer step count: 6700
+2025-11-17 12:18:06,659 - ✓ New best validation loss: 1.889955
+2025-11-17 12:18:38,953 - Step 6750/21295 (31.7%), Loss: 1.7401, LR: 1.98e-06, Tokens: 316
+2025-11-17 12:18:38,953 -   Scheduler step: 421, Optimizer step count: 6750
+2025-11-17 12:19:12,888 - Step 6800/21295 (31.9%), Loss: 1.6447, LR: 2.00e-06, Tokens: 312
+2025-11-17 12:19:12,888 -   Scheduler step: 425, Optimizer step count: 6800
+2025-11-17 12:19:16,426 - ✓ New best validation loss: 1.814582
+2025-11-17 12:19:20,714 - ✓ Checkpoint saved at step 6800
+2025-11-17 12:19:53,833 - Step 6850/21295 (32.2%), Loss: 1.5298, LR: 2.01e-06, Tokens: 318
+2025-11-17 12:19:53,834 -   Scheduler step: 428, Optimizer step count: 6850
+2025-11-17 12:20:26,009 - Step 6900/21295 (32.4%), Loss: 1.6080, LR: 2.03e-06, Tokens: 317
+2025-11-17 12:20:26,010 -   Scheduler step: 431, Optimizer step count: 6900
+2025-11-17 12:20:29,517 - ✓ New best validation loss: 1.740663
+2025-11-17 12:21:01,268 - Step 6950/21295 (32.6%), Loss: 2.0266, LR: 2.04e-06, Tokens: 273
+2025-11-17 12:21:01,268 -   Scheduler step: 434, Optimizer step count: 6950
+2025-11-17 12:21:33,056 - Step 7000/21295 (32.9%), Loss: 1.4818, LR: 2.05e-06, Tokens: 318
+2025-11-17 12:21:33,056 -   Scheduler step: 437, Optimizer step count: 7000
+2025-11-17 12:21:36,574 - ✓ New best validation loss: 1.659023
+2025-11-17 12:21:40,884 - ✓ Checkpoint saved at step 7000
+2025-11-17 12:22:13,141 - Step 7050/21295 (33.1%), Loss: 1.5313, LR: 2.07e-06, Tokens: 290
+2025-11-17 12:22:13,141 -   Scheduler step: 440, Optimizer step count: 7050
+2025-11-17 12:22:47,201 - Step 7100/21295 (33.3%), Loss: 1.4238, LR: 2.08e-06, Tokens: 317
+2025-11-17 12:22:47,202 -   Scheduler step: 443, Optimizer step count: 7100
+2025-11-17 12:22:50,730 - ✓ New best validation loss: 1.575355
+2025-11-17 12:23:22,989 - Step 7150/21295 (33.6%), Loss: 1.8499, LR: 2.10e-06, Tokens: 256
+2025-11-17 12:23:22,990 -   Scheduler step: 446, Optimizer step count: 7150
+2025-11-17 12:23:55,098 - Step 7200/21295 (33.8%), Loss: 1.4011, LR: 2.11e-06, Tokens: 290
+2025-11-17 12:23:55,098 -   Scheduler step: 450, Optimizer step count: 7200
+2025-11-17 12:23:59,531 - ✓ New best validation loss: 1.481439
+2025-11-17 12:24:05,181 - ✓ Checkpoint saved at step 7200
+2025-11-17 12:24:36,828 - Step 7250/21295 (34.0%), Loss: 1.7179, LR: 2.13e-06, Tokens: 270
+2025-11-17 12:24:36,828 -   Scheduler step: 453, Optimizer step count: 7250
+2025-11-17 12:25:08,957 - Step 7300/21295 (34.3%), Loss: 1.4025, LR: 2.14e-06, Tokens: 285
+2025-11-17 12:25:08,957 -   Scheduler step: 456, Optimizer step count: 7300
+2025-11-17 12:25:12,789 - ✓ New best validation loss: 1.400736
+2025-11-17 12:25:45,438 - Step 7350/21295 (34.5%), Loss: 1.6756, LR: 2.16e-06, Tokens: 258
+2025-11-17 12:25:45,438 -   Scheduler step: 459, Optimizer step count: 7350
+2025-11-17 12:26:19,050 - Step 7400/21295 (34.7%), Loss: 1.2002, LR: 2.17e-06, Tokens: 308
+2025-11-17 12:26:19,050 -   Scheduler step: 462, Optimizer step count: 7400
+2025-11-17 12:26:23,469 - ✓ New best validation loss: 1.320183
+2025-11-17 12:26:29,428 - ✓ Checkpoint saved at step 7400
+2025-11-17 12:27:03,117 - Step 7450/21295 (35.0%), Loss: 1.1674, LR: 2.19e-06, Tokens: 291
+2025-11-17 12:27:03,118 -   Scheduler step: 465, Optimizer step count: 7450
+2025-11-17 12:27:35,039 - Step 7500/21295 (35.2%), Loss: 1.2398, LR: 2.20e-06, Tokens: 294
+2025-11-17 12:27:35,039 -   Scheduler step: 468, Optimizer step count: 7500
+2025-11-17 12:27:38,758 - ✓ New best validation loss: 1.244652
+2025-11-17 12:28:10,401 - Step 7550/21295 (35.5%), Loss: 1.1213, LR: 2.21e-06, Tokens: 295
+2025-11-17 12:28:10,402 -   Scheduler step: 471, Optimizer step count: 7550
+2025-11-17 12:28:42,371 - Step 7600/21295 (35.7%), Loss: 1.0349, LR: 2.23e-06, Tokens: 314
+2025-11-17 12:28:42,371 -   Scheduler step: 475, Optimizer step count: 7600
+2025-11-17 12:28:47,256 - ✓ New best validation loss: 1.161069
+2025-11-17 12:28:52,895 - ✓ Checkpoint saved at step 7600
+2025-11-17 12:29:24,423 - Step 7650/21295 (35.9%), Loss: 1.4279, LR: 2.25e-06, Tokens: 266
+2025-11-17 12:29:24,424 -   Scheduler step: 478, Optimizer step count: 7650
+2025-11-17 12:29:58,481 - Step 7700/21295 (36.2%), Loss: 0.9940, LR: 2.26e-06, Tokens: 293
+2025-11-17 12:29:58,481 -   Scheduler step: 481, Optimizer step count: 7700
+2025-11-17 12:30:03,561 - ✓ New best validation loss: 1.096491
+2025-11-17 12:30:37,317 - Step 7750/21295 (36.4%), Loss: 1.0557, LR: 2.27e-06, Tokens: 290
+2025-11-17 12:30:37,318 -   Scheduler step: 484, Optimizer step count: 7750
+2025-11-17 12:31:09,180 - Step 7800/21295 (36.6%), Loss: 0.9170, LR: 2.29e-06, Tokens: 322
+2025-11-17 12:31:09,180 -   Scheduler step: 487, Optimizer step count: 7800
+2025-11-17 12:31:13,925 - ✓ New best validation loss: 1.036651
+2025-11-17 12:31:18,724 - ✓ Checkpoint saved at step 7800
+2025-11-17 12:31:50,273 - Step 7850/21295 (36.9%), Loss: 0.9922, LR: 2.30e-06, Tokens: 293
+2025-11-17 12:31:50,273 -   Scheduler step: 490, Optimizer step count: 7850
+2025-11-17 12:32:22,010 - Step 7900/21295 (37.1%), Loss: 0.8929, LR: 2.32e-06, Tokens: 295
+2025-11-17 12:32:22,011 -   Scheduler step: 493, Optimizer step count: 7900
+2025-11-17 12:32:26,839 - ✓ New best validation loss: 0.981084
+2025-11-17 12:32:58,217 - Step 7950/21295 (37.3%), Loss: 0.9676, LR: 2.33e-06, Tokens: 296
+2025-11-17 12:32:58,217 -   Scheduler step: 496, Optimizer step count: 7950
+2025-11-17 12:33:32,659 - Step 8000/21295 (37.6%), Loss: 0.8304, LR: 2.35e-06, Tokens: 313
+2025-11-17 12:33:32,660 -   Scheduler step: 500, Optimizer step count: 8000
+2025-11-17 12:33:37,420 - ✓ New best validation loss: 0.918112
+2025-11-17 12:33:41,867 - ✓ Checkpoint saved at step 8000
+2025-11-17 12:34:15,892 - Step 8050/21295 (37.8%), Loss: 0.8383, LR: 2.36e-06, Tokens: 292
+2025-11-17 12:34:15,892 -   Scheduler step: 503, Optimizer step count: 8050
+2025-11-17 12:34:47,235 - Step 8100/21295 (38.0%), Loss: 0.8236, LR: 2.38e-06, Tokens: 284
+2025-11-17 12:34:47,235 -   Scheduler step: 506, Optimizer step count: 8100
+2025-11-17 12:34:52,530 - ✓ New best validation loss: 0.863345
+2025-11-17 12:35:24,134 - Step 8150/21295 (38.3%), Loss: 1.0264, LR: 2.39e-06, Tokens: 263
+2025-11-17 12:35:24,134 -   Scheduler step: 509, Optimizer step count: 8150
+2025-11-17 12:35:55,639 - Step 8200/21295 (38.5%), Loss: 0.9863, LR: 2.41e-06, Tokens: 260
+2025-11-17 12:35:55,640 -   Scheduler step: 512, Optimizer step count: 8200
+2025-11-17 12:35:59,404 - ✓ New best validation loss: 0.812709
+2025-11-17 12:36:04,484 - ✓ Checkpoint saved at step 8200
+2025-11-17 12:36:36,185 - Step 8250/21295 (38.7%), Loss: 0.7842, LR: 2.42e-06, Tokens: 288
+2025-11-17 12:36:36,186 -   Scheduler step: 515, Optimizer step count: 8250
+2025-11-17 12:37:10,040 - Step 8300/21295 (39.0%), Loss: 1.0544, LR: 2.43e-06, Tokens: 266
+2025-11-17 12:37:10,041 -   Scheduler step: 518, Optimizer step count: 8300
+2025-11-17 12:37:13,742 - ✓ New best validation loss: 0.769634
+2025-11-17 12:37:47,413 - Step 8350/21295 (39.2%), Loss: 0.6900, LR: 2.45e-06, Tokens: 298
+2025-11-17 12:37:47,413 -   Scheduler step: 521, Optimizer step count: 8350
+2025-11-17 12:38:19,534 - Step 8400/21295 (39.4%), Loss: 0.7500, LR: 2.47e-06, Tokens: 289
+2025-11-17 12:38:19,535 -   Scheduler step: 525, Optimizer step count: 8400
+2025-11-17 12:38:24,144 - ✓ New best validation loss: 0.729804
+2025-11-17 12:38:30,097 - ✓ Checkpoint saved at step 8400
+2025-11-17 12:39:01,583 - Step 8450/21295 (39.7%), Loss: 0.6984, LR: 2.48e-06, Tokens: 288
+2025-11-17 12:39:01,583 -   Scheduler step: 528, Optimizer step count: 8450
+2025-11-17 12:39:33,682 - Step 8500/21295 (39.9%), Loss: 0.8525, LR: 2.50e-06, Tokens: 269
+2025-11-17 12:39:33,682 -   Scheduler step: 531, Optimizer step count: 8500
+2025-11-17 12:39:37,361 - ✓ New best validation loss: 0.702101
+2025-11-17 12:40:09,052 - Step 8550/21295 (40.2%), Loss: 0.5324, LR: 2.51e-06, Tokens: 323
+2025-11-17 12:40:09,052 -   Scheduler step: 534, Optimizer step count: 8550
+2025-11-17 12:40:43,034 - Step 8600/21295 (40.4%), Loss: 0.5617, LR: 2.52e-06, Tokens: 320
+2025-11-17 12:40:43,034 -   Scheduler step: 537, Optimizer step count: 8600
+2025-11-17 12:40:46,806 - ✓ New best validation loss: 0.677602
+2025-11-17 12:40:51,164 - ✓ Checkpoint saved at step 8600
+2025-11-17 12:41:25,194 - Step 8650/21295 (40.6%), Loss: 0.6326, LR: 2.54e-06, Tokens: 288
+2025-11-17 12:41:25,194 -   Scheduler step: 540, Optimizer step count: 8650
+2025-11-17 12:41:57,185 - Step 8700/21295 (40.9%), Loss: 0.6045, LR: 2.55e-06, Tokens: 315
+2025-11-17 12:41:57,185 -   Scheduler step: 543, Optimizer step count: 8700
+2025-11-17 12:42:01,687 - ✓ New best validation loss: 0.653724
+2025-11-17 12:42:33,899 - Step 8750/21295 (41.1%), Loss: 0.5548, LR: 2.57e-06, Tokens: 318
+2025-11-17 12:42:33,900 -   Scheduler step: 546, Optimizer step count: 8750
+2025-11-17 12:43:06,055 - Step 8800/21295 (41.3%), Loss: 0.7588, LR: 2.58e-06, Tokens: 262
+2025-11-17 12:43:06,056 -   Scheduler step: 550, Optimizer step count: 8800
+2025-11-17 12:43:09,674 - ✓ New best validation loss: 0.629319
+2025-11-17 12:43:14,317 - ✓ Checkpoint saved at step 8800
+2025-11-17 12:43:46,215 - Step 8850/21295 (41.6%), Loss: 0.5906, LR: 2.60e-06, Tokens: 297
+2025-11-17 12:43:46,215 -   Scheduler step: 553, Optimizer step count: 8850
+2025-11-17 12:44:19,607 - Step 8900/21295 (41.8%), Loss: 0.5655, LR: 2.61e-06, Tokens: 310
+2025-11-17 12:44:19,608 -   Scheduler step: 556, Optimizer step count: 8900
+2025-11-17 12:44:23,402 - ✓ New best validation loss: 0.609458
+2025-11-17 12:44:57,388 - Step 8950/21295 (42.0%), Loss: 0.5778, LR: 2.63e-06, Tokens: 284
+2025-11-17 12:44:57,389 -   Scheduler step: 559, Optimizer step count: 8950
+2025-11-17 12:45:29,076 - Step 9000/21295 (42.3%), Loss: 0.5537, LR: 2.64e-06, Tokens: 295
+2025-11-17 12:45:29,076 -   Scheduler step: 562, Optimizer step count: 9000
+2025-11-17 12:45:32,810 - ✓ New best validation loss: 0.589808
+2025-11-17 12:45:37,757 - ✓ Checkpoint saved at step 9000
+2025-11-17 12:46:09,826 - Step 9050/21295 (42.5%), Loss: 0.5418, LR: 2.66e-06, Tokens: 292
+2025-11-17 12:46:09,826 -   Scheduler step: 565, Optimizer step count: 9050
+2025-11-17 12:46:41,915 - Step 9100/21295 (42.7%), Loss: 0.4801, LR: 2.67e-06, Tokens: 326
+2025-11-17 12:46:41,915 -   Scheduler step: 568, Optimizer step count: 9100
+2025-11-17 12:46:45,776 - ✓ New best validation loss: 0.572080
+2025-11-17 12:47:17,405 - Step 9150/21295 (43.0%), Loss: 0.5274, LR: 2.68e-06, Tokens: 289
+2025-11-17 12:47:17,405 -   Scheduler step: 571, Optimizer step count: 9150
+2025-11-17 12:47:51,452 - Step 9200/21295 (43.2%), Loss: 0.5822, LR: 2.70e-06, Tokens: 296
+2025-11-17 12:47:51,453 -   Scheduler step: 575, Optimizer step count: 9200
+2025-11-17 12:47:55,186 - ✓ New best validation loss: 0.552450
+2025-11-17 12:47:59,597 - ✓ Checkpoint saved at step 9200
+2025-11-17 12:48:33,522 - Step 9250/21295 (43.4%), Loss: 0.5276, LR: 2.72e-06, Tokens: 293
+2025-11-17 12:48:33,522 -   Scheduler step: 578, Optimizer step count: 9250
+2025-11-17 12:49:05,791 - Step 9300/21295 (43.7%), Loss: 0.6269, LR: 2.73e-06, Tokens: 268
+2025-11-17 12:49:05,791 -   Scheduler step: 581, Optimizer step count: 9300
+2025-11-17 12:49:09,450 - ✓ New best validation loss: 0.538010
+2025-11-17 12:49:41,119 - Step 9350/21295 (43.9%), Loss: 0.6322, LR: 2.74e-06, Tokens: 259
+2025-11-17 12:49:41,119 -   Scheduler step: 584, Optimizer step count: 9350
+2025-11-17 12:50:13,008 - Step 9400/21295 (44.1%), Loss: 0.4965, LR: 2.76e-06, Tokens: 286
+2025-11-17 12:50:13,009 -   Scheduler step: 587, Optimizer step count: 9400
+2025-11-17 12:50:16,780 - ✓ New best validation loss: 0.525804
+2025-11-17 12:50:21,685 - ✓ Checkpoint saved at step 9400
+2025-11-17 12:50:53,638 - Step 9450/21295 (44.4%), Loss: 0.5035, LR: 2.77e-06, Tokens: 316
+2025-11-17 12:50:53,638 -   Scheduler step: 590, Optimizer step count: 9450
+2025-11-17 12:51:27,181 - Step 9500/21295 (44.6%), Loss: 0.4398, LR: 2.79e-06, Tokens: 320
+2025-11-17 12:51:27,181 -   Scheduler step: 593, Optimizer step count: 9500
+2025-11-17 12:51:30,814 - ✓ New best validation loss: 0.514392
+2025-11-17 12:52:05,086 - Step 9550/21295 (44.8%), Loss: 0.4823, LR: 2.80e-06, Tokens: 293
+2025-11-17 12:52:05,086 -   Scheduler step: 596, Optimizer step count: 9550
+2025-11-17 12:52:37,139 - Step 9600/21295 (45.1%), Loss: 0.5160, LR: 2.82e-06, Tokens: 299
+2025-11-17 12:52:37,140 -   Scheduler step: 600, Optimizer step count: 9600
+2025-11-17 12:52:41,715 - ✓ New best validation loss: 0.501804
+2025-11-17 12:52:47,383 - ✓ Checkpoint saved at step 9600
+2025-11-17 12:53:19,108 - Step 9650/21295 (45.3%), Loss: 0.4249, LR: 2.83e-06, Tokens: 296
+2025-11-17 12:53:19,108 -   Scheduler step: 603, Optimizer step count: 9650
+2025-11-17 12:53:51,148 - Step 9700/21295 (45.6%), Loss: 0.4730, LR: 2.85e-06, Tokens: 290
+2025-11-17 12:53:51,148 -   Scheduler step: 606, Optimizer step count: 9700
+2025-11-17 12:53:56,051 - ✓ New best validation loss: 0.490376
+2025-11-17 12:54:27,534 - Step 9750/21295 (45.8%), Loss: 0.4426, LR: 2.86e-06, Tokens: 296
+2025-11-17 12:54:27,534 -   Scheduler step: 609, Optimizer step count: 9750
+2025-11-17 12:55:00,677 - Step 9800/21295 (46.0%), Loss: 0.4171, LR: 2.88e-06, Tokens: 320
+2025-11-17 12:55:00,677 -   Scheduler step: 612, Optimizer step count: 9800
+2025-11-17 12:55:05,051 - ✓ New best validation loss: 0.479191
+2025-11-17 12:55:09,361 - ✓ Checkpoint saved at step 9800
+2025-11-17 12:55:42,556 - Step 9850/21295 (46.3%), Loss: 0.4596, LR: 2.89e-06, Tokens: 313
+2025-11-17 12:55:42,557 -   Scheduler step: 615, Optimizer step count: 9850
+2025-11-17 12:56:15,575 - Step 9900/21295 (46.5%), Loss: 0.6136, LR: 2.90e-06, Tokens: 261
+2025-11-17 12:56:15,575 -   Scheduler step: 618, Optimizer step count: 9900
+2025-11-17 12:56:19,890 - ✓ New best validation loss: 0.472902
+2025-11-17 12:56:51,411 - Step 9950/21295 (46.7%), Loss: 0.5644, LR: 2.92e-06, Tokens: 255
+2025-11-17 12:56:51,411 -   Scheduler step: 621, Optimizer step count: 9950
+2025-11-17 12:57:23,293 - Step 10000/21295 (47.0%), Loss: 0.4706, LR: 2.94e-06, Tokens: 322
+2025-11-17 12:57:23,293 -   Scheduler step: 625, Optimizer step count: 10000
+2025-11-17 12:57:27,684 - ✓ New best validation loss: 0.466315
+2025-11-17 12:57:31,973 - ✓ Checkpoint saved at step 10000
+2025-11-17 12:58:03,377 - Step 10050/21295 (47.2%), Loss: 0.4601, LR: 2.95e-06, Tokens: 282
+2025-11-17 12:58:03,378 -   Scheduler step: 628, Optimizer step count: 10050
+2025-11-17 12:58:35,883 - Step 10100/21295 (47.4%), Loss: 0.4405, LR: 2.97e-06, Tokens: 290
+2025-11-17 12:58:35,883 -   Scheduler step: 631, Optimizer step count: 10100
+2025-11-17 12:58:39,368 - ✓ New best validation loss: 0.463042
+2025-11-17 12:59:13,275 - Step 10150/21295 (47.7%), Loss: 0.4935, LR: 2.98e-06, Tokens: 268
+2025-11-17 12:59:13,276 -   Scheduler step: 634, Optimizer step count: 10150
+2025-11-17 12:59:45,449 - Step 10200/21295 (47.9%), Loss: 0.4124, LR: 2.99e-06, Tokens: 319
+2025-11-17 12:59:45,449 -   Scheduler step: 637, Optimizer step count: 10200
+2025-11-17 12:59:48,929 - ✓ New best validation loss: 0.459236
+2025-11-17 12:59:53,226 - ✓ Checkpoint saved at step 10200
+2025-11-17 13:00:24,837 - Step 10250/21295 (48.1%), Loss: 0.3952, LR: 3.01e-06, Tokens: 293
+2025-11-17 13:00:24,838 -   Scheduler step: 640, Optimizer step count: 10250
+2025-11-17 13:00:56,616 - Step 10300/21295 (48.4%), Loss: 0.4269, LR: 3.02e-06, Tokens: 285
+2025-11-17 13:00:56,616 -   Scheduler step: 643, Optimizer step count: 10300
+2025-11-17 13:01:00,080 - ✓ New best validation loss: 0.456720
+2025-11-17 13:01:32,009 - Step 10350/21295 (48.6%), Loss: 0.3981, LR: 3.04e-06, Tokens: 322
+2025-11-17 13:01:32,010 -   Scheduler step: 646, Optimizer step count: 10350
+2025-11-17 13:02:05,750 - Step 10400/21295 (48.8%), Loss: 0.4061, LR: 3.05e-06, Tokens: 290
+2025-11-17 13:02:05,751 -   Scheduler step: 650, Optimizer step count: 10400
+2025-11-17 13:02:09,243 - ✓ New best validation loss: 0.453731
+2025-11-17 13:02:13,558 - ✓ Checkpoint saved at step 10400
+2025-11-17 13:02:47,031 - Step 10450/21295 (49.1%), Loss: 0.3978, LR: 3.07e-06, Tokens: 287
+2025-11-17 13:02:47,031 -   Scheduler step: 653, Optimizer step count: 10450
+2025-11-17 13:03:19,965 - Step 10500/21295 (49.3%), Loss: 0.4397, LR: 3.08e-06, Tokens: 317
+2025-11-17 13:03:19,965 -   Scheduler step: 656, Optimizer step count: 10500
+2025-11-17 13:03:23,932 - ✓ New best validation loss: 0.452326
+2025-11-17 13:03:55,479 - Step 10550/21295 (49.5%), Loss: 0.4374, LR: 3.10e-06, Tokens: 309
+2025-11-17 13:03:55,479 -   Scheduler step: 659, Optimizer step count: 10550
+2025-11-17 13:04:27,533 - Step 10600/21295 (49.8%), Loss: 0.4389, LR: 3.11e-06, Tokens: 314
+2025-11-17 13:04:27,533 -   Scheduler step: 662, Optimizer step count: 10600
+2025-11-17 13:04:31,224 - ✓ New best validation loss: 0.448444
+2025-11-17 13:04:35,533 - ✓ Checkpoint saved at step 10600
+2025-11-17 13:05:07,169 - Step 10650/21295 (50.0%), Loss: 0.4320, LR: 3.13e-06, Tokens: 296
+2025-11-17 13:05:07,169 -   Scheduler step: 665, Optimizer step count: 10650
+2025-11-17 13:05:40,038 - Step 10700/21295 (50.2%), Loss: 0.4831, LR: 3.14e-06, Tokens: 299
+2025-11-17 13:05:40,038 -   Scheduler step: 668, Optimizer step count: 10700
+2025-11-17 13:05:43,673 - ✓ New best validation loss: 0.445483
+2025-11-17 13:06:17,638 - Step 10750/21295 (50.5%), Loss: 0.3890, LR: 3.15e-06, Tokens: 321
+2025-11-17 13:06:17,638 -   Scheduler step: 671, Optimizer step count: 10750
+2025-11-17 13:06:50,077 - Step 10800/21295 (50.7%), Loss: 0.4069, LR: 3.17e-06, Tokens: 285
+2025-11-17 13:06:50,078 -   Scheduler step: 675, Optimizer step count: 10800
+2025-11-17 13:06:53,592 - ✓ New best validation loss: 0.443107
+2025-11-17 13:06:57,886 - ✓ Checkpoint saved at step 10800
+2025-11-17 13:07:29,542 - Step 10850/21295 (51.0%), Loss: 0.4082, LR: 3.19e-06, Tokens: 284
+2025-11-17 13:07:29,542 -   Scheduler step: 678, Optimizer step count: 10850
+2025-11-17 13:08:01,698 - Step 10900/21295 (51.2%), Loss: 0.4795, LR: 3.20e-06, Tokens: 260
+2025-11-17 13:08:01,698 -   Scheduler step: 681, Optimizer step count: 10900
+2025-11-17 13:08:05,163 - ✓ New best validation loss: 0.440571
+2025-11-17 13:08:36,264 - Step 10950/21295 (51.4%), Loss: 0.3852, LR: 3.21e-06, Tokens: 324
+2025-11-17 13:08:36,264 -   Scheduler step: 684, Optimizer step count: 10950
+2025-11-17 13:09:10,274 - Step 11000/21295 (51.7%), Loss: 0.4171, LR: 3.23e-06, Tokens: 291
+2025-11-17 13:09:10,274 -   Scheduler step: 687, Optimizer step count: 11000
+2025-11-17 13:09:13,721 - ✓ New best validation loss: 0.438432
+2025-11-17 13:09:18,002 - ✓ Checkpoint saved at step 11000
+2025-11-17 13:09:52,004 - Step 11050/21295 (51.9%), Loss: 0.3698, LR: 3.24e-06, Tokens: 293
+2025-11-17 13:09:52,004 -   Scheduler step: 690, Optimizer step count: 11050
+2025-11-17 13:10:23,609 - Step 11100/21295 (52.1%), Loss: 0.3677, LR: 3.26e-06, Tokens: 316
+2025-11-17 13:10:23,609 -   Scheduler step: 693, Optimizer step count: 11100
+2025-11-17 13:10:27,878 - ✓ New best validation loss: 0.436700
+2025-11-17 13:10:59,029 - Step 11150/21295 (52.4%), Loss: 0.3905, LR: 3.27e-06, Tokens: 319
+2025-11-17 13:10:59,030 -   Scheduler step: 696, Optimizer step count: 11150
+2025-11-17 13:11:31,052 - Step 11200/21295 (52.6%), Loss: 0.3896, LR: 3.29e-06, Tokens: 285
+2025-11-17 13:11:31,052 -   Scheduler step: 700, Optimizer step count: 11200
+2025-11-17 13:11:34,530 - ✓ New best validation loss: 0.435332
+2025-11-17 13:11:38,840 - ✓ Checkpoint saved at step 11200
+2025-11-17 13:12:11,491 - Step 11250/21295 (52.8%), Loss: 0.4521, LR: 3.30e-06, Tokens: 283
+2025-11-17 13:12:11,492 -   Scheduler step: 703, Optimizer step count: 11250
+2025-11-17 13:12:44,353 - Step 11300/21295 (53.1%), Loss: 0.3802, LR: 3.32e-06, Tokens: 315
+2025-11-17 13:12:44,353 -   Scheduler step: 706, Optimizer step count: 11300
+2025-11-17 13:12:48,615 - ✓ New best validation loss: 0.431937
+2025-11-17 13:13:19,817 - Step 11350/21295 (53.3%), Loss: 0.3872, LR: 3.33e-06, Tokens: 321
+2025-11-17 13:13:19,818 -   Scheduler step: 709, Optimizer step count: 11350
+2025-11-17 13:13:51,616 - Step 11400/21295 (53.5%), Loss: 0.4544, LR: 3.35e-06, Tokens: 267
+2025-11-17 13:13:51,616 -   Scheduler step: 712, Optimizer step count: 11400
+2025-11-17 13:13:56,172 - ✓ New best validation loss: 0.429376
+2025-11-17 13:14:02,057 - ✓ Checkpoint saved at step 11400
+2025-11-17 13:14:33,271 - Step 11450/21295 (53.8%), Loss: 0.3498, LR: 3.36e-06, Tokens: 294
+2025-11-17 13:14:33,271 -   Scheduler step: 715, Optimizer step count: 11450
+2025-11-17 13:15:06,873 - Step 11500/21295 (54.0%), Loss: 0.4055, LR: 3.37e-06, Tokens: 294
+2025-11-17 13:15:06,873 -   Scheduler step: 718, Optimizer step count: 11500
+2025-11-17 13:15:10,579 - ✓ New best validation loss: 0.428129
+2025-11-17 13:15:44,013 - Step 11550/21295 (54.2%), Loss: 0.3899, LR: 3.39e-06, Tokens: 289
+2025-11-17 13:15:44,013 -   Scheduler step: 721, Optimizer step count: 11550
+2025-11-17 13:16:15,325 - Step 11600/21295 (54.5%), Loss: 0.3882, LR: 3.41e-06, Tokens: 284
+2025-11-17 13:16:15,326 -   Scheduler step: 725, Optimizer step count: 11600
+2025-11-17 13:16:19,645 - ✓ New best validation loss: 0.425437
+2025-11-17 13:16:25,009 - ✓ Checkpoint saved at step 11600
+2025-11-17 13:16:56,209 - Step 11650/21295 (54.7%), Loss: 0.4285, LR: 3.42e-06, Tokens: 319
+2025-11-17 13:16:56,209 -   Scheduler step: 728, Optimizer step count: 11650
+2025-11-17 13:17:27,836 - Step 11700/21295 (54.9%), Loss: 0.4027, LR: 3.44e-06, Tokens: 295
+2025-11-17 13:17:27,837 -   Scheduler step: 731, Optimizer step count: 11700
+2025-11-17 13:17:31,516 - ✓ New best validation loss: 0.423456
+2025-11-17 13:18:04,558 - Step 11750/21295 (55.2%), Loss: 0.3501, LR: 3.45e-06, Tokens: 295
+2025-11-17 13:18:04,559 -   Scheduler step: 734, Optimizer step count: 11750
+2025-11-17 13:18:37,065 - Step 11800/21295 (55.4%), Loss: 0.4189, LR: 3.46e-06, Tokens: 287
+2025-11-17 13:18:37,066 -   Scheduler step: 737, Optimizer step count: 11800
+2025-11-17 13:18:40,707 - ✓ New best validation loss: 0.421827
+2025-11-17 13:18:45,082 - ✓ Checkpoint saved at step 11800
+2025-11-17 13:19:16,404 - Step 11850/21295 (55.6%), Loss: 0.3474, LR: 3.48e-06, Tokens: 296
+2025-11-17 13:19:16,405 -   Scheduler step: 740, Optimizer step count: 11850
+2025-11-17 13:19:47,829 - Step 11900/21295 (55.9%), Loss: 0.4477, LR: 3.49e-06, Tokens: 263
+2025-11-17 13:19:47,830 -   Scheduler step: 743, Optimizer step count: 11900
+2025-11-17 13:19:51,534 - ✓ New best validation loss: 0.419815
+2025-11-17 13:20:22,964 - Step 11950/21295 (56.1%), Loss: 0.3724, LR: 3.51e-06, Tokens: 300
+2025-11-17 13:20:22,965 -   Scheduler step: 746, Optimizer step count: 11950
+2025-11-17 13:20:57,055 - Step 12000/21295 (56.4%), Loss: 0.3788, LR: 3.52e-06, Tokens: 291
+2025-11-17 13:20:57,056 -   Scheduler step: 750, Optimizer step count: 12000
+2025-11-17 13:21:00,893 - ✓ New best validation loss: 0.416594
+2025-11-17 13:21:05,690 - ✓ Checkpoint saved at step 12000
+2025-11-17 13:21:39,002 - Step 12050/21295 (56.6%), Loss: 0.3880, LR: 3.54e-06, Tokens: 293
+2025-11-17 13:21:39,002 -   Scheduler step: 753, Optimizer step count: 12050
+2025-11-17 13:22:10,462 - Step 12100/21295 (56.8%), Loss: 0.3612, LR: 3.55e-06, Tokens: 291
+2025-11-17 13:22:10,462 -   Scheduler step: 756, Optimizer step count: 12100
+2025-11-17 13:22:14,087 - ✓ New best validation loss: 0.414745
+2025-11-17 13:22:45,281 - Step 12150/21295 (57.1%), Loss: 0.4009, LR: 3.57e-06, Tokens: 320
+2025-11-17 13:22:45,282 -   Scheduler step: 759, Optimizer step count: 12150
+2025-11-17 13:23:17,723 - Step 12200/21295 (57.3%), Loss: 0.4151, LR: 3.58e-06, Tokens: 294
+2025-11-17 13:23:17,724 -   Scheduler step: 762, Optimizer step count: 12200
+2025-11-17 13:23:21,290 - ✓ New best validation loss: 0.413994
+2025-11-17 13:23:26,879 - ✓ Checkpoint saved at step 12200
+2025-11-17 13:24:00,104 - Step 12250/21295 (57.5%), Loss: 0.4026, LR: 3.59e-06, Tokens: 272
+2025-11-17 13:24:00,104 -   Scheduler step: 765, Optimizer step count: 12250
+2025-11-17 13:24:32,600 - Step 12300/21295 (57.8%), Loss: 0.3818, LR: 3.61e-06, Tokens: 323
+2025-11-17 13:24:32,600 -   Scheduler step: 768, Optimizer step count: 12300
+2025-11-17 13:24:36,357 - ✓ New best validation loss: 0.411452
+2025-11-17 13:25:07,675 - Step 12350/21295 (58.0%), Loss: 0.4522, LR: 3.62e-06, Tokens: 265
+2025-11-17 13:25:07,675 -   Scheduler step: 771, Optimizer step count: 12350
+2025-11-17 13:25:38,905 - Step 12400/21295 (58.2%), Loss: 0.4313, LR: 3.64e-06, Tokens: 260
+2025-11-17 13:25:38,905 -   Scheduler step: 775, Optimizer step count: 12400
+2025-11-17 13:25:42,841 - ✓ New best validation loss: 0.409240
+2025-11-17 13:25:47,848 - ✓ Checkpoint saved at step 12400
+2025-11-17 13:26:19,401 - Step 12450/21295 (58.5%), Loss: 0.3721, LR: 3.66e-06, Tokens: 321
+2025-11-17 13:26:19,401 -   Scheduler step: 778, Optimizer step count: 12450
+2025-11-17 13:26:53,576 - Step 12500/21295 (58.7%), Loss: 0.3502, LR: 3.67e-06, Tokens: 294
+2025-11-17 13:26:53,577 -   Scheduler step: 781, Optimizer step count: 12500
+2025-11-17 13:26:57,269 - ✓ New best validation loss: 0.407555
+2025-11-17 13:27:29,871 - Step 12550/21295 (58.9%), Loss: 0.3670, LR: 3.68e-06, Tokens: 320
+2025-11-17 13:27:29,871 -   Scheduler step: 784, Optimizer step count: 12550
+2025-11-17 13:28:01,427 - Step 12600/21295 (59.2%), Loss: 0.3709, LR: 3.70e-06, Tokens: 302
+2025-11-17 13:28:01,427 -   Scheduler step: 787, Optimizer step count: 12600
+2025-11-17 13:28:05,001 - ✓ New best validation loss: 0.405333
+2025-11-17 13:28:09,296 - ✓ Checkpoint saved at step 12600
+2025-11-17 13:28:40,375 - Step 12650/21295 (59.4%), Loss: 0.3907, LR: 3.71e-06, Tokens: 287
+2025-11-17 13:28:40,375 -   Scheduler step: 790, Optimizer step count: 12650
+2025-11-17 13:29:12,640 - Step 12700/21295 (59.6%), Loss: 0.3594, LR: 3.73e-06, Tokens: 322
+2025-11-17 13:29:12,640 -   Scheduler step: 793, Optimizer step count: 12700
+2025-11-17 13:29:17,054 - ✓ New best validation loss: 0.403601
+2025-11-17 13:29:51,032 - Step 12750/21295 (59.9%), Loss: 0.4121, LR: 3.74e-06, Tokens: 315
+2025-11-17 13:29:51,032 -   Scheduler step: 796, Optimizer step count: 12750
+2025-11-17 13:30:22,762 - Step 12800/21295 (60.1%), Loss: 0.3565, LR: 3.76e-06, Tokens: 299
+2025-11-17 13:30:22,762 -   Scheduler step: 800, Optimizer step count: 12800
+2025-11-17 13:30:27,409 - ✓ New best validation loss: 0.401427
+2025-11-17 13:30:31,721 - ✓ Checkpoint saved at step 12800
+2025-11-17 13:31:02,801 - Step 12850/21295 (60.3%), Loss: 0.3686, LR: 3.77e-06, Tokens: 314
+2025-11-17 13:31:02,802 -   Scheduler step: 803, Optimizer step count: 12850
+2025-11-17 13:31:34,000 - Step 12900/21295 (60.6%), Loss: 0.3461, LR: 3.79e-06, Tokens: 310
+2025-11-17 13:31:34,000 -   Scheduler step: 806, Optimizer step count: 12900
+2025-11-17 13:31:38,526 - ✓ New best validation loss: 0.399052
+2025-11-17 13:32:10,606 - Step 12950/21295 (60.8%), Loss: 0.3552, LR: 3.80e-06, Tokens: 292
+2025-11-17 13:32:10,606 -   Scheduler step: 809, Optimizer step count: 12950
+2025-11-17 13:32:44,022 - Step 13000/21295 (61.0%), Loss: 0.3830, LR: 3.82e-06, Tokens: 287
+2025-11-17 13:32:44,023 -   Scheduler step: 812, Optimizer step count: 13000
+2025-11-17 13:32:48,764 - ✓ New best validation loss: 0.397625
+2025-11-17 13:32:53,179 - ✓ Checkpoint saved at step 13000
+2025-11-17 13:33:25,964 - Step 13050/21295 (61.3%), Loss: 0.3635, LR: 3.83e-06, Tokens: 317
+2025-11-17 13:33:25,965 -   Scheduler step: 815, Optimizer step count: 13050
+2025-11-17 13:33:57,603 - Step 13100/21295 (61.5%), Loss: 0.4332, LR: 3.84e-06, Tokens: 256
+2025-11-17 13:33:57,603 -   Scheduler step: 818, Optimizer step count: 13100
+2025-11-17 13:34:01,980 - ✓ New best validation loss: 0.395427
+2025-11-17 13:34:33,022 - Step 13150/21295 (61.8%), Loss: 0.3354, LR: 3.86e-06, Tokens: 315
+2025-11-17 13:34:33,022 -   Scheduler step: 821, Optimizer step count: 13150
+2025-11-17 13:35:06,181 - Step 13200/21295 (62.0%), Loss: 0.3424, LR: 3.88e-06, Tokens: 320
+2025-11-17 13:35:06,181 -   Scheduler step: 825, Optimizer step count: 13200
+2025-11-17 13:35:09,644 - ✓ New best validation loss: 0.393362
+2025-11-17 13:35:13,939 - ✓ Checkpoint saved at step 13200
+2025-11-17 13:35:47,490 - Step 13250/21295 (62.2%), Loss: 0.3596, LR: 3.89e-06, Tokens: 286
+2025-11-17 13:35:47,490 -   Scheduler step: 828, Optimizer step count: 13250
+2025-11-17 13:36:19,531 - Step 13300/21295 (62.5%), Loss: 0.3404, LR: 3.91e-06, Tokens: 305
+2025-11-17 13:36:19,532 -   Scheduler step: 831, Optimizer step count: 13300
+2025-11-17 13:36:24,339 - ✓ New best validation loss: 0.390163
+2025-11-17 13:36:55,533 - Step 13350/21295 (62.7%), Loss: 0.3256, LR: 3.92e-06, Tokens: 298
+2025-11-17 13:36:55,533 -   Scheduler step: 834, Optimizer step count: 13350
+2025-11-17 13:37:26,817 - Step 13400/21295 (62.9%), Loss: 0.3405, LR: 3.93e-06, Tokens: 314
+2025-11-17 13:37:26,817 -   Scheduler step: 837, Optimizer step count: 13400
+2025-11-17 13:37:30,792 - ✓ New best validation loss: 0.389106
+2025-11-17 13:37:35,083 - ✓ Checkpoint saved at step 13400
+2025-11-17 13:38:06,822 - Step 13450/21295 (63.2%), Loss: 0.3845, LR: 3.95e-06, Tokens: 308
+2025-11-17 13:38:06,822 -   Scheduler step: 840, Optimizer step count: 13450
+2025-11-17 13:38:40,535 - Step 13500/21295 (63.4%), Loss: 0.4157, LR: 3.96e-06, Tokens: 269
+2025-11-17 13:38:40,535 -   Scheduler step: 843, Optimizer step count: 13500
+2025-11-17 13:38:43,971 - ✓ New best validation loss: 0.386437
+2025-11-17 13:39:15,772 - Step 13550/21295 (63.6%), Loss: 0.3396, LR: 3.98e-06, Tokens: 316
+2025-11-17 13:39:15,773 -   Scheduler step: 846, Optimizer step count: 13550
+2025-11-17 13:39:47,249 - Step 13600/21295 (63.9%), Loss: 0.3544, LR: 3.99e-06, Tokens: 317
+2025-11-17 13:39:47,249 -   Scheduler step: 850, Optimizer step count: 13600
+2025-11-17 13:39:51,918 - ✓ New best validation loss: 0.384574
+2025-11-17 13:39:56,221 - ✓ Checkpoint saved at step 13600
+2025-11-17 13:40:27,129 - Step 13650/21295 (64.1%), Loss: 0.3198, LR: 4.01e-06, Tokens: 322
+2025-11-17 13:40:27,129 -   Scheduler step: 853, Optimizer step count: 13650
+2025-11-17 13:41:00,347 - Step 13700/21295 (64.3%), Loss: 0.3402, LR: 4.02e-06, Tokens: 285
+2025-11-17 13:41:00,347 -   Scheduler step: 856, Optimizer step count: 13700
+2025-11-17 13:41:04,895 - ✓ New best validation loss: 0.381024
+2025-11-17 13:41:38,530 - Step 13750/21295 (64.6%), Loss: 0.4206, LR: 4.04e-06, Tokens: 265
+2025-11-17 13:41:38,530 -   Scheduler step: 859, Optimizer step count: 13750
+2025-11-17 13:42:09,589 - Step 13800/21295 (64.8%), Loss: 0.3346, LR: 4.05e-06, Tokens: 295
+2025-11-17 13:42:09,589 -   Scheduler step: 862, Optimizer step count: 13800
+2025-11-17 13:42:13,935 - ✓ New best validation loss: 0.379025
+2025-11-17 13:42:18,246 - ✓ Checkpoint saved at step 13800
+2025-11-17 13:42:49,327 - Step 13850/21295 (65.0%), Loss: 0.3511, LR: 4.06e-06, Tokens: 288
+2025-11-17 13:42:49,328 -   Scheduler step: 865, Optimizer step count: 13850
+2025-11-17 13:43:20,901 - Step 13900/21295 (65.3%), Loss: 0.4081, LR: 4.08e-06, Tokens: 288
+2025-11-17 13:43:20,901 -   Scheduler step: 868, Optimizer step count: 13900
+2025-11-17 13:43:25,395 - ✓ New best validation loss: 0.375615
+2025-11-17 13:43:58,173 - Step 13950/21295 (65.5%), Loss: 0.4213, LR: 4.09e-06, Tokens: 268
+2025-11-17 13:43:58,173 -   Scheduler step: 871, Optimizer step count: 13950
+2025-11-17 13:44:31,007 - Step 14000/21295 (65.7%), Loss: 0.3612, LR: 4.11e-06, Tokens: 278
+2025-11-17 13:44:31,007 -   Scheduler step: 875, Optimizer step count: 14000
+2025-11-17 13:44:34,769 - ✓ New best validation loss: 0.372464
+2025-11-17 13:44:39,189 - ✓ Checkpoint saved at step 14000
+2025-11-17 13:45:10,708 - Step 14050/21295 (66.0%), Loss: 0.3138, LR: 4.13e-06, Tokens: 297
+2025-11-17 13:45:10,708 -   Scheduler step: 878, Optimizer step count: 14050
+2025-11-17 13:45:41,997 - Step 14100/21295 (66.2%), Loss: 0.3328, LR: 4.14e-06, Tokens: 314
+2025-11-17 13:45:41,997 -   Scheduler step: 881, Optimizer step count: 14100
+2025-11-17 13:45:47,355 - ✓ New best validation loss: 0.370936
+2025-11-17 13:46:18,607 - Step 14150/21295 (66.4%), Loss: 0.3055, LR: 4.15e-06, Tokens: 294
+2025-11-17 13:46:18,607 -   Scheduler step: 884, Optimizer step count: 14150
+2025-11-17 13:46:52,661 - Step 14200/21295 (66.7%), Loss: 0.3866, LR: 4.17e-06, Tokens: 267
+2025-11-17 13:46:52,661 -   Scheduler step: 887, Optimizer step count: 14200
+2025-11-17 13:46:57,509 - ✓ New best validation loss: 0.367818
+2025-11-17 13:47:01,975 - ✓ Checkpoint saved at step 14200
+2025-11-17 13:47:36,073 - Step 14250/21295 (66.9%), Loss: 0.3244, LR: 4.18e-06, Tokens: 294
+2025-11-17 13:47:36,074 -   Scheduler step: 890, Optimizer step count: 14250
+2025-11-17 13:48:07,206 - Step 14300/21295 (67.2%), Loss: 0.3866, LR: 4.20e-06, Tokens: 257
+2025-11-17 13:48:07,207 -   Scheduler step: 893, Optimizer step count: 14300
+2025-11-17 13:48:12,566 - ✓ New best validation loss: 0.367570
+2025-11-17 13:48:43,219 - Step 14350/21295 (67.4%), Loss: 0.3477, LR: 4.21e-06, Tokens: 291
+2025-11-17 13:48:43,219 -   Scheduler step: 896, Optimizer step count: 14350
+2025-11-17 13:49:15,190 - Step 14400/21295 (67.6%), Loss: 0.3277, LR: 4.23e-06, Tokens: 291
+2025-11-17 13:49:15,190 -   Scheduler step: 900, Optimizer step count: 14400
+2025-11-17 13:49:19,891 - ✓ New best validation loss: 0.363927
+2025-11-17 13:49:24,293 - ✓ Checkpoint saved at step 14400
+2025-11-17 13:49:57,072 - Step 14450/21295 (67.9%), Loss: 0.3330, LR: 4.24e-06, Tokens: 298
+2025-11-17 13:49:57,072 -   Scheduler step: 903, Optimizer step count: 14450
+2025-11-17 13:50:30,545 - Step 14500/21295 (68.1%), Loss: 0.2886, LR: 4.26e-06, Tokens: 301
+2025-11-17 13:50:30,546 -   Scheduler step: 906, Optimizer step count: 14500
+2025-11-17 13:50:35,235 - ✓ New best validation loss: 0.360129
+2025-11-17 13:51:05,854 - Step 14550/21295 (68.3%), Loss: 0.3214, LR: 4.27e-06, Tokens: 298
+2025-11-17 13:51:05,854 -   Scheduler step: 909, Optimizer step count: 14550
+2025-11-17 13:51:36,201 - Step 14600/21295 (68.6%), Loss: 0.3519, LR: 4.29e-06, Tokens: 292
+2025-11-17 13:51:36,201 -   Scheduler step: 912, Optimizer step count: 14600
+2025-11-17 13:51:40,960 - ✓ New best validation loss: 0.356289
+2025-11-17 13:51:45,355 - ✓ Checkpoint saved at step 14600
+2025-11-17 13:52:16,631 - Step 14650/21295 (68.8%), Loss: 0.2906, LR: 4.30e-06, Tokens: 287
+2025-11-17 13:52:16,632 -   Scheduler step: 915, Optimizer step count: 14650
+2025-11-17 13:52:51,032 - Step 14700/21295 (69.0%), Loss: 0.3336, LR: 4.31e-06, Tokens: 292
+2025-11-17 13:52:51,032 -   Scheduler step: 918, Optimizer step count: 14700
+2025-11-17 13:52:55,778 - ✓ New best validation loss: 0.353557
+2025-11-17 13:53:28,728 - Step 14750/21295 (69.3%), Loss: 0.3179, LR: 4.33e-06, Tokens: 294
+2025-11-17 13:53:28,728 -   Scheduler step: 921, Optimizer step count: 14750
+2025-11-17 13:53:59,866 - Step 14800/21295 (69.5%), Loss: 0.3196, LR: 4.35e-06, Tokens: 290
+2025-11-17 13:53:59,866 -   Scheduler step: 925, Optimizer step count: 14800
+2025-11-17 13:54:04,629 - ✓ New best validation loss: 0.348487
+2025-11-17 13:54:09,261 - ✓ Checkpoint saved at step 14800
+2025-11-17 13:54:40,442 - Step 14850/21295 (69.7%), Loss: 0.3614, LR: 4.36e-06, Tokens: 311
+2025-11-17 13:54:40,442 -   Scheduler step: 928, Optimizer step count: 14850
+2025-11-17 13:55:12,495 - Step 14900/21295 (70.0%), Loss: 0.3964, LR: 4.38e-06, Tokens: 275
+2025-11-17 13:55:12,495 -   Scheduler step: 931, Optimizer step count: 14900
+2025-11-17 13:55:15,935 - ✓ New best validation loss: 0.344768
+2025-11-17 13:55:49,449 - Step 14950/21295 (70.2%), Loss: 0.3179, LR: 4.39e-06, Tokens: 312
+2025-11-17 13:55:49,449 -   Scheduler step: 934, Optimizer step count: 14950
+2025-11-17 13:56:21,386 - Step 15000/21295 (70.4%), Loss: 0.3283, LR: 4.40e-06, Tokens: 321
+2025-11-17 13:56:21,386 -   Scheduler step: 937, Optimizer step count: 15000
+2025-11-17 13:56:26,094 - ✓ New best validation loss: 0.339532
+2025-11-17 13:56:30,411 - ✓ Checkpoint saved at step 15000
+2025-11-17 13:57:01,469 - Step 15050/21295 (70.7%), Loss: 0.3267, LR: 4.42e-06, Tokens: 322
+2025-11-17 13:57:01,469 -   Scheduler step: 940, Optimizer step count: 15050
+2025-11-17 13:57:32,768 - Step 15100/21295 (70.9%), Loss: 0.3489, LR: 4.43e-06, Tokens: 258
+2025-11-17 13:57:32,768 -   Scheduler step: 943, Optimizer step count: 15100
+2025-11-17 13:57:37,351 - ✓ New best validation loss: 0.336175
+2025-11-17 13:58:08,995 - Step 15150/21295 (71.1%), Loss: 0.2760, LR: 4.45e-06, Tokens: 288
+2025-11-17 13:58:08,996 -   Scheduler step: 946, Optimizer step count: 15150
+2025-11-17 13:58:42,750 - Step 15200/21295 (71.4%), Loss: 0.3334, LR: 4.46e-06, Tokens: 315
+2025-11-17 13:58:42,750 -   Scheduler step: 950, Optimizer step count: 15200
+2025-11-17 13:58:47,001 - ✓ New best validation loss: 0.331713
+2025-11-17 13:58:51,522 - ✓ Checkpoint saved at step 15200
+2025-11-17 13:59:25,240 - Step 15250/21295 (71.6%), Loss: 0.3246, LR: 4.48e-06, Tokens: 320
+2025-11-17 13:59:25,240 -   Scheduler step: 953, Optimizer step count: 15250
+2025-11-17 13:59:56,874 - Step 15300/21295 (71.8%), Loss: 0.2958, LR: 4.49e-06, Tokens: 284
+2025-11-17 13:59:56,874 -   Scheduler step: 956, Optimizer step count: 15300
+2025-11-17 14:00:01,533 - ✓ New best validation loss: 0.326101
+2025-11-17 14:00:32,666 - Step 15350/21295 (72.1%), Loss: 0.2818, LR: 4.51e-06, Tokens: 291
+2025-11-17 14:00:32,667 -   Scheduler step: 959, Optimizer step count: 15350
+2025-11-17 14:01:04,887 - Step 15400/21295 (72.3%), Loss: 0.2915, LR: 4.52e-06, Tokens: 291
+2025-11-17 14:01:04,887 -   Scheduler step: 962, Optimizer step count: 15400
+2025-11-17 14:01:09,182 - ✓ New best validation loss: 0.321942
+2025-11-17 14:01:13,734 - ✓ Checkpoint saved at step 15400
+2025-11-17 14:01:46,266 - Step 15450/21295 (72.6%), Loss: 0.2777, LR: 4.53e-06, Tokens: 294
+2025-11-17 14:01:46,266 -   Scheduler step: 965, Optimizer step count: 15450
+2025-11-17 14:02:19,367 - Step 15500/21295 (72.8%), Loss: 0.2797, LR: 4.55e-06, Tokens: 317
+2025-11-17 14:02:19,367 -   Scheduler step: 968, Optimizer step count: 15500
+2025-11-17 14:02:23,926 - ✓ New best validation loss: 0.318228
+2025-11-17 14:02:54,994 - Step 15550/21295 (73.0%), Loss: 0.3137, LR: 4.56e-06, Tokens: 293
+2025-11-17 14:02:54,994 -   Scheduler step: 971, Optimizer step count: 15550
+2025-11-17 14:03:26,456 - Step 15600/21295 (73.3%), Loss: 0.3169, LR: 4.58e-06, Tokens: 286
+2025-11-17 14:03:26,456 -   Scheduler step: 975, Optimizer step count: 15600
+2025-11-17 14:03:29,900 - ✓ New best validation loss: 0.315388
+2025-11-17 14:03:34,222 - ✓ Checkpoint saved at step 15600
+2025-11-17 14:04:05,694 - Step 15650/21295 (73.5%), Loss: 0.3379, LR: 4.60e-06, Tokens: 286
+2025-11-17 14:04:05,694 -   Scheduler step: 978, Optimizer step count: 15650
+2025-11-17 14:04:39,768 - Step 15700/21295 (73.7%), Loss: 0.2656, LR: 4.61e-06, Tokens: 292
+2025-11-17 14:04:39,768 -   Scheduler step: 981, Optimizer step count: 15700
+2025-11-17 14:04:44,246 - ✓ New best validation loss: 0.314427
+2025-11-17 14:05:17,381 - Step 15750/21295 (74.0%), Loss: 0.3058, LR: 4.62e-06, Tokens: 287
+2025-11-17 14:05:17,381 -   Scheduler step: 984, Optimizer step count: 15750
+2025-11-17 14:05:48,799 - Step 15800/21295 (74.2%), Loss: 0.2918, LR: 4.64e-06, Tokens: 283
+2025-11-17 14:05:48,800 -   Scheduler step: 987, Optimizer step count: 15800
+2025-11-17 14:05:53,036 - ✓ New best validation loss: 0.312951
+2025-11-17 14:05:57,330 - ✓ Checkpoint saved at step 15800
+2025-11-17 14:06:28,577 - Step 15850/21295 (74.4%), Loss: 0.2882, LR: 4.65e-06, Tokens: 317
+2025-11-17 14:06:28,577 -   Scheduler step: 990, Optimizer step count: 15850
+2025-11-17 14:07:00,219 - Step 15900/21295 (74.7%), Loss: 0.2619, LR: 4.67e-06, Tokens: 316
+2025-11-17 14:07:00,220 -   Scheduler step: 993, Optimizer step count: 15900
+2025-11-17 14:07:04,808 - ✓ New best validation loss: 0.311586
+2025-11-17 14:07:38,448 - Step 15950/21295 (74.9%), Loss: 0.3094, LR: 4.68e-06, Tokens: 318
+2025-11-17 14:07:38,448 -   Scheduler step: 996, Optimizer step count: 15950
+2025-11-17 14:08:10,010 - Step 16000/21295 (75.1%), Loss: 0.3090, LR: 4.70e-06, Tokens: 313
+2025-11-17 14:08:10,011 -   Scheduler step: 1000, Optimizer step count: 16000
+2025-11-17 14:08:14,602 - ✓ New best validation loss: 0.310253
+2025-11-17 14:08:18,898 - ✓ Checkpoint saved at step 16000
+2025-11-17 14:08:49,452 - Step 16050/21295 (75.4%), Loss: 0.2728, LR: 4.71e-06, Tokens: 316
+2025-11-17 14:08:49,453 -   Scheduler step: 1003, Optimizer step count: 16050
+2025-11-17 14:09:20,482 - Step 16100/21295 (75.6%), Loss: 0.3110, LR: 4.73e-06, Tokens: 263
+2025-11-17 14:09:20,482 -   Scheduler step: 1006, Optimizer step count: 16100
+2025-11-17 14:09:23,920 - ✓ New best validation loss: 0.307997
+2025-11-17 14:09:57,219 - Step 16150/21295 (75.8%), Loss: 0.2769, LR: 4.74e-06, Tokens: 293
+2025-11-17 14:09:57,219 -   Scheduler step: 1009, Optimizer step count: 16150
+2025-11-17 14:10:29,061 - Step 16200/21295 (76.1%), Loss: 0.3141, LR: 4.76e-06, Tokens: 289
+2025-11-17 14:10:29,062 -   Scheduler step: 1012, Optimizer step count: 16200
+2025-11-17 14:10:33,377 - Validation loss at step 16200: 0.308079 (no improvement: 1/20)
+2025-11-17 14:10:37,687 - ✓ Checkpoint saved at step 16200
+2025-11-17 14:11:08,121 - Step 16250/21295 (76.3%), Loss: 0.2641, LR: 4.77e-06, Tokens: 325
+2025-11-17 14:11:08,121 -   Scheduler step: 1015, Optimizer step count: 16250
+2025-11-17 14:11:38,777 - Step 16300/21295 (76.5%), Loss: 0.2542, LR: 4.78e-06, Tokens: 314
+2025-11-17 14:11:38,777 -   Scheduler step: 1018, Optimizer step count: 16300
+2025-11-17 14:11:43,260 - ✓ New best validation loss: 0.307523
+2025-11-17 14:12:16,176 - Step 16350/21295 (76.8%), Loss: 0.2852, LR: 4.80e-06, Tokens: 315
+2025-11-17 14:12:16,176 -   Scheduler step: 1021, Optimizer step count: 16350
+2025-11-17 14:12:47,962 - Step 16400/21295 (77.0%), Loss: 0.3593, LR: 4.82e-06, Tokens: 267
+2025-11-17 14:12:47,963 -   Scheduler step: 1025, Optimizer step count: 16400
+2025-11-17 14:12:52,315 - ✓ New best validation loss: 0.306308
+2025-11-17 14:12:56,890 - ✓ Checkpoint saved at step 16400
+2025-11-17 14:13:27,492 - Step 16450/21295 (77.2%), Loss: 0.2804, LR: 4.83e-06, Tokens: 320
+2025-11-17 14:13:27,492 -   Scheduler step: 1028, Optimizer step count: 16450
+2025-11-17 14:13:58,382 - Step 16500/21295 (77.5%), Loss: 0.3086, LR: 4.84e-06, Tokens: 300
+2025-11-17 14:13:58,382 -   Scheduler step: 1031, Optimizer step count: 16500
+2025-11-17 14:14:02,923 - ✓ New best validation loss: 0.304675
+2025-11-17 14:14:35,770 - Step 16550/21295 (77.7%), Loss: 0.2812, LR: 4.86e-06, Tokens: 289
+2025-11-17 14:14:35,771 -   Scheduler step: 1034, Optimizer step count: 16550
+2025-11-17 14:15:08,201 - Step 16600/21295 (78.0%), Loss: 0.2438, LR: 4.87e-06, Tokens: 320
+2025-11-17 14:15:08,201 -   Scheduler step: 1037, Optimizer step count: 16600
+2025-11-17 14:15:12,841 - Validation loss at step 16600: 0.304808 (no improvement: 1/20)
+2025-11-17 14:15:17,224 - ✓ Checkpoint saved at step 16600
+2025-11-17 14:15:47,726 - Step 16650/21295 (78.2%), Loss: 0.2912, LR: 4.89e-06, Tokens: 310
+2025-11-17 14:15:47,727 -   Scheduler step: 1040, Optimizer step count: 16650
+2025-11-17 14:16:18,896 - Step 16700/21295 (78.4%), Loss: 0.2865, LR: 4.90e-06, Tokens: 315
+2025-11-17 14:16:18,896 -   Scheduler step: 1043, Optimizer step count: 16700
+2025-11-17 14:16:22,391 - ✓ New best validation loss: 0.304002
+2025-11-17 14:16:54,921 - Step 16750/21295 (78.7%), Loss: 0.2602, LR: 4.92e-06, Tokens: 318
+2025-11-17 14:16:54,921 -   Scheduler step: 1046, Optimizer step count: 16750
+2025-11-17 14:17:27,445 - Step 16800/21295 (78.9%), Loss: 0.2784, LR: 4.93e-06, Tokens: 288
+2025-11-17 14:17:27,445 -   Scheduler step: 1050, Optimizer step count: 16800
+2025-11-17 14:17:31,905 - ✓ New best validation loss: 0.303140
+2025-11-17 14:17:36,385 - ✓ Checkpoint saved at step 16800
+2025-11-17 14:18:07,250 - Step 16850/21295 (79.1%), Loss: 0.3464, LR: 4.95e-06, Tokens: 262
+2025-11-17 14:18:07,250 -   Scheduler step: 1053, Optimizer step count: 16850
+2025-11-17 14:18:38,032 - Step 16900/21295 (79.4%), Loss: 0.2589, LR: 4.96e-06, Tokens: 324
+2025-11-17 14:18:38,032 -   Scheduler step: 1056, Optimizer step count: 16900
+2025-11-17 14:18:42,433 - ✓ New best validation loss: 0.301347
+2025-11-17 14:19:14,708 - Step 16950/21295 (79.6%), Loss: 0.3330, LR: 4.98e-06, Tokens: 274
+2025-11-17 14:19:14,708 -   Scheduler step: 1059, Optimizer step count: 16950
+2025-11-17 14:19:47,664 - Step 17000/21295 (79.8%), Loss: 0.2813, LR: 4.99e-06, Tokens: 285
+2025-11-17 14:19:47,664 -   Scheduler step: 1062, Optimizer step count: 17000
+2025-11-17 14:19:52,459 - Validation loss at step 17000: 0.302610 (no improvement: 1/20)
+2025-11-17 14:19:56,906 - ✓ Checkpoint saved at step 17000
+2025-11-17 14:20:28,566 - Step 17050/21295 (80.1%), Loss: 0.2818, LR: 5.00e-06, Tokens: 311
+2025-11-17 14:20:28,566 -   Scheduler step: 1065, Optimizer step count: 17050
+2025-11-17 14:20:59,284 - Step 17100/21295 (80.3%), Loss: 0.2670, LR: 5.00e-06, Tokens: 294
+2025-11-17 14:20:59,284 -   Scheduler step: 1068, Optimizer step count: 17100
+2025-11-17 14:21:03,757 - ✓ New best validation loss: 0.300062
+2025-11-17 14:21:35,523 - Step 17150/21295 (80.5%), Loss: 0.2549, LR: 5.00e-06, Tokens: 324
+2025-11-17 14:21:35,523 -   Scheduler step: 1071, Optimizer step count: 17150
+2025-11-17 14:22:09,063 - Step 17200/21295 (80.8%), Loss: 0.2713, LR: 5.00e-06, Tokens: 312
+2025-11-17 14:22:09,063 -   Scheduler step: 1075, Optimizer step count: 17200
+2025-11-17 14:22:13,865 - ✓ New best validation loss: 0.299650
+2025-11-17 14:22:18,368 - ✓ Checkpoint saved at step 17200
+2025-11-17 14:22:50,821 - Step 17250/21295 (81.0%), Loss: 0.2925, LR: 5.00e-06, Tokens: 293
+2025-11-17 14:22:50,822 -   Scheduler step: 1078, Optimizer step count: 17250
+2025-11-17 14:23:21,799 - Step 17300/21295 (81.2%), Loss: 0.2716, LR: 5.00e-06, Tokens: 287
+2025-11-17 14:23:21,800 -   Scheduler step: 1081, Optimizer step count: 17300
+2025-11-17 14:23:26,343 - ✓ New best validation loss: 0.298828
+2025-11-17 14:23:57,006 - Step 17350/21295 (81.5%), Loss: 0.2575, LR: 5.00e-06, Tokens: 290
+2025-11-17 14:23:57,006 -   Scheduler step: 1084, Optimizer step count: 17350
+2025-11-17 14:24:31,451 - Step 17400/21295 (81.7%), Loss: 0.3212, LR: 5.00e-06, Tokens: 285
+2025-11-17 14:24:31,451 -   Scheduler step: 1087, Optimizer step count: 17400
+2025-11-17 14:24:36,003 - ✓ New best validation loss: 0.297230
+2025-11-17 14:24:40,370 - ✓ Checkpoint saved at step 17400
+2025-11-17 14:25:13,647 - Step 17450/21295 (81.9%), Loss: 0.2736, LR: 5.00e-06, Tokens: 318
+2025-11-17 14:25:13,647 -   Scheduler step: 1090, Optimizer step count: 17450
+2025-11-17 14:25:44,944 - Step 17500/21295 (82.2%), Loss: 0.2962, LR: 5.00e-06, Tokens: 286
+2025-11-17 14:25:44,944 -   Scheduler step: 1093, Optimizer step count: 17500
+2025-11-17 14:25:48,489 - Validation loss at step 17500: 0.297915 (no improvement: 1/20)
+2025-11-17 14:26:19,232 - Step 17550/21295 (82.4%), Loss: 0.2797, LR: 5.00e-06, Tokens: 290
+2025-11-17 14:26:19,233 -   Scheduler step: 1096, Optimizer step count: 17550
+2025-11-17 14:26:52,771 - Step 17600/21295 (82.6%), Loss: 0.2471, LR: 5.00e-06, Tokens: 308
+2025-11-17 14:26:52,771 -   Scheduler step: 1100, Optimizer step count: 17600
+2025-11-17 14:26:57,333 - Validation loss at step 17600: 0.298326 (no improvement: 2/20)
+2025-11-17 14:27:01,801 - ✓ Checkpoint saved at step 17600
+2025-11-17 14:27:35,961 - Step 17650/21295 (82.9%), Loss: 0.2958, LR: 5.00e-06, Tokens: 315
+2025-11-17 14:27:35,961 -   Scheduler step: 1103, Optimizer step count: 17650
+2025-11-17 14:28:06,869 - Step 17700/21295 (83.1%), Loss: 0.3424, LR: 5.00e-06, Tokens: 258
+2025-11-17 14:28:06,869 -   Scheduler step: 1106, Optimizer step count: 17700
+2025-11-17 14:28:11,382 - ✓ New best validation loss: 0.297177
+2025-11-17 14:28:42,314 - Step 17750/21295 (83.4%), Loss: 0.3066, LR: 5.00e-06, Tokens: 302
+2025-11-17 14:28:42,314 -   Scheduler step: 1109, Optimizer step count: 17750
+2025-11-17 14:29:14,755 - Step 17800/21295 (83.6%), Loss: 0.3315, LR: 5.00e-06, Tokens: 267
+2025-11-17 14:29:14,755 -   Scheduler step: 1112, Optimizer step count: 17800
+2025-11-17 14:29:19,406 - ✓ New best validation loss: 0.295050
+2025-11-17 14:29:23,829 - ✓ Checkpoint saved at step 17800
+2025-11-17 14:29:56,978 - Step 17850/21295 (83.8%), Loss: 0.2213, LR: 5.00e-06, Tokens: 312
+2025-11-17 14:29:56,979 -   Scheduler step: 1115, Optimizer step count: 17850
+2025-11-17 14:30:28,991 - Step 17900/21295 (84.1%), Loss: 0.2804, LR: 5.00e-06, Tokens: 318
+2025-11-17 14:30:28,991 -   Scheduler step: 1118, Optimizer step count: 17900
+2025-11-17 14:30:33,468 - Validation loss at step 17900: 0.296377 (no improvement: 1/20)
+2025-11-17 14:31:04,195 - Step 17950/21295 (84.3%), Loss: 0.3312, LR: 5.00e-06, Tokens: 254
+2025-11-17 14:31:04,196 -   Scheduler step: 1121, Optimizer step count: 17950
+2025-11-17 14:31:35,930 - Step 18000/21295 (84.5%), Loss: 0.2721, LR: 5.00e-06, Tokens: 289
+2025-11-17 14:31:35,930 -   Scheduler step: 1125, Optimizer step count: 18000
+2025-11-17 14:31:40,480 - ✓ New best validation loss: 0.293283
+2025-11-17 14:31:44,911 - ✓ Checkpoint saved at step 18000
+2025-11-17 14:32:17,567 - Step 18050/21295 (84.8%), Loss: 0.2633, LR: 5.00e-06, Tokens: 284
+2025-11-17 14:32:17,568 -   Scheduler step: 1128, Optimizer step count: 18050
+2025-11-17 14:32:49,875 - Step 18100/21295 (85.0%), Loss: 0.2573, LR: 5.00e-06, Tokens: 296
+2025-11-17 14:32:49,875 -   Scheduler step: 1131, Optimizer step count: 18100
+2025-11-17 14:32:54,198 - ✓ New best validation loss: 0.292701
+2025-11-17 14:33:24,984 - Step 18150/21295 (85.2%), Loss: 0.2261, LR: 5.00e-06, Tokens: 316
+2025-11-17 14:33:24,984 -   Scheduler step: 1134, Optimizer step count: 18150
+2025-11-17 14:33:56,006 - Step 18200/21295 (85.5%), Loss: 0.3361, LR: 5.00e-06, Tokens: 257
+2025-11-17 14:33:56,006 -   Scheduler step: 1137, Optimizer step count: 18200
+2025-11-17 14:34:00,147 - Validation loss at step 18200: 0.292710 (no improvement: 1/20)
+2025-11-17 14:34:04,635 - ✓ Checkpoint saved at step 18200
+2025-11-17 14:34:36,753 - Step 18250/21295 (85.7%), Loss: 0.2494, LR: 5.00e-06, Tokens: 320
+2025-11-17 14:34:36,754 -   Scheduler step: 1140, Optimizer step count: 18250
+2025-11-17 14:35:09,052 - Step 18300/21295 (85.9%), Loss: 0.2699, LR: 5.00e-06, Tokens: 293
+2025-11-17 14:35:09,052 -   Scheduler step: 1143, Optimizer step count: 18300
+2025-11-17 14:35:13,722 - ✓ New best validation loss: 0.291851
+2025-11-17 14:35:44,486 - Step 18350/21295 (86.2%), Loss: 0.2906, LR: 5.00e-06, Tokens: 313
+2025-11-17 14:35:44,486 -   Scheduler step: 1146, Optimizer step count: 18350
+2025-11-17 14:36:15,553 - Step 18400/21295 (86.4%), Loss: 0.2777, LR: 5.00e-06, Tokens: 320
+2025-11-17 14:36:15,554 -   Scheduler step: 1150, Optimizer step count: 18400
+2025-11-17 14:36:20,295 - ✓ New best validation loss: 0.291588
+2025-11-17 14:36:24,680 - ✓ Checkpoint saved at step 18400
+2025-11-17 14:36:56,351 - Step 18450/21295 (86.6%), Loss: 0.2302, LR: 5.00e-06, Tokens: 324
+2025-11-17 14:36:56,351 -   Scheduler step: 1153, Optimizer step count: 18450
+2025-11-17 14:37:29,498 - Step 18500/21295 (86.9%), Loss: 0.2632, LR: 5.00e-06, Tokens: 334
+2025-11-17 14:37:29,498 -   Scheduler step: 1156, Optimizer step count: 18500
+2025-11-17 14:37:34,342 - ✓ New best validation loss: 0.290625
+2025-11-17 14:38:04,555 - Step 18550/21295 (87.1%), Loss: 0.2807, LR: 5.00e-06, Tokens: 320
+2025-11-17 14:38:04,555 -   Scheduler step: 1159, Optimizer step count: 18550
+2025-11-17 14:38:35,452 - Step 18600/21295 (87.3%), Loss: 0.2507, LR: 5.00e-06, Tokens: 295
+2025-11-17 14:38:35,452 -   Scheduler step: 1162, Optimizer step count: 18600
+2025-11-17 14:38:40,281 - Validation loss at step 18600: 0.291081 (no improvement: 1/20)
+2025-11-17 14:38:44,579 - ✓ Checkpoint saved at step 18600
+2025-11-17 14:39:16,143 - Step 18650/21295 (87.6%), Loss: 0.2557, LR: 5.00e-06, Tokens: 319
+2025-11-17 14:39:16,144 -   Scheduler step: 1165, Optimizer step count: 18650
+2025-11-17 14:39:49,801 - Step 18700/21295 (87.8%), Loss: 0.2853, LR: 5.00e-06, Tokens: 310
+2025-11-17 14:39:49,801 -   Scheduler step: 1168, Optimizer step count: 18700
+2025-11-17 14:39:54,533 - ✓ New best validation loss: 0.290193
+2025-11-17 14:40:25,519 - Step 18750/21295 (88.0%), Loss: 0.3543, LR: 5.00e-06, Tokens: 265
+2025-11-17 14:40:25,520 -   Scheduler step: 1171, Optimizer step count: 18750
+2025-11-17 14:40:56,810 - Step 18800/21295 (88.3%), Loss: 0.2221, LR: 5.00e-06, Tokens: 319
+2025-11-17 14:40:56,811 -   Scheduler step: 1175, Optimizer step count: 18800
+2025-11-17 14:41:00,354 - ✓ New best validation loss: 0.288598
+2025-11-17 14:41:04,662 - ✓ Checkpoint saved at step 18800
+2025-11-17 14:41:35,845 - Step 18850/21295 (88.5%), Loss: 0.2625, LR: 5.00e-06, Tokens: 315
+2025-11-17 14:41:35,845 -   Scheduler step: 1178, Optimizer step count: 18850
+2025-11-17 14:42:10,222 - Step 18900/21295 (88.8%), Loss: 0.2689, LR: 5.00e-06, Tokens: 310
+2025-11-17 14:42:10,222 -   Scheduler step: 1181, Optimizer step count: 18900
+2025-11-17 14:42:15,105 - ✓ New best validation loss: 0.287088
+2025-11-17 14:42:46,770 - Step 18950/21295 (89.0%), Loss: 0.2606, LR: 5.00e-06, Tokens: 319
+2025-11-17 14:42:46,770 -   Scheduler step: 1184, Optimizer step count: 18950
+2025-11-17 14:43:17,614 - Step 19000/21295 (89.2%), Loss: 0.2744, LR: 5.00e-06, Tokens: 292
+2025-11-17 14:43:17,614 -   Scheduler step: 1187, Optimizer step count: 19000
+2025-11-17 14:43:22,084 - Validation loss at step 19000: 0.287188 (no improvement: 1/20)
+2025-11-17 14:43:26,403 - ✓ Checkpoint saved at step 19000
+2025-11-17 14:43:56,952 - Step 19050/21295 (89.5%), Loss: 0.3040, LR: 5.00e-06, Tokens: 263
+2025-11-17 14:43:56,952 -   Scheduler step: 1190, Optimizer step count: 19050
+2025-11-17 14:44:30,891 - Step 19100/21295 (89.7%), Loss: 0.2665, LR: 5.00e-06, Tokens: 296
+2025-11-17 14:44:30,891 -   Scheduler step: 1193, Optimizer step count: 19100
+2025-11-17 14:44:35,213 - Validation loss at step 19100: 0.288184 (no improvement: 2/20)
+2025-11-17 14:45:07,676 - Step 19150/21295 (89.9%), Loss: 0.2838, LR: 5.00e-06, Tokens: 284
+2025-11-17 14:45:07,676 -   Scheduler step: 1196, Optimizer step count: 19150
+2025-11-17 14:45:38,447 - Step 19200/21295 (90.2%), Loss: 0.2617, LR: 5.00e-06, Tokens: 287
+2025-11-17 14:45:38,447 -   Scheduler step: 1200, Optimizer step count: 19200
+2025-11-17 14:45:43,662 - Validation loss at step 19200: 0.287204 (no improvement: 3/20)
+2025-11-17 14:45:47,954 - ✓ Checkpoint saved at step 19200
+2025-11-17 14:46:18,677 - Step 19250/21295 (90.4%), Loss: 0.2460, LR: 5.00e-06, Tokens: 294
+2025-11-17 14:46:18,677 -   Scheduler step: 1203, Optimizer step count: 19250
+2025-11-17 14:46:51,873 - Step 19300/21295 (90.6%), Loss: 0.2709, LR: 5.00e-06, Tokens: 298
+2025-11-17 14:46:51,874 -   Scheduler step: 1206, Optimizer step count: 19300
+2025-11-17 14:46:56,388 - Validation loss at step 19300: 0.287331 (no improvement: 4/20)
+2025-11-17 14:47:29,521 - Step 19350/21295 (90.9%), Loss: 0.3324, LR: 5.00e-06, Tokens: 262
+2025-11-17 14:47:29,522 -   Scheduler step: 1209, Optimizer step count: 19350
+2025-11-17 14:48:00,234 - Step 19400/21295 (91.1%), Loss: 0.2502, LR: 5.00e-06, Tokens: 313
+2025-11-17 14:48:00,235 -   Scheduler step: 1212, Optimizer step count: 19400
+2025-11-17 14:48:04,547 - ✓ New best validation loss: 0.287086
+2025-11-17 14:48:08,858 - ✓ Checkpoint saved at step 19400
+2025-11-17 14:48:39,291 - Step 19450/21295 (91.3%), Loss: 0.2369, LR: 5.00e-06, Tokens: 314
+2025-11-17 14:48:39,291 -   Scheduler step: 1215, Optimizer step count: 19450
+2025-11-17 14:49:11,746 - Step 19500/21295 (91.6%), Loss: 0.2886, LR: 5.00e-06, Tokens: 320
+2025-11-17 14:49:11,746 -   Scheduler step: 1218, Optimizer step count: 19500
+2025-11-17 14:49:15,297 - ✓ New best validation loss: 0.284252
+2025-11-17 14:49:49,186 - Step 19550/21295 (91.8%), Loss: 0.2744, LR: 5.00e-06, Tokens: 319
+2025-11-17 14:49:49,186 -   Scheduler step: 1221, Optimizer step count: 19550
+2025-11-17 14:50:20,470 - Step 19600/21295 (92.0%), Loss: 0.2517, LR: 5.00e-06, Tokens: 316
+2025-11-17 14:50:20,470 -   Scheduler step: 1225, Optimizer step count: 19600
+2025-11-17 14:50:23,910 - ✓ New best validation loss: 0.283342
+2025-11-17 14:50:28,201 - ✓ Checkpoint saved at step 19600
+2025-11-17 14:50:59,215 - Step 19650/21295 (92.3%), Loss: 0.2157, LR: 5.00e-06, Tokens: 323
+2025-11-17 14:50:59,215 -   Scheduler step: 1228, Optimizer step count: 19650
+2025-11-17 14:51:31,301 - Step 19700/21295 (92.5%), Loss: 0.2581, LR: 5.00e-06, Tokens: 317
+2025-11-17 14:51:31,301 -   Scheduler step: 1231, Optimizer step count: 19700
+2025-11-17 14:51:34,840 - Validation loss at step 19700: 0.284765 (no improvement: 1/20)
+2025-11-17 14:52:08,776 - Step 19750/21295 (92.7%), Loss: 0.2778, LR: 5.00e-06, Tokens: 318
+2025-11-17 14:52:08,776 -   Scheduler step: 1234, Optimizer step count: 19750
+2025-11-17 14:52:40,258 - Step 19800/21295 (93.0%), Loss: 0.2375, LR: 5.00e-06, Tokens: 316
+2025-11-17 14:52:40,258 -   Scheduler step: 1237, Optimizer step count: 19800
+2025-11-17 14:52:43,722 - Validation loss at step 19800: 0.283584 (no improvement: 2/20)
+2025-11-17 14:52:48,017 - ✓ Checkpoint saved at step 19800
+2025-11-17 14:53:19,099 - Step 19850/21295 (93.2%), Loss: 0.2395, LR: 5.00e-06, Tokens: 291
+2025-11-17 14:53:19,099 -   Scheduler step: 1240, Optimizer step count: 19850
+2025-11-17 14:53:50,112 - Step 19900/21295 (93.4%), Loss: 0.2463, LR: 5.00e-06, Tokens: 293
+2025-11-17 14:53:50,112 -   Scheduler step: 1243, Optimizer step count: 19900
+2025-11-17 14:53:53,570 - ✓ New best validation loss: 0.283114
+2025-11-17 14:54:26,881 - Step 19950/21295 (93.7%), Loss: 0.2602, LR: 5.00e-06, Tokens: 301
+2025-11-17 14:54:26,881 -   Scheduler step: 1246, Optimizer step count: 19950
+2025-11-17 14:54:58,907 - Step 20000/21295 (93.9%), Loss: 0.2978, LR: 5.00e-06, Tokens: 291
+2025-11-17 14:54:58,908 -   Scheduler step: 1250, Optimizer step count: 20000
+2025-11-17 14:55:02,327 - ✓ New best validation loss: 0.281933
+2025-11-17 14:55:06,599 - ✓ Checkpoint saved at step 20000
+2025-11-17 14:55:37,546 - Step 20050/21295 (94.2%), Loss: 0.2732, LR: 5.00e-06, Tokens: 315
+2025-11-17 14:55:37,546 -   Scheduler step: 1253, Optimizer step count: 20050
+2025-11-17 14:56:08,817 - Step 20100/21295 (94.4%), Loss: 0.2276, LR: 5.00e-06, Tokens: 293
+2025-11-17 14:56:08,817 -   Scheduler step: 1256, Optimizer step count: 20100
+2025-11-17 14:56:12,257 - ✓ New best validation loss: 0.280972
+2025-11-17 14:56:45,380 - Step 20150/21295 (94.6%), Loss: 0.2757, LR: 5.00e-06, Tokens: 318
+2025-11-17 14:56:45,380 -   Scheduler step: 1259, Optimizer step count: 20150
+2025-11-17 14:57:17,969 - Step 20200/21295 (94.9%), Loss: 0.2398, LR: 5.00e-06, Tokens: 323
+2025-11-17 14:57:17,970 -   Scheduler step: 1262, Optimizer step count: 20200
+2025-11-17 14:57:21,492 - Validation loss at step 20200: 0.282241 (no improvement: 1/20)
+2025-11-17 14:57:25,779 - ✓ Checkpoint saved at step 20200
+2025-11-17 14:57:56,455 - Step 20250/21295 (95.1%), Loss: 0.2717, LR: 5.00e-06, Tokens: 314
+2025-11-17 14:57:56,455 -   Scheduler step: 1265, Optimizer step count: 20250
+2025-11-17 14:58:27,677 - Step 20300/21295 (95.3%), Loss: 0.2510, LR: 5.00e-06, Tokens: 296
+2025-11-17 14:58:27,677 -   Scheduler step: 1268, Optimizer step count: 20300
+2025-11-17 14:58:31,102 - ✓ New best validation loss: 0.280747
+2025-11-17 14:59:03,759 - Step 20350/21295 (95.6%), Loss: 0.3194, LR: 5.00e-06, Tokens: 261
+2025-11-17 14:59:03,760 -   Scheduler step: 1271, Optimizer step count: 20350
+2025-11-17 14:59:36,829 - Step 20400/21295 (95.8%), Loss: 0.2648, LR: 5.00e-06, Tokens: 325
+2025-11-17 14:59:36,829 -   Scheduler step: 1275, Optimizer step count: 20400
+2025-11-17 14:59:40,284 - ✓ New best validation loss: 0.279312
+2025-11-17 14:59:44,752 - ✓ Checkpoint saved at step 20400
+2025-11-17 15:00:16,151 - Step 20450/21295 (96.0%), Loss: 0.2253, LR: 5.00e-06, Tokens: 324
+2025-11-17 15:00:16,151 -   Scheduler step: 1278, Optimizer step count: 20450
+2025-11-17 15:00:47,302 - Step 20500/21295 (96.3%), Loss: 0.2450, LR: 5.00e-06, Tokens: 320
+2025-11-17 15:00:47,302 -   Scheduler step: 1281, Optimizer step count: 20500
+2025-11-17 15:00:50,769 - Validation loss at step 20500: 0.279890 (no improvement: 1/20)
+2025-11-17 15:01:22,594 - Step 20550/21295 (96.5%), Loss: 0.2511, LR: 5.00e-06, Tokens: 315
+2025-11-17 15:01:22,595 -   Scheduler step: 1284, Optimizer step count: 20550
+2025-11-17 15:01:56,127 - Step 20600/21295 (96.7%), Loss: 0.2312, LR: 5.00e-06, Tokens: 300
+2025-11-17 15:01:56,127 -   Scheduler step: 1287, Optimizer step count: 20600
+2025-11-17 15:01:59,640 - Validation loss at step 20600: 0.280355 (no improvement: 2/20)
+2025-11-17 15:02:03,929 - ✓ Checkpoint saved at step 20600
+2025-11-17 15:02:36,021 - Step 20650/21295 (97.0%), Loss: 0.3387, LR: 5.00e-06, Tokens: 289
+2025-11-17 15:02:36,021 -   Scheduler step: 1290, Optimizer step count: 20650
+2025-11-17 15:03:07,249 - Step 20700/21295 (97.2%), Loss: 0.2752, LR: 5.00e-06, Tokens: 294
+2025-11-17 15:03:07,250 -   Scheduler step: 1293, Optimizer step count: 20700
+2025-11-17 15:03:10,729 - ✓ New best validation loss: 0.278178
+2025-11-17 15:03:41,768 - Step 20750/21295 (97.4%), Loss: 0.3140, LR: 5.00e-06, Tokens: 266
+2025-11-17 15:03:41,768 -   Scheduler step: 1296, Optimizer step count: 20750
+2025-11-17 15:04:15,968 - Step 20800/21295 (97.7%), Loss: 0.2720, LR: 5.00e-06, Tokens: 285
+2025-11-17 15:04:15,968 -   Scheduler step: 1300, Optimizer step count: 20800
+2025-11-17 15:04:19,416 - Validation loss at step 20800: 0.278730 (no improvement: 1/20)
+2025-11-17 15:04:23,715 - ✓ Checkpoint saved at step 20800
+2025-11-17 15:04:57,000 - Step 20850/21295 (97.9%), Loss: 0.2505, LR: 5.00e-06, Tokens: 305
+2025-11-17 15:04:57,000 -   Scheduler step: 1303, Optimizer step count: 20850
+2025-11-17 15:05:28,306 - Step 20900/21295 (98.1%), Loss: 0.2814, LR: 5.00e-06, Tokens: 299
+2025-11-17 15:05:28,306 -   Scheduler step: 1306, Optimizer step count: 20900
+2025-11-17 15:05:31,783 - ✓ New best validation loss: 0.277991
+2025-11-17 15:06:02,751 - Step 20950/21295 (98.4%), Loss: 0.2534, LR: 5.00e-06, Tokens: 291
+2025-11-17 15:06:02,751 -   Scheduler step: 1309, Optimizer step count: 20950
+2025-11-17 15:06:36,393 - Step 21000/21295 (98.6%), Loss: 0.2405, LR: 5.00e-06, Tokens: 295
+2025-11-17 15:06:36,393 -   Scheduler step: 1312, Optimizer step count: 21000
+2025-11-17 15:06:40,829 - ✓ New best validation loss: 0.276156
+2025-11-17 15:06:45,134 - ✓ Checkpoint saved at step 21000
+2025-11-17 15:07:19,332 - Step 21050/21295 (98.8%), Loss: 0.2355, LR: 5.00e-06, Tokens: 324
+2025-11-17 15:07:19,333 -   Scheduler step: 1315, Optimizer step count: 21050
+2025-11-17 15:07:50,434 - Step 21100/21295 (99.1%), Loss: 0.2800, LR: 5.00e-06, Tokens: 291
+2025-11-17 15:07:50,434 -   Scheduler step: 1318, Optimizer step count: 21100
+2025-11-17 15:07:55,618 - ✓ New best validation loss: 0.276067
+2025-11-17 15:08:26,022 - Step 21150/21295 (99.3%), Loss: 0.2710, LR: 5.00e-06, Tokens: 282
+2025-11-17 15:08:26,022 -   Scheduler step: 1321, Optimizer step count: 21150
+2025-11-17 15:08:58,272 - Step 21200/21295 (99.6%), Loss: 0.2539, LR: 5.00e-06, Tokens: 287
+2025-11-17 15:08:58,272 -   Scheduler step: 1325, Optimizer step count: 21200
+2025-11-17 15:09:02,527 - ✓ New best validation loss: 0.275976
+2025-11-17 15:09:06,832 - ✓ Checkpoint saved at step 21200
+2025-11-17 15:09:40,607 - Step 21250/21295 (99.8%), Loss: 0.2555, LR: 5.00e-06, Tokens: 317
+2025-11-17 15:09:40,607 -   Scheduler step: 1328, Optimizer step count: 21250

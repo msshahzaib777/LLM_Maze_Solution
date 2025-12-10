@@ -1,0 +1,8 @@
+2025-11-18 13:38:41,836 - Log file created at: ./logs/Adapter_qwen34B_123_234_20251118_133841.log
+2025-11-18 13:38:59,072 - Sample training data:
+2025-11-18 13:38:59,072 - 757668
+2025-11-18 13:39:02,630 - Starting fresh training with 16-bit quantization
+2025-11-18 13:40:38,503 - Fresh training - Initial LR: 5.00e-06
+2025-11-18 13:40:38,504 - Starting training from step 1 to 355170
+2025-11-18 13:41:05,138 - Step 50/355170 (0.0%), Loss: 1.3095, LR: 2.82e-10, Tokens: 139
+2025-11-18 13:41:05,138 -   Scheduler step: 1, Optimizer step count: 50

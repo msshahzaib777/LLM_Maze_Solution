@@ -1,0 +1,4 @@
+2025-11-17 17:06:50,668 - Log file created at: ./logs/qwen34B_123_20251117_170650.log
+2025-11-17 17:06:52,247 - Sample training data:
+2025-11-17 17:06:52,247 - 136363
+2025-11-17 17:06:53,627 - Resuming from step 21200: /home/mshahz02/fileserverdata/models/finetuned/adapter/qwen34B_123/step_21200

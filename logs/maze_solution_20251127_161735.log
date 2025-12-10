@@ -1,0 +1,143 @@
+Logging to: logs/maze_solution_20251127_161735.log
+Loading model from /home/mshahz02/fileserverdata/models/finetuned/merged_models...
+Using checkpoint: /home/mshahz02/fileserverdata/models/finetuned/adapter/paperbased_adapter_env_agent_v1/step_75000 (step 75000)
+Generating 5x5 maze...
+
+Start: (1, 5), Goal: (9, 1)
+###########
+#    S    #
+# # #######
+# #       #
+##### #####
+#         #
+##### #####
+#         #
+### ### # #
+#E    # # #
+###########
+==================================================
+
+--- Step 1 Input ---
+<|im_start|>system
+Maze assistant. Respond in strict JSON with requested fields only. Minimize reasoning and thinking.<|im_end|>
+<|im_start|>user
+Current position: (1, 5)
+Goal position: (9, 1)
+Distances to walls: up=0, down=0, left=4, right=4
+Recent history: None
+Cell visit count: 1
+
+Local view (C=current, -=visited, #=wall, E=exit):
+# # # # #
+# # # # #
+    C
+  # # # #
+
+
+Return JSON with optimal_step (direction: up/down/left/right). Minimize reasoning.<|im_end|>
+<|im_start|>assistant
+<think>
+--- End Input ---
+
+Step 1: (1, 5) -> down | Visits: 1
+ERROR: Invalid move 'down' into wall (illegal 1/5)
+
+--- Step 2 Input ---
+<|im_start|>system
+Maze assistant. Respond in strict JSON with requested fields only. Minimize reasoning and thinking.<|im_end|>
+<|im_start|>user
+Current position: (1, 5)
+Goal position: (9, 1)
+Distances to walls: up=0, down=0, left=4, right=4
+Recent history: None
+Cell visit count: 1
+
+Local view (C=current, -=visited, #=wall, E=exit):
+# # # # #
+# # # # #
+    C
+  # # # #
+
+
+Return JSON with optimal_step (direction: up/down/left/right). Minimize reasoning.<|im_end|>
+<|im_start|>assistant
+<think>
+--- End Input ---
+
+Step 2: (1, 5) -> down | Visits: 1
+ERROR: Invalid move 'down' into wall (illegal 2/5)
+
+--- Step 3 Input ---
+<|im_start|>system
+Maze assistant. Respond in strict JSON with requested fields only. Minimize reasoning and thinking.<|im_end|>
+<|im_start|>user
+Current position: (1, 5)
+Goal position: (9, 1)
+Distances to walls: up=0, down=0, left=4, right=4
+Recent history: None
+Cell visit count: 1
+
+Local view (C=current, -=visited, #=wall, E=exit):
+# # # # #
+# # # # #
+    C
+  # # # #
+
+
+Return JSON with optimal_step (direction: up/down/left/right). Minimize reasoning.<|im_end|>
+<|im_start|>assistant
+<think>
+--- End Input ---
+
+Step 3: (1, 5) -> down | Visits: 1
+ERROR: Invalid move 'down' into wall (illegal 3/5)
+
+--- Step 4 Input ---
+<|im_start|>system
+Maze assistant. Respond in strict JSON with requested fields only. Minimize reasoning and thinking.<|im_end|>
+<|im_start|>user
+Current position: (1, 5)
+Goal position: (9, 1)
+Distances to walls: up=0, down=0, left=4, right=4
+Recent history: None
+Cell visit count: 1
+
+Local view (C=current, -=visited, #=wall, E=exit):
+# # # # #
+# # # # #
+    C
+  # # # #
+
+
+Return JSON with optimal_step (direction: up/down/left/right). Minimize reasoning.<|im_end|>
+<|im_start|>assistant
+<think>
+--- End Input ---
+
+Step 4: (1, 5) -> down | Visits: 1
+ERROR: Invalid move 'down' into wall (illegal 4/5)
+
+--- Step 5 Input ---
+<|im_start|>system
+Maze assistant. Respond in strict JSON with requested fields only. Minimize reasoning and thinking.<|im_end|>
+<|im_start|>user
+Current position: (1, 5)
+Goal position: (9, 1)
+Distances to walls: up=0, down=0, left=4, right=4
+Recent history: None
+Cell visit count: 1
+
+Local view (C=current, -=visited, #=wall, E=exit):
+# # # # #
+# # # # #
+    C
+  # # # #
+
+
+Return JSON with optimal_step (direction: up/down/left/right). Minimize reasoning.<|im_end|>
+<|im_start|>assistant
+<think>
+--- End Input ---
+
+Step 5: (1, 5) -> down | Visits: 1
+ERROR: Invalid move 'down' into wall (illegal 5/5)

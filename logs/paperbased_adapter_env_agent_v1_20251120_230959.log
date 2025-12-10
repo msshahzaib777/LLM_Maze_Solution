@@ -1,0 +1,4 @@
+2025-11-20 23:09:59,006 - Log file created at: ./logs/paperbased_adapter_env_agent_v1_20251120_230959.log
+2025-11-20 23:10:07,520 - Sample training data:
+2025-11-20 23:10:07,521 - 198327
+2025-11-20 23:10:10,200 - Starting fresh training with 16-bit quantization

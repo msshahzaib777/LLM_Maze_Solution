@@ -18,7 +18,7 @@ tqdm>=4.64.0
 safetensors>=0.4.0
 
 # Optional: For better performance
-# bitsandbytes>=0.41.0  # For 8-bit training (Linux/Windows with CUDA)
+bitsandbytes>=0.41.0  # For 8-bit training (Linux/Windows with CUDA) - Required for quantization
 # flash-attn>=2.0.0     # For flash attention (requires specific setup)
 
 # Development and testing

@@ -1,0 +1,17 @@
+2025-11-20 23:16:27,584 - Log file created at: ./logs/paperbased_adapter_env_agent_v1_20251120_231627.log
+2025-11-20 23:16:30,993 - Sample training data:
+2025-11-20 23:16:30,993 - 198327
+2025-11-20 23:16:32,415 - Starting fresh training with 16-bit quantization
+2025-11-20 23:21:41,025 - Fresh training - Initial LR: 5.00e-06
+2025-11-20 23:21:41,026 - Starting training from step 1 to 118390
+2025-11-20 23:22:12,492 - Exception occurred during training: OutOfMemoryError('CUDA out of memory. Tried to allocate 594.00 MiB. GPU 0 has a total capacity of 31.73 GiB of which 592.69 MiB is free. Including non-PyTorch memory, this process has 31.15 GiB memory in use. Of the allocated memory 30.33 GiB is allocated by PyTorch, and 366.90 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)')
+Traceback (most recent call last):
+  File "/home/mshahz02/projects/LLM_Maze_Solution/ddpTraining.py", line 228, in <module>
+    loss = model(input_ids=input_ids, labels=input_ids).loss / ACCUM; loss.backward()
+  File "/home/mshahz02/.conda/envs/py39/lib/python3.9/site-packages/torch/_tensor.py", line 581, in backward
+    torch.autograd.backward(
+  File "/home/mshahz02/.conda/envs/py39/lib/python3.9/site-packages/torch/autograd/__init__.py", line 347, in backward
+    _engine_run_backward(
+  File "/home/mshahz02/.conda/envs/py39/lib/python3.9/site-packages/torch/autograd/graph.py", line 825, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 594.00 MiB. GPU 0 has a total capacity of 31.73 GiB of which 592.69 MiB is free. Including non-PyTorch memory, this process has 31.15 GiB memory in use. Of the allocated memory 30.33 GiB is allocated by PyTorch, and 366.90 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
